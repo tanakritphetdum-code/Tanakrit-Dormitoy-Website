@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanakrit Dormitory — หอพักชายธนกฤษฎ์ นครศรีธรรมราช</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+
+    <!-- Immediate Login Modal Script for Instant Response -->
+    <script>
+        function toggleLoginModal(forceOpen) {
+            const modal = document.getElementById('login-modal');
+            if (!modal) return;
+            const isCurrentlyOpen = modal.classList.contains('active') && !modal.classList.contains('hidden');
+            const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !isCurrentlyOpen;
+            if (shouldOpen) {
+                modal.classList.remove('hidden');
+                modal.classList.add('active');
+                setTimeout(() => {
+                    const input = document.getElementById('login-username');
+                    if (input) input.focus();
+                }, 50);
+            } else {
+                modal.classList.remove('active');
+                modal.classList.add('hidden');
+            }
+        }
+    </script>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-root"></div>
+
+    <!-- Global Modal Backdrop -->
+    <div id="app-modal-backdrop" class="modal-backdrop"></div>
+
+    <!-- ==================== หน้า Landing Page ==================== -->
+    <div id="page-landing">
+        <header class="navbar">
+            <div class="nav-brand">
+                <div class="logo-box">TK</div>
+                <div>
+                    <div class="brand-title">Tanakrit Dormitory</div>
+                    <div class="brand-sub">หอพักชายธนกฤษฎ์ นครศรีธรรมราช</div>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <a href="#rooms">รูปแบบห้องพัก</a>
+                <a href="#features">สิ่งอำนวยความสะดวก</a>
+                <a href="#rates">อัตราค่าบริการ</a>
+                <a href="#contact">ติดต่อเรา</a>
+                <button class="btn btn-primary" id="btn-toggle-login" onclick="toggleLoginModal(true)">
+                    เข้าสู่ระบบจัดการ
+                </button>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    ✨ หอพักสไตล์โมเดิร์น ปลอดภัย บรรยากาศเงียบสงบ หอพักชายธนกฤษฎ์ นครศรีธรรมราช
+                </div>
+                <h1>ระบบบริหารจัดการหอพัก <br><span>Tanakrit Dormitory</span></h1>
+                <p>
+                    บริการห้องพักรายเดือนคุณภาพสูง พร้อมระบบดิจิทัลครบวงจร: คำนวณค่าน้ำ-ค่าไฟอัตโนมัติ 
+                    ระบบแจ้งซ่อมอุปกรณ์ด่วน ออกบิลพร้อม QR Code สแกนจ่าย และจุดรับพัสดุไปรษณีย์ที่ปลอดภัยตลอด 24 ชั่วโมง
+                </p>
+                <div class="hero-actions">
+                    <a href="#rooms" class="btn btn-sand">ดูห้องพักว่างและอัตราค่าเช่า</a>
+                    <button class="btn btn-outline-white" onclick="document.getElementById('btn-toggle-login').click()">
+                        เข้าสู่ระบบผู้พักและเจ้าหน้าที่
+                    </button>
+                </div>
+
+                <!-- Live Metrics Strip -->
+                <div class="hero-stats-strip">
+                    <div class="hstat-item">
+                        <div class="num">48</div>
+                        <div class="lbl">ห้องพักในอาคาร (3 ชั้น)</div>
+                    </div>
+                    <div class="hstat-item">
+                        <div class="num">87.5%</div>
+                        <div class="lbl">อัตราการเข้าพักปัจจุบัน</div>
+                    </div>
+                    <div class="hstat-item">
+                        <div class="num">24 ชม.</div>
+                        <div class="lbl">CCTV & ประตูคีย์การ์ด</div>
+                    </div>
+                    <div class="hstat-item">
+                        <div class="num">100%</div>
+                        <div class="lbl">ระบบบริการออนไลน์</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Room Showcase Section -->
+        <section id="rooms" class="section">
+            <div class="section-header">
+                <div class="sub">Room Types & Rates</div>
+                <h2>ประเภทห้องพักที่เปิดให้บริการ</h2>
+                <p>ออกแบบพื้นที่เพื่อรองรับการพักผ่อนและการสร้างสรรค์งานศิลปะของนักศึกษาและบุคลากร</p>
+            </div>
+
+            <div class="room-catalog-grid">
+                <!-- Room Type 1 -->
+                <div class="rcard">
+                    <div class="rcard-img">
+                        <span class="rcard-img-badge">ยอดนิยม 🔥</span>
+                        <div style="font-size:3.5rem;">🛏️</div>
+                    </div>
+                    <div class="rcard-body">
+                        <h3>Standard Air (ห้องแอร์)</h3>
+                        <div class="rcard-price">3,500 - 3,700 ฿ <span>/ เดือน</span></div>
+                        <p style="color:var(--muted); font-size:0.9rem; margin-bottom:16px;">
+                            ห้องพักพร้อมเครื่องปรับอากาศ ประหยัดไฟเบอร์ 5 เตียงนอน โต๊ะเขียนหนังสือ ตู้เสื้อผ้า และระเบียงส่วนตัว
+                        </p>
+                        <div class="rcard-amenities">
+                            <span class="rcard-pill">❄️ แอร์เบอร์ 5</span>
+                            <span class="rcard-pill">🛏️ เตียง 5 ฟุต</span>
+                            <span class="rcard-pill">🚿 เครื่องทำน้ำอุ่น</span>
+                            <span class="rcard-pill">🛜 Free Wi-Fi</span>
+                        </div>
+                        <button class="btn btn-outline" style="width:100%;" onclick="document.getElementById('btn-toggle-login').click()">จองห้องพัก / สอบถาม</button>
+                    </div>
+                </div>
+
+                <!-- Room Type 2 -->
+                <div class="rcard">
+                    <div class="rcard-img" style="background:linear-gradient(135deg, #174849, #0a2f30);">
+                        <span class="rcard-img-badge" style="background:var(--sand); color:var(--teal-950);">วิวระเบียงมุม</span>
+                        <div style="font-size:3.5rem;">🛋️</div>
+                    </div>
+                    <div class="rcard-body">
+                        <h3>Deluxe Corner (ห้องมุมกว้าง)</h3>
+                        <div class="rcard-price">4,200 - 4,400 ฿ <span>/ เดือน</span></div>
+                        <p style="color:var(--muted); font-size:0.9rem; margin-bottom:16px;">
+                            พื้นที่กว้างพิเศษ รับแสงธรรมชาติ 2 ทิศทาง เหมาะสำหรับการวาดภาพ ทำงานศิลปนิพนธ์ พร้อมระเบียงกว้าง
+                        </p>
+                        <div class="rcard-amenities">
+                            <span class="rcard-pill">❄️ แอร์อินเวอร์เตอร์</span>
+                            <span class="rcard-pill">🎨 แสงธรรมชาติมุมห้อง</span>
+                            <span class="rcard-pill">🪟 ระเบียงกว้าง</span>
+                            <span class="rcard-pill">🛜 Wi-Fi ความเร็วสูง</span>
+                        </div>
+                        <button class="btn btn-outline" style="width:100%;" onclick="document.getElementById('btn-toggle-login').click()">จองห้องพัก / สอบถาม</button>
+                    </div>
+                </div>
+
+                <!-- Room Type 3 -->
+                <div class="rcard">
+                    <div class="rcard-img" style="background:linear-gradient(135deg, #225a52, #13453e);">
+                        <span class="rcard-img-badge">ประหยัดสุดคุ้ม</span>
+                        <div style="font-size:3.5rem;">🍃</div>
+                    </div>
+                    <div class="rcard-body">
+                        <h3>Standard Fan (ห้องพัดลม)</h3>
+                        <div class="rcard-price">2,800 - 3,000 ฿ <span>/ เดือน</span></div>
+                        <p style="color:var(--muted); font-size:0.9rem; margin-bottom:16px;">
+                            ห้องพักโปร่งสบาย ลมถ่ายเทสะดวก พัดลมเพดาน เตียงเดี่ยว ตู้เสื้อผ้า เฟอร์นิเจอร์ครบชุด ราคาสบายกระเป๋า
+                        </p>
+                        <div class="rcard-amenities">
+                            <span class="rcard-pill">💨 พัดลมเพดาน</span>
+                            <span class="rcard-pill">🪟 หน้าต่างรับลม</span>
+                            <span class="rcard-pill">🚿 ห้องน้ำส่วนตัว</span>
+                            <span class="rcard-pill">🛜 Free Wi-Fi</span>
+                        </div>
+                        <button class="btn btn-outline" style="width:100%;" onclick="document.getElementById('btn-toggle-login').click()">จองห้องพัก / สอบถาม</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Facilities Section -->
+        <section id="features" class="section" style="background:#f4fbf7; max-width:100%; padding:80px 40px;">
+            <div style="max-width:1180px; margin:0 auto;">
+                <div class="section-header">
+                    <div class="sub">Facilities & Systems</div>
+                    <h2>สิ่งอำนวยความสะดวกและระบบบริการ</h2>
+                    <p>ครบครันทั้งความปลอดภัย การใช้ชีวิต และระบบจัดการออนไลน์ที่ทันสมัย</p>
+                </div>
+                <div class="feature-grid">
+                    <div class="fcard">
+                        <div class="f-icon-box">🛜</div>
+                        <h3>High-Speed Wi-Fi ทั่วอาคาร</h3>
+                        <p>อินเทอร์เน็ตความเร็วสูงครอบคลุมทุกห้องและทุกชั้น รองรับการเรียนออนไลน์และสตรีมมิง</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="f-icon-box">🛡️</div>
+                        <h3>ความปลอดภัย 24 ชั่วโมง</h3>
+                        <p>กล้องวงจรปิด CCTV ทุกจุดสำคัญ ระบบประตูคีย์การ์ดสแกนเข้าอาคาร และเจ้าหน้าที่ดูแล</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="f-icon-box">🅿️</div>
+                        <h3>ที่จอดรถในร่มกว้างขวาง</h3>
+                        <p>พื้นที่จอดรถจักรยานยนต์และรถยนต์ในร่ม มีแสงสว่างทั่วถึง พร้อมกล้องวงจรปิดบันทึกตลอด 24 ชม.</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="f-icon-box">🧾</div>
+                        <h3>คำนวณค่าน้ำ-ไฟ และ QR จ่ายเงิน</h3>
+                        <p>คิดเงินอัตโนมัติตามมิเตอร์จริง ตรวจสอบใบแจ้งหนี้และสแกนจ่ายผ่าน Thai QR PromptPay ได้ทันที</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="f-icon-box">🔧</div>
+                        <h3>ระบบแจ้งซ่อมบำรุงออนไลน์</h3>
+                        <p>แจ้งปัญหาอุปกรณ์ชำรุดผ่านระบบ พร้อมติดตามสถานะการดำเนินงานของช่างได้แบบเรียลไทม์</p>
+                    </div>
+                    <div class="fcard">
+                        <div class="f-icon-box">📦</div>
+                        <h3>จุดรับและแจ้งเตือนพัสดุ</h3>
+                        <p>บันทึกพัสดุที่มาส่ง เจ้าหน้าที่คัดแยกตามห้องพัก ผู้พักตรวจสอบและยืนยันรับของได้อย่างปลอดภัย</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rate Calculator Section -->
+        <section id="rates" class="section">
+            <div class="section-header">
+                <div class="sub">First-Month Calculator</div>
+                <h2>คำนวณค่าใช้จ่ายแรกเข้าพัก</h2>
+                <p>คำนวณงบประมาณค่าเช่าและเงินประกันแรกเข้าได้อย่างโปร่งใส ไม่มีค่าใช้จ่ายแอบแฝง</p>
+            </div>
+
+            <div class="calc-card">
+                <div>
+                    <h3 style="margin-bottom:16px;">เลือกประเภทห้องพัก</h3>
+                    <div class="field">
+                        <label>ประเภทห้องที่ต้องการ</label>
+                        <select id="calc-room-select" class="form-select">
+                            <option value="3500">Standard Air (ห้องแอร์) — 3,500 ฿/เดือน</option>
+                            <option value="4200">Deluxe Corner (ห้องมุมกว้าง) — 4,200 ฿/เดือน</option>
+                            <option value="2800">Standard Fan (ห้องพัดลม) — 2,800 ฿/เดือน</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>จำนวนเดือนที่ต้องการทำสัญญา</label>
+                        <select id="calc-contract" class="form-select">
+                            <option value="1">สัญญา 1 ภาคเรียน (4 เดือน)</option>
+                            <option value="2" selected>สัญญา 1 ปีการศึกษา (10 เดือน)</option>
+                        </select>
+                    </div>
+                    <div style="background:var(--mint-50); border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:20px;">
+                        <span style="font-size:0.85rem; color:var(--muted); display:block; margin-bottom:4px;">เงื่อนไขอัตราค่าสาธารณูปโภค:</span>
+                        <div style="font-size:0.88rem; color:var(--teal-900); font-weight:500;">
+                            • ค่าน้ำประปา: 18 บาท/หน่วย<br>
+                            • ค่าไฟฟ้า: 8 บาท/หน่วย<br>
+                            • ค่าบริการส่วนกลาง & Wi-Fi: 100 บาท/เดือน
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background:var(--mint-50); border-radius:14px; padding:24px; border:1px solid var(--line); display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                        <h4 style="margin:0 0 16px 0; color:var(--teal-950);">สรุปยอดเงินแรกเข้าโดยประมาณ</h4>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
+                            <span>ค่าเช่าห้องพักล่วงหน้า (1 เดือน):</span>
+                            <strong id="calc-rent-show">3,500 ฿</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
+                            <span>เงินประกันความเสียหาย (คืนเมื่อครบสัญญา):</span>
+                            <strong id="calc-deposit-show">3,500 ฿</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
+                            <span>ค่ามัดจำคีย์การ์ดและกุญแจ:</span>
+                            <strong>300 ฿</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
+                            <span>ค่าบริการส่วนกลางเดือนแรก:</span>
+                            <strong>100 ฿</strong>
+                        </div>
+                    </div>
+
+                    <div style="border-top:2px dashed var(--line); padding-top:16px; margin-top:20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:1.1rem; font-weight:600; color:var(--teal-950);">ยอดรวมแรกเข้าทั้งหมด:</span>
+                            <span style="font-family:'Kanit'; font-size:1.9rem; font-weight:700; color:var(--emerald);" id="calc-total-show">7,400 ฿</span>
+                        </div>
+                        <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="document.getElementById('btn-toggle-login').click()">
+                            ติดต่อจองห้องพักทันที
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+            <div class="section-header">
+                <div class="sub">Contact & Location</div>
+                <h2>ที่ตั้งและการติดต่อ</h2>
+                <p>เดินทางสะดวก ปลอดภัย ใกล้วิทยาลัยช่างศิลป์ นครศรีธรรมราช เพียง 3 นาที</p>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:28px;">
+                <div class="card" style="margin:0;">
+                    <h3 style="margin-bottom:16px;">ข้อมูลการติดต่อสำนักงาน</h3>
+                    <div style="display:flex; flex-direction:column; gap:14px; font-size:0.95rem;">
+                        <div style="display:flex; gap:12px; align-items:flex-start;">
+                            <span style="font-size:1.2rem;">📍</span>
+                            <div>
+                                <strong>ที่อยู่หอพัก:</strong><br>
+                                123 หมู่ 4 ต.ท่าเรือ อ.เมือง จ.นครศรีธรรมราช 80000
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <span style="font-size:1.2rem;">📞</span>
+                            <div>
+                                <strong>โทรศัพท์:</strong> 075-345-678, 089-999-8877
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <span style="font-size:1.2rem;">💬</span>
+                            <div>
+                                <strong>Line Official:</strong> @tanakritdorm
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <span style="font-size:1.2rem;">⏰</span>
+                            <div>
+                                <strong>เวลาทำการสำนักงาน:</strong> ทุกวัน 08:30 - 20:00 น.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin:0; background:linear-gradient(135deg, var(--teal-950), var(--teal-900)); color:white;">
+                    <h3 style="color:white; margin-bottom:12px;">แผนที่จำลองสถานที่</h3>
+                    <p style="color:#B4D5CE; font-size:0.9rem; margin-bottom:20px;">
+                        ตั้งอยู่บนถนนสายหลัก ใกล้ร้านสะดวกซื้อ 7-Eleven ตลาดสด และป้ายรถประจำทาง
+                    </p>
+                    <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
+                        <span style="font-size:2.5rem;">🗺️</span>
+                        <span style="font-weight:600; color:var(--sand);">Tanakrit Dormitory @ นครศรีธรรมราช</span>
+                        <small style="color:#B4D5CE;">พิกัด: 8.4312° N, 99.9631° E</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="landing-footer">
+            <div class="footer-grid">
+                <div>
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                        <div class="logo-box">TK</div>
+                        <span style="font-family:'Kanit'; font-weight:700; font-size:1.2rem; color:white;">Tanakrit Dormitory</span>
+                    </div>
+                    <p style="font-size:0.9rem; line-height:1.6; max-width:380px;">
+                        หอพักชายธนกฤษฎ์ นครศรีธรรมราช มุ่งมั่นให้บริการที่พักอาศัยที่ปลอดภัย สะอาด 
+                        และระบบบริหารจัดการที่โปร่งใส ทันสมัยเพื่อชีวิตความเป็นอยู่ที่ดีที่สุด
+                    </p>
+                </div>
+                <div>
+                    <h4 style="color:white; margin-bottom:14px;">เมนูด่วน</h4>
+                    <div style="display:flex; flex-direction:column; gap:8px; font-size:0.9rem;">
+                        <a href="#rooms">รูปแบบห้องพัก</a>
+                        <a href="#features">สิ่งอำนวยความสะดวก</a>
+                        <a href="#rates">อัตราค่าบริการ</a>
+                        <a href="#contact">ติดต่อเรา</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="color:white; margin-bottom:14px;">ระบบสำหรับผู้พัก</h4>
+                    <div style="display:flex; flex-direction:column; gap:8px; font-size:0.9rem;">
+                        <a href="#" onclick="toggleLoginModal(true)">เข้าสู่ระบบจัดการ</a>
+                        <a href="#" onclick="toggleLoginModal(true)">ตรวจสอบค่าน้ำ-ค่าไฟ</a>
+                        <a href="#" onclick="toggleLoginModal(true)">แจ้งซ่อมอุปกรณ์</a>
+                        <a href="#" onclick="toggleLoginModal(true)">ตรวจสอบพัสดุ</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                © 2026 Tanakrit Dormitory. All rights reserved. หอพักชายธนกฤษฎ์ นครศรีธรรมราช
+            </div>
+        </footer>
+    </div>
+
+
+    <!-- ==================== Login Modal Dialog ==================== -->
+    <div id="login-modal" class="modal-backdrop hidden">
+        <div class="modal-dialog" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3 class="modal-title">เข้าสู่ระบบ Tanakrit Dormitory</h3>
+                <button class="modal-close" id="btn-close-login-modal" onclick="toggleLoginModal(false)">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- 1-Click Quick Login Role Buttons -->
+                <div style="margin-bottom:18px;">
+                    <div style="font-size:0.85rem; color:var(--muted); margin-bottom:8px; font-weight:500;">
+                        🚀 ทดลองเข้าสู่ระบบด่วนใน 1 คลิก:
+                    </div>
+                    <div class="quick-login-pills">
+                        <div class="btn-quick-login" data-role="admin" onclick="window.quickLoginAs && window.quickLoginAs('admin')">
+                            <strong>👑 Admin</strong>
+                            <small>ผู้จัดการหอพัก</small>
+                        </div>
+                        <div class="btn-quick-login" data-role="staff" onclick="window.quickLoginAs && window.quickLoginAs('staff')">
+                            <strong>🛠️ Staff</strong>
+                            <small>เจ้าหน้าที่/ช่าง</small>
+                        </div>
+                        <div class="btn-quick-login" data-role="student" onclick="window.quickLoginAs && window.quickLoginAs('student')">
+                            <strong>🎓 Student</strong>
+                            <small>ผู้พัก (ห้อง 302)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align:center; position:relative; margin:16px 0;">
+                    <hr style="border:none; border-top:1px solid var(--line);">
+                    <span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:white; padding:0 12px; font-size:0.8rem; color:var(--muted);">
+                        หรือล็อกอินด้วยชื่อผู้ใช้
+                    </span>
+                </div>
+
+                <form id="login-form">
+                    <div class="field">
+                        <label>ชื่อผู้ใช้งาน (Username)</label>
+                        <input type="text" id="login-username" required placeholder="admin / staff / student">
+                    </div>
+                    <div class="field">
+                        <label>รหัสผ่าน (Password)</label>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                    <div id="login-error" class="login-error hidden" style="color:var(--danger); font-size:0.85rem; margin-bottom:10px; background:#FDE8E7; padding:8px 12px; border-radius:8px;">
+                        ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 6px;">
+                        เข้าสู่ระบบ
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== หน้า App / Dashboard หลังเข้าสู่ระบบ ==================== -->
+    <div id="page-app" class="hidden">
+        <div class="app-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-brand">
+                    <div class="logo-box">TK</div>
+                    <div>
+                        <div class="brand-title" style="color:white;">Tanakrit Dormitory</div>
+                        <div class="brand-sub" style="color:#B4D5CE;">หอพักชายธนกฤษฎ์</div>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav" id="sidebar-nav">
+                    <!-- เมนูจะถูกเติมอัตโนมัติผ่าน js/app.js ตาม Role -->
+                </nav>
+
+                <div class="sidebar-footer">
+                    <button class="btn-logout" id="btn-logout">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        ออกจากระบบ
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="main-wrapper">
+                <header class="app-header">
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <button class="menu-toggle" id="btn-sidebar-toggle">☰</button>
+                        <div class="app-header-title" id="app-view-title">แดชบอร์ดภาพรวม</div>
+                    </div>
+
+                    <div class="user-badge-profile">
+                        <div class="u-avatar" id="header-user-initial">A</div>
+                        <div>
+                            <div class="u-name" id="header-user-name">ผู้ดูแลระบบ</div>
+                            <div class="u-role" id="header-user-role-label">Administrator</div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="app-content" id="app-content-body">
+                    <!-- เนื้อหาแต่ละหน้าจอเรนเดอร์มาแสดงตรงนี้ -->
+                </main>
+            </div>
+        </div>
+        <div class="overlay" id="overlay"></div>
+    </div>
+
+    <!-- Script Calculator บนหน้า Landing -->
+    <script>
+        const calcSelect = document.getElementById('calc-room-select');
+        if (calcSelect) {
+            calcSelect.addEventListener('change', () => {
+                const rent = Number(calcSelect.value);
+                const deposit = rent;
+                const keycard = 300;
+                const common = 100;
+                const total = rent + deposit + keycard + common;
+                document.getElementById('calc-rent-show').textContent = rent.toLocaleString() + ' ฿';
+                document.getElementById('calc-deposit-show').textContent = deposit.toLocaleString() + ' ฿';
+                document.getElementById('calc-total-show').textContent = total.toLocaleString() + ' ฿';
+            });
+        }
+    </script>
+
+    <!-- โหลดสคริปต์หลักของระบบ (รองรับทั้ง file:// และ http://) -->
+    <script src="./js/bundle.js"></script>
+
+</body>
+</html>
