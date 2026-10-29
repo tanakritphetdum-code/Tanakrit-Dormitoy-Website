@@ -136,10 +136,9 @@ function bindSettingsEvents() {
 
   const dormForm = document.getElementById('form-dorm-settings');
   if (dormForm) {
-    dormForm.onsubmit = (e) => {
+    dormForm.onsubmit = async (e) => {
       e.preventDefault();
-      const db = supabase.getRawData();
-      db.settings = {
+      const newSettings = {
         dorm_name: document.getElementById('set-dorm-name').value.trim(),
         sub_title: document.getElementById('set-dorm-sub').value.trim(),
         water_rate: Number(document.getElementById('set-water-rate').value),
@@ -149,19 +148,19 @@ function bindSettingsEvents() {
         line_id: document.getElementById('set-line').value.trim(),
         promptpay_number: document.getElementById('set-promptpay').value.trim()
       };
-      localStorage.setItem('tanakrit_dormitory_db_v1', JSON.stringify(db));
-      toast('บันทึกการตั้งค่าหอพักเรียบร้อยแล้ว', 'success');
+      const { error } = await supabase.from('settings').eq('id', 'default').update(newSettings);
+      if (error) {
+        toast('เกิดข้อผิดพลาดในการบันทึกขึ้นระบบ Supabase', 'error');
+        return;
+      }
+      toast('บันทึกการตั้งค่าหอพักขึ้น Supabase เรียบร้อยแล้ว', 'success');
     };
   }
 
   const btnReset = document.getElementById('btn-reset-db');
   if (btnReset) {
     btnReset.onclick = () => {
-      if (confirm('คุณต้องการรีเซ็ตข้อมูลทั้งหมดกลับเป็นค่าเริ่มต้นหรือไม่?')) {
-        supabase.resetToDefaults();
-        toast('รีเซ็ตข้อมูลระบบกลับสู่ค่าเริ่มต้นเรียบร้อยแล้ว', 'success');
-        setTimeout(() => location.reload(), 800);
-      }
+      toast('ระบบเชื่อมต่อฐานข้อมูล Supabase Cloud เรียบร้อยแล้ว', 'info');
     };
   }
 }

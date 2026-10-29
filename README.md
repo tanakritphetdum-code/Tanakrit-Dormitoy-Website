@@ -40,14 +40,15 @@
 
 ```text
 ├── index.html          # หน้าเว็บหลัก (Landing Page + แอปจัดการ)
-├── KPlogin.html        # หน้า Redirect ไปยัง index.html
+├── KPlogin.html        # หน้า Redirect ไปยัง index.html (ตัวเลือกสำรอง สามารถตัดออกได้)
 ├── build_bundle.js     # สคริปต์ Node.js รวมไฟล์ JS สำหรับ Standalone
+├── build_bundle.ps1    # สคริปต์ PowerShell รวมไฟล์ JS สำหรับ Windows
 ├── README.md           # เอกสารแนะนำและคู่มือโปรเจกต์
 ├── css/
 │   └── style.css       # ชุดดีไซน์และ CSS หลักของทั้งระบบ
 └── js/
     ├── bundle.js       # ไฟล์ JS รวมชุดหลักที่โหลดใน index.html
-    ├── supabase.js     # ฐานข้อมูลจำลอง LocalStorage DB Engine
+    ├── supabase.js     # ระบบเชื่อมต่อ Supabase Cloud Database (PostgREST API)
     ├── api.js          # ระบบ Modal, Toast และ Icons
     ├── auth.js         # ระบบ Authentication และ Session
     ├── app.js          # Core Router และ Sidebar
