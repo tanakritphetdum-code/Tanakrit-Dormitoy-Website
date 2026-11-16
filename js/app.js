@@ -53,17 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Quick Login Buttons ในหน้าต่าง Login
-  document.querySelectorAll('.btn-quick-login').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const role = btn.getAttribute('data-role');
-      quickLoginAs(role, (user) => {
-        setupSidebarMenu(user);
-        switchView('dashboard');
-      });
-    });
-  });
-
   // Submit ฟอร์มล็อกอิน
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
