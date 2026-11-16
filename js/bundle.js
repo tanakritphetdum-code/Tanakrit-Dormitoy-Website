@@ -236,8 +236,12 @@ const ICONS = {
   phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
   sparkles: '<path d="M12 3l1.91 5.89a1 1 0 0 0 .95.69h6.19l-5.01 3.64a1 1 0 0 0-.36 1.12l1.91 5.89-5.01-3.64a1 1 0 0 0-1.18 0l-5.01 3.64 1.91-5.89a1 1 0 0 0-.36-1.12L1.95 9.58h6.19a1 1 0 0 0 .95-.69L12 3z"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  key: '<path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5-3 3 1.5 1.5-2 2-1.5-1.5-3 3 1.5 1.5-2 2-1.5-1.5L2 19v3h3l1.5-1.5-1.5-1.5 2-2 1.5 1.5 3-3-1.5-1.5 2-2 1.5 1.5 3-3-1.5-1.5L19 4l2-2z"/>',
   trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
-  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'
 };
 function ic(name, cls = '') {
   return `<svg class="icon ${cls}" viewBox="0 0 24 24">${ICONS[name] || ''}</svg>`;
@@ -311,9 +315,70 @@ function closeModal() {
   }
 }
 
+// ย่อขนาดรูปภาพและแปลงเป็น Data URL สำหรับเก็บในฐานข้อมูลอย่างมีประสิทธิภาพ
+function compressImage(file, maxDimension = 1000, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    if (!file.type || !file.type.startsWith('image/')) {
+      return reject(new Error('ไฟล์ที่เลือกไม่ใช่รูปภาพ'));
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = () => reject(new Error('ไม่สามารถประมวลผลรูปภาพได้'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('ไม่สามารถอ่านไฟล์ได้'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// แสดงรูปภาพขนาดใหญ่ใน Modal
+function showImageModal(imgUrl, title = 'ดูรูปภาพขยายใหญ่') {
+  showModal({
+    title,
+    body: `
+      <div style="text-align:center; padding:8px 0;">
+        <img src="${imgUrl}" alt="Preview" style="max-width:100%; max-height:72vh; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.12); object-fit:contain;">
+      </div>
+    `,
+    footer: `
+      <a href="${imgUrl}" download="image.jpg" class="btn btn-outline" style="margin-right:auto;">${ic('printer')} บันทึกรูปภาพ</a>
+      <button type="button" class="btn btn-primary" onclick="window.closeAppModal()">ปิดหน้าต่าง</button>
+    `,
+    maxWidth: '680px'
+  });
+}
+window.showImageModal = showImageModal;
+
 
 /* ========== js/auth.js ========== */
 // js/auth.js
+// ระบบยืนยันตัวตน (Authentication) เชื่อมต่อตาราง users ใน Supabase Cloud
+
+
+// รายชื่อบัญชีเริ่มต้นสำรอง (สำหรับกรณีออฟไลน์)
 const USERS = [
   { username: 'admin', password: 'admin123', role: 'admin', name: 'นายเกียรติศักดิ์ บริหาร (ผู้จัดการหอพัก)', initial: 'ผ', tenantId: null, room: null, roleTitle: 'ผู้ดูแลระบบสูงสุด' },
   { username: 'staff', password: 'staff123', role: 'staff', name: 'นางสาวสมหญิง เจ้าหน้าที่หอพัก', initial: 'ส', tenantId: null, room: null, roleTitle: 'เจ้าหน้าที่ธุรการ/ช่าง' },
@@ -334,40 +399,118 @@ function initAuth() {
   }
   return null;
 }
-function handleLogin(e, onSuccess) {
+
+// ตรวจสอบการ Login ผ่าน Supabase users table
+async function handleLogin(e, onSuccess) {
   if (e) e.preventDefault();
   const u = document.getElementById('login-username').value.trim();
   const p = document.getElementById('login-password').value;
-  const found = USERS.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
   const errBox = document.getElementById('login-error');
+  const btnSubmit = document.querySelector('#login-form button[type="submit"]');
 
-  if (!found) {
-    if (errBox) {
-      errBox.classList.remove('hidden');
-      errBox.style.display = 'block';
+  if (btnSubmit) {
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'กำลังตรวจสอบ...';
+  }
+
+  try {
+    let found = null;
+
+    // 1. ตรวจสอบผ่านตาราง users บน Supabase
+    const { data, error } = await supabase.from('users').eq('username', u);
+    if (!error && data && data.length > 0) {
+      const user = data[0];
+      if (user.password === p) {
+        found = {
+          ...user,
+          tenantId: user.tenant_id,
+          roleTitle: user.role_title || (user.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (user.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${user.room || '-'})`)),
+          initial: user.name ? user.name.trim().charAt(0) : 'U'
+        };
+      }
     }
-    toast('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
-    return;
+
+    // 2. สำรอง: ถ้าไม่พบใน Supabase ให้ดูใน USERS อาเรย์เริ่มต้น
+    if (!found) {
+      found = USERS.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
+    }
+
+    if (!found) {
+      if (errBox) {
+        errBox.textContent = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+        errBox.classList.remove('hidden');
+        errBox.style.display = 'block';
+      }
+      toast('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+      return;
+    }
+
+    if (found.status === 'suspended') {
+      if (errBox) {
+        errBox.textContent = 'บัญชีผู้ใช้นี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ';
+        errBox.classList.remove('hidden');
+        errBox.style.display = 'block';
+      }
+      toast('บัญชีผู้ใช้นี้ถูกระงับการใช้งาน', 'error');
+      return;
+    }
+
+    if (errBox) {
+      errBox.classList.add('hidden');
+      errBox.style.display = 'none';
+    }
+
+    if (!found.initial && found.name) {
+      found.initial = found.name.trim().charAt(0);
+    }
+
+    setCurrentUser(found);
+    toggleLoginModal(false);
+
+    if (onSuccess) onSuccess(found);
+    toast(`ยินดีต้อนรับ ${found.name}`, 'success');
+  } catch (err) {
+    console.error('Login process error:', err);
+    toast('เกิดข้อผิดพลาดในการตรวจสอบบัญชีผู้ใช้', 'error');
+  } finally {
+    if (btnSubmit) {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'เข้าสู่ระบบ';
+    }
   }
-
-  if (errBox) {
-    errBox.classList.add('hidden');
-    errBox.style.display = 'none';
-  }
-
-  setCurrentUser(found);
-  toggleLoginModal(false);
-
-  if (onSuccess) onSuccess(found);
-  toast(`ยินดีต้อนรับ ${found.name}`, 'success');
 }
-function quickLoginAs(roleName, onSuccess) {
-  const found = USERS.find(x => x.role === roleName);
-  if (!found) return;
-  setCurrentUser(found);
-  toggleLoginModal(false);
-  if (onSuccess) onSuccess(found);
-  toast(`เข้าสู่ระบบในฐานะ ${found.name} (${found.roleTitle})`, 'success');
+
+// 1-Click Quick Demo Login (ดึงข้อมูลล่าสุดจาก Supabase)
+async function quickLoginAs(roleName, onSuccess) {
+  try {
+    let found = null;
+    const { data } = await supabase.from('users').eq('role', roleName);
+    if (data && data.length > 0) {
+      const u = data[0];
+      found = {
+        ...u,
+        tenantId: u.tenant_id,
+        roleTitle: u.role_title || (u.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (u.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${u.room || '302'})`)),
+        initial: u.name ? u.name.trim().charAt(0) : 'U'
+      };
+    } else {
+      found = USERS.find(x => x.role === roleName);
+    }
+
+    if (!found) return;
+
+    setCurrentUser(found);
+    toggleLoginModal(false);
+    if (onSuccess) onSuccess(found);
+    toast(`เข้าสู่ระบบในฐานะ ${found.name} (${found.roleTitle || found.role})`, 'success');
+  } catch (e) {
+    const fallback = USERS.find(x => x.role === roleName);
+    if (fallback) {
+      setCurrentUser(fallback);
+      toggleLoginModal(false);
+      if (onSuccess) onSuccess(fallback);
+    }
+  }
 }
 function setCurrentUser(user) {
   currentUser = user;
@@ -417,6 +560,7 @@ function toggleSidebar(open) {
 // js/utilities.js
 
 
+
 let utilityStatusFilter = 'all';
 async function renderUtilitiesView() {
   setTimeout(() => {
@@ -430,7 +574,7 @@ async function renderUtilitiesView() {
         <div>
           <h3>${ic('bill')} ระบบบันทึกมิเตอร์น้ำ-ไฟ และออกใบแจ้งหนี้ (Billing & Utilities)</h3>
           <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
-            คำนวณค่าน้ำ ค่าไฟ ค่าเช่าห้อง ออกใบเสร็จรับเงิน และสร้าง QR Code สแกนจ่าย
+            คำนวณค่าน้ำ ค่าไฟ ค่าเช่าห้อง ตรวจสอบสลิปโอนเงิน และสร้าง QR Code สแกนจ่าย
           </p>
         </div>
         <button class="btn btn-primary" id="btn-add-meter">
@@ -448,6 +592,7 @@ async function renderUtilitiesView() {
         <div class="filter-tabs" id="utility-status-tabs">
           <button class="filter-tab-btn active" data-status="all">ทั้งหมด</button>
           <button class="filter-tab-btn" data-status="pending">รอชำระเงิน</button>
+          <button class="filter-tab-btn" data-status="verifying" style="color:#E65100;">รอตรวจสลิป ⏳</button>
           <button class="filter-tab-btn" data-status="paid">ชำระแล้ว</button>
         </div>
         <div style="margin-left: auto;">
@@ -495,6 +640,7 @@ async function loadUtilitiesData() {
   // Summary counters
   const totalBills = readings.length;
   const pendingBills = readings.filter(r => r.status === 'pending');
+  const verifyingBills = readings.filter(r => r.status === 'verifying');
   const paidBills = readings.filter(r => r.status === 'paid');
   const totalRevenue = readings.reduce((acc, cur) => acc + (cur.total_price || 0), 0);
   const pendingAmount = pendingBills.reduce((acc, cur) => acc + (cur.total_price || 0), 0);
@@ -507,7 +653,11 @@ async function loadUtilitiesData() {
       </div>
       <div class="rstat-item vacant">
         <span class="num" style="color:var(--danger);">${fmtCurrency(pendingAmount)}</span>
-        <span class="lbl">ค้างชำระ (${pendingBills.length} บิล)</span>
+        <span class="lbl">รอชำระ (${pendingBills.length} บิล)</span>
+      </div>
+      <div class="rstat-item" style="background:#FFF8E1; border:1px solid #FFE082;">
+        <span class="num" style="color:#E65100;">${verifyingBills.length}</span>
+        <span class="lbl" style="color:#B78103; font-weight:600;">รอตรวจสลิป ⏳</span>
       </div>
       <div class="rstat-item occupied">
         <span class="num">${paidBills.length}</span>
@@ -529,8 +679,17 @@ async function loadUtilitiesData() {
   let html = '';
   filtered.forEach(r => {
     const isPaid = r.status === 'paid';
-    const badgeClass = isPaid ? 'approved' : 'pending';
-    const badgeText = isPaid ? 'ชำระแล้ว' : 'รอชำระ';
+    const isVerifying = r.status === 'verifying';
+    let badgeClass = 'pending';
+    let badgeText = 'รอชำระ';
+
+    if (isPaid) {
+      badgeClass = 'approved';
+      badgeText = '✓ ชำระแล้ว';
+    } else if (isVerifying) {
+      badgeClass = 'verifying';
+      badgeText = '⏳ รอตรวจสลิป';
+    }
 
     html += `
       <tr>
@@ -555,10 +714,19 @@ async function loadUtilitiesData() {
         </td>
         <td><span class="badge ${badgeClass}">${badgeText}</span></td>
         <td>
-          <div style="display: flex; gap: 6px;">
-            <button class="btn btn-outline btn-sm btn-view-invoice" data-id="${r.id}" title="เปิดดูใบแจ้งหนี้ / สแกนจ่าย">
-              ${ic('bill')} ใบแจ้งหนี้
-            </button>
+          <div style="display: flex; gap: 6px; align-items:center;">
+            ${isVerifying ? `
+              <button class="btn btn-primary btn-sm btn-view-invoice" data-id="${r.id}" style="background:#E65100; border-color:#E65100;" title="ตรวจสอบสลิปโอนเงิน">
+                ${ic('eye')} ตรวจสลิป
+              </button>
+            ` : `
+              <button class="btn btn-outline btn-sm btn-view-invoice" data-id="${r.id}" title="เปิดดูใบแจ้งหนี้ / สแกนจ่าย">
+                ${ic('bill')} ใบแจ้งหนี้
+              </button>
+            `}
+            ${r.slip_url ? `
+              <img src="${r.slip_url}" class="img-thumb-preview" alt="สลิป" onclick="event.stopPropagation(); window.showImageModal('${r.slip_url}', 'สลิปโอนเงิน ห้อง ${r.room_number}')" title="คลิกดูสลิปขนาดเต็ม">
+            ` : ''}
             <button class="btn ${isPaid ? 'btn-outline' : 'btn-primary'} btn-sm btn-toggle-pay" data-id="${r.id}" title="${isPaid ? 'เปลี่ยนเป็นยังไม่ชำระ' : 'ยืนยันรับชำระเงิน'}">
               ${isPaid ? ic('x') : ic('check')}
             </button>
@@ -619,7 +787,16 @@ function bindUtilitiesEvents() {
 // Modal ใบแจ้งหนี้และ QR Code สแกนจ่าย
 function openInvoiceModal(bill) {
   const isPaid = bill.status === 'paid';
+  const isVerifying = bill.status === 'verifying';
+  const isAdminOrStaff = currentUser && (currentUser.role === 'admin' || currentUser.role === 'staff');
   const qrMockUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PROMPTPAY-0899998877-AMOUNT-${bill.total_price}`;
+
+  let statusBadgeHtml = '<div class="invoice-badge unpaid">รอชำระเงิน</div>';
+  if (isPaid) {
+    statusBadgeHtml = '<div class="invoice-badge paid">✓ ชำระเงินแล้ว</div>';
+  } else if (isVerifying) {
+    statusBadgeHtml = '<div class="invoice-badge" style="background:#FFF3E0; color:#E65100; border:1px solid #FFE0B2;">⏳ รอตรวจสลิป</div>';
+  }
 
   const body = `
     <div class="invoice-container" id="printable-invoice">
@@ -633,9 +810,7 @@ function openInvoiceModal(bill) {
             <div style="font-size: 0.8rem; color: var(--muted);">123 หมู่ 4 ต.ท่าเรือ อ.เมือง จ.นครศรีธรรมราช โทร. 075-345-678</div>
           </div>
           <div style="text-align: right;">
-            <div class="invoice-badge ${isPaid ? 'paid' : 'unpaid'}">
-              ${isPaid ? '✓ ชำระเงินแล้ว' : 'รอชำระเงิน'}
-            </div>
+            ${statusBadgeHtml}
             <div style="font-size: 0.85rem; margin-top: 6px; color: var(--muted);">เลขที่: <strong>${bill.id}</strong></div>
             <div style="font-size: 0.85rem; color: var(--muted);">รอบบิล: <strong>${bill.month_label || bill.billing_month}</strong></div>
           </div>
@@ -705,15 +880,46 @@ function openInvoiceModal(bill) {
         </tfoot>
       </table>
 
+      <!-- กล่องสถานะสลิปที่แนบแล้ว (ถ้ามี) -->
+      ${isVerifying ? `
+        <div style="background:#FFF9E6; border:1.5px solid #FFC107; border-radius:12px; padding:16px; margin-top:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+            <div>
+              <div style="font-weight:700; color:#E65100; font-size:1.02rem;">
+                ⏳ มีการแนบสลิปแล้ว — อยู่ระหว่างรอเจ้าหน้าที่ตรวจสอบ
+              </div>
+              <div style="font-size:0.85rem; color:var(--muted); margin-top:4px;">
+                แนบเมื่อ: ${fmtDate(bill.slip_uploaded_at || bill.created_at)}
+                ${bill.payment_notes ? `<br>หมายเหตุจากผู้โอน: <strong>${bill.payment_notes}</strong>` : ''}
+              </div>
+            </div>
+            ${bill.slip_url ? `
+              <img src="${bill.slip_url}" class="img-thumb-preview" alt="สลิป" onclick="window.showImageModal('${bill.slip_url}', 'สลิปโอนเงิน ห้อง ${bill.room_number}')" title="คลิกดูสลิปขนาดเต็ม" style="width:72px; height:72px;">
+            ` : ''}
+          </div>
+          ${isAdminOrStaff ? `
+            <div style="display:flex; gap:10px; margin-top:14px; padding-top:12px; border-top:1px dashed #FFE082;">
+              <button type="button" class="btn btn-primary" id="btn-approve-slip" style="flex:1;">
+                ${ic('check')} ✅ อนุมัติการชำระเงิน (ออกใบเสร็จ)
+              </button>
+              <button type="button" class="btn btn-outline" id="btn-reject-slip" style="color:var(--danger); border-color:#fadbd8;">
+                ${ic('x')} ❌ ปฏิเสธสลิป / แจ้งโอนใหม่
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      <!-- ส่วนชำระเงิน และแนบสลิปโอนเงิน -->
       ${!isPaid ? `
-        <div class="qr-payment-box">
+        <div class="qr-payment-box" style="margin-top:20px;">
           <div style="flex: 1;">
             <div style="font-weight: 600; color: var(--teal-950); margin-bottom: 6px; font-size: 1rem;">
               📱 สแกนจ่ายผ่าน Thai QR PromptPay
             </div>
             <p style="font-size: 0.85rem; color: var(--muted); margin: 0 0 8px 0; line-height: 1.5;">
               รองรับทุกแอปพลิเคชันธนาคาร (พร้อมเพย์: 089-999-8877 นายเกียรติศักดิ์ บริหาร)<br>
-              เมื่อโอนชำระเรียบร้อย กรุณาส่งสลิปผ่าน Line OA: <strong>@tanakritdorm</strong>
+              เมื่อโอนชำระเรียบร้อย สามารถแนบสลิปด้านล่างเพื่อให้เจ้าหน้าที่อนุมัติทันที
             </p>
           </div>
           <div style="text-align: center;">
@@ -721,13 +927,56 @@ function openInvoiceModal(bill) {
             <div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">สแกนเพื่อจ่ายเงิน</div>
           </div>
         </div>
-      ` : `
-        <div style="background: var(--mint-50); border: 1.5px solid var(--emerald); border-radius: 12px; padding: 16px; text-align: center; margin-top: 20px;">
-          <div style="color: var(--emerald); font-weight: 600; font-size: 1.1rem;">
-            ✓ ได้รับการชำระเงินเรียบร้อยแล้ว
+
+        <!-- ฟอร์มอัปโหลดสลิป -->
+        <div style="margin-top:18px; background:#FAFDFB; border:1.5px solid var(--line); border-radius:12px; padding:18px;">
+          <h4 style="margin:0 0 8px 0; color:var(--teal-950); display:flex; align-items:center; gap:8px;">
+            ${ic('image')} แนบสลิปหลักฐานการโอนเงิน (Upload Payment Slip)
+          </h4>
+          <p style="font-size:0.85rem; color:var(--muted); margin:0 0 14px 0;">
+            คลิกกล่องด้านล่างเพื่อเลือกรูปสลิปจากเครื่อง หรือถ่ายรูปสลิป
+          </p>
+
+          <input type="file" id="slip-file-input" accept="image/*" style="display:none;">
+
+          <div class="upload-dropzone" id="slip-dropzone">
+            <div id="slip-dropzone-content">
+              <div style="font-size:2rem; margin-bottom:4px;">📸</div>
+              <div style="font-weight:600; color:var(--teal-950); font-size:0.95rem;">คลิกเพื่อเลือกไฟล์รูปภาพสลิป</div>
+              <div style="font-size:0.8rem; color:var(--muted); margin-top:4px;">รองรับ JPG, PNG, WEBP (ระบบบีบอัดขนาดให้อัตโนมัติ)</div>
+            </div>
+            <div id="slip-preview-wrap" style="display:none; align-items:center; justify-content:center; gap:14px;">
+              <img id="slip-preview-img" style="max-height:120px; border-radius:8px; border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+              <div>
+                <div id="slip-filename" style="font-size:0.85rem; font-weight:600; color:var(--teal-950); margin-bottom:6px;"></div>
+                <button type="button" class="btn btn-outline btn-sm" id="btn-change-slip">เปลี่ยนรูปภาพ</button>
+              </div>
+            </div>
           </div>
-          <div style="font-size: 0.85rem; color: var(--muted); margin-top: 4px;">
-            ขอบคุณที่ชำระค่าบริการตรงเวลา ออกใบเสร็จโดย Tanakrit Dormitory System
+
+          <div class="field" style="margin-top:12px;">
+            <label style="font-size:0.85rem;">หมายเหตุเพิ่มเติม (ถ้ามี เช่น เวลาที่โอน หรือชื่อธนาคาร)</label>
+            <input type="text" id="slip-notes-input" placeholder="เช่น โอนจาก SCB เวลา 09:45 น.">
+          </div>
+
+          <button type="button" class="btn btn-primary" id="btn-submit-slip" style="width:100%; margin-top:14px;" disabled>
+            🚀 ส่งหลักฐานการชำระเงินให้เจ้าหน้าที่
+          </button>
+        </div>
+      ` : `
+        <div style="background: var(--mint-50); border: 1.5px solid var(--emerald); border-radius: 12px; padding: 16px; margin-top: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+            <div>
+              <div style="color: var(--emerald); font-weight: 600; font-size: 1.1rem;">
+                ✓ ได้รับการชำระเงินเรียบร้อยแล้ว
+              </div>
+              <div style="font-size: 0.85rem; color: var(--muted); margin-top: 4px;">
+                ขอบคุณที่ชำระค่าบริการตรงเวลา ออกใบเสร็จโดย Tanakrit Dormitory System
+              </div>
+            </div>
+            ${bill.slip_url ? `
+              <img src="${bill.slip_url}" class="img-thumb-preview" alt="สลิป" onclick="window.showImageModal('${bill.slip_url}', 'สลิปการชำระเงิน ห้อง ${bill.room_number}')" title="คลิกดูสลิปที่แนบไว้" style="width:64px; height:64px;">
+            ` : ''}
           </div>
         </div>
       `}
@@ -745,6 +994,110 @@ function openInvoiceModal(bill) {
     footer,
     maxWidth: '640px'
   });
+
+  // Bind Events สำหรับอัปโหลดสลิป
+  let selectedSlipFile = null;
+  const dropzone = document.getElementById('slip-dropzone');
+  const fileInput = document.getElementById('slip-file-input');
+  const dropzoneContent = document.getElementById('slip-dropzone-content');
+  const previewWrap = document.getElementById('slip-preview-wrap');
+  const previewImg = document.getElementById('slip-preview-img');
+  const filenameEl = document.getElementById('slip-filename');
+  const btnSubmitSlip = document.getElementById('btn-submit-slip');
+  const btnChangeSlip = document.getElementById('btn-change-slip');
+
+  if (dropzone && fileInput) {
+    dropzone.onclick = () => fileInput.click();
+    if (btnChangeSlip) {
+      btnChangeSlip.onclick = (e) => {
+        e.stopPropagation();
+        fileInput.click();
+      };
+    }
+
+    fileInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      selectedSlipFile = file;
+
+      const objUrl = URL.createObjectURL(file);
+      previewImg.src = objUrl;
+      filenameEl.textContent = file.name;
+      dropzoneContent.style.display = 'none';
+      previewWrap.style.display = 'flex';
+      btnSubmitSlip.disabled = false;
+    };
+  }
+
+  if (btnSubmitSlip) {
+    btnSubmitSlip.onclick = async () => {
+      if (!selectedSlipFile) {
+        toast('กรุณาเลือกไฟล์สลิปก่อนส่ง', 'error');
+        return;
+      }
+
+      btnSubmitSlip.disabled = true;
+      btnSubmitSlip.textContent = '⏳ กำลังประมวลผลรูปภาพและส่งสลิป...';
+
+      try {
+        const dataUrl = await compressImage(selectedSlipFile, 1200, 0.85);
+        const notes = document.getElementById('slip-notes-input') ? document.getElementById('slip-notes-input').value.trim() : '';
+
+        const { error } = await supabase.from('meter_readings').eq('id', bill.id).update({
+          status: 'verifying',
+          slip_url: dataUrl,
+          slip_uploaded_at: new Date().toISOString(),
+          payment_notes: notes
+        });
+
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการบันทึกสลิป', 'error');
+          btnSubmitSlip.disabled = false;
+          btnSubmitSlip.textContent = '🚀 ส่งหลักฐานการชำระเงินให้เจ้าหน้าที่';
+          return;
+        }
+
+        toast('ส่งหลักฐานสลิปโอนเงินเรียบร้อยแล้ว อยู่ระหว่างเจ้าหน้าที่ตรวจสอบ', 'success');
+        closeModal();
+        if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+      } catch (err) {
+        console.error('Slip upload error:', err);
+        toast('ไม่สามารถประมวลผลรูปภาพสลิปได้', 'error');
+        btnSubmitSlip.disabled = false;
+      }
+    };
+  }
+
+  // Bind Events อนุมัติ / ปฏิเสธ สำหรับ Admin & Staff
+  const btnApproveSlip = document.getElementById('btn-approve-slip');
+  if (btnApproveSlip) {
+    btnApproveSlip.onclick = async () => {
+      btnApproveSlip.disabled = true;
+      await supabase.from('meter_readings').eq('id', bill.id).update({
+        status: 'paid'
+      });
+      toast(`อนุมัติการชำระเงินห้อง ${bill.room_number} สำเร็จ`, 'success');
+      closeModal();
+      if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+    };
+  }
+
+  const btnRejectSlip = document.getElementById('btn-reject-slip');
+  if (btnRejectSlip) {
+    btnRejectSlip.onclick = async () => {
+      const reason = prompt('ระบุเหตุผลในการปฏิเสธสลิป (เช่น ยอดเงินไม่ตรง หรือสลิปไม่ชัดเจน):', 'สลิปไม่ชัดเจน กรุณาแนบใหม่อีกครั้ง');
+      if (reason === null) return;
+
+      btnRejectSlip.disabled = true;
+      await supabase.from('meter_readings').eq('id', bill.id).update({
+        status: 'pending',
+        payment_notes: `[ปฏิเสธ]: ${reason}`
+      });
+      toast(`ปฏิเสธสลิปและแจ้งให้ห้อง ${bill.room_number} โอนใหม่แล้ว`, 'info');
+      closeModal();
+      if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+    };
+  }
 }
 
 // Modal จดมิเตอร์ใหม่
@@ -1447,6 +1800,13 @@ async function loadTenantsData() {
       if (!target) return;
       if (confirm(`ยืนยันการแจ้งย้ายออก / ลบข้อมูลผู้พัก "${target.name}" ห้อง ${target.room}?`)) {
         await supabase.from('tenants').eq('id', id).delete();
+        // ลบบัญชีผู้ใช้งานที่ผูกกับห้องหรือรหัสผู้เช่านี้ด้วย
+        if (target.tenant_id) {
+          await supabase.from('users').eq('username', target.tenant_id).delete();
+        }
+        if (target.room) {
+          await supabase.from('users').eq('room', target.room).delete();
+        }
         // Update room status to vacant if needed
         const { data: matchedRooms } = await supabase.from('rooms').eq('room_number', target.room);
         if (matchedRooms && matchedRooms.length > 0) {
@@ -1555,6 +1915,23 @@ function openAddTenantModal() {
       role: 'student'
     }]);
 
+    // สร้างบัญชีผู้ใช้สำหรับ Login ให้อัตโนมัติ (Username: รหัสนักศึกษา/เบอร์โทร, Password: เลขห้อง)
+    const username = tid || phone || ('student' + room);
+    const initialPassword = room;
+    await supabase.from('users').insert([{
+      id: 'U-' + Math.floor(1000 + Math.random() * 9000),
+      username: username,
+      password: initialPassword,
+      role: 'student',
+      name: name,
+      room: room,
+      phone: phone,
+      email: email,
+      tenant_id: tid,
+      role_title: `ผู้พักอาศัย (ห้อง ${room})`,
+      status: 'active'
+    }]);
+
     // Update room status
     await supabase.from('rooms').eq('room_number', room).update({
       status: 'occupied',
@@ -1562,7 +1939,7 @@ function openAddTenantModal() {
       tenant_phone: phone
     });
 
-    toast(`ลงทะเบียน ${name} เข้าห้อง ${room} สำเร็จ`, 'success');
+    toast(`ลงทะเบียน ${name} เข้าห้อง ${room} และสร้างบัญชีผู้ใช้ (Username: ${username}, Password: ${initialPassword}) สำเร็จ`, 'success');
     closeModal();
     loadTenantsData();
   };
@@ -1635,10 +2012,416 @@ function openEditTenantModal(tenant) {
       check_in: checkin
     });
 
-    toast('แก้ไขข้อมูลผู้เช่าเรียบร้อยแล้ว', 'success');
+    // อัปเดตข้อมูลในตาราง users ด้วย
+    if (tenant.tenant_id) {
+      await supabase.from('users').eq('username', tenant.tenant_id).update({
+        name,
+        room,
+        phone,
+        email,
+        tenant_id: tid
+      });
+    } else if (tenant.room) {
+      await supabase.from('users').eq('room', tenant.room).update({
+        name,
+        room,
+        phone,
+        email,
+        tenant_id: tid
+      });
+    }
+
+    toast('แก้ไขข้อมูลผู้เช่าและซิงค์บัญชีผู้ใช้เรียบร้อยแล้ว', 'success');
     closeModal();
     loadTenantsData();
   };
+}
+
+
+/* ========== js/bookings.js ========== */
+// js/bookings.js
+// ระบบจองห้องพักออนไลน์สำหรับบุคคลภายนอก และระบบจัดการการจองสำหรับ Admin
+
+
+let bookingFilterStatus = 'all';
+let bookingSearchTerm = '';
+
+// ฟังก์ชันเปิด Modal จองห้องพักจากหน้า Landing Page (เรียกใช้งานได้แบบ Public)
+function openBookingModal(preselectedType = '') {
+  const body = `
+    <form id="form-public-booking">
+      <div style="background:#f4fbf7; border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:16px;">
+        <div style="font-size:0.88rem; color:var(--teal-950); line-height:1.5;">
+          ✨ กรอกข้อมูลเพื่อแจ้งความประสงค์จองหรือสอบถามห้องพักว่าง เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันห้องพักและแจ้งรายละเอียดเงินมัดจำครับ
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="field">
+          <label>ชื่อ - นามสกุล ผู้จอง *</label>
+          <input type="text" id="bk-name" required placeholder="นาย/นางสาว ...">
+        </div>
+        <div class="field">
+          <label>เบอร์โทรศัพท์ติดต่อ *</label>
+          <input type="tel" id="bk-phone" required placeholder="08x-xxx-xxxx">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="field">
+          <label>Line ID (สำหรับติดต่อส่งรูป/สัญญา)</label>
+          <input type="text" id="bk-line" placeholder="เช่น @line_id หรือเบอร์โทร">
+        </div>
+        <div class="field">
+          <label>ประเภทห้องพักที่สนใจ *</label>
+          <select id="bk-type" required>
+            <option value="Standard Air" ${preselectedType === 'Standard Air' ? 'selected' : ''}>Standard Air (ห้องแอร์) 3,500 - 3,700 ฿</option>
+            <option value="Standard Fan" ${preselectedType === 'Standard Fan' ? 'selected' : ''}>Standard Fan (ห้องพัดลม) 2,800 - 3,000 ฿</option>
+            <option value="Deluxe Corner" ${preselectedType === 'Deluxe Corner' ? 'selected' : ''}>Deluxe Corner (ห้องมุมกว้าง) 4,200 - 4,400 ฿</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="field">
+          <label>ชั้นที่ต้องการ (ถ้ามีในใจ)</label>
+          <select id="bk-floor">
+            <option value="">ชั้นไหนก็ได้ (ตามห้องว่าง)</option>
+            <option value="1">ชั้น 1 (เข้า-ออกสะดวก)</option>
+            <option value="2">ชั้น 2 (บรรยากาศกำลังดี)</option>
+            <option value="3">ชั้น 3 (วิวสูง เงียบสงบ)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>วันที่คาดว่าจะเข้าพัก *</label>
+          <input type="date" id="bk-date" required value="${new Date().toISOString().split('T')[0]}">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>ข้อความเพิ่มเติม / ความต้องการพิเศษ</label>
+        <textarea id="bk-notes" rows="3" placeholder="เช่น มีรถจักรยานยนต์ 1 คัน, ต้องการห้องชั้นสูง, ขอนัดดูห้องตัวอย่างวันเสาร์นี้"></textarea>
+      </div>
+    </form>
+  `;
+
+  const footer = `
+    <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ปิด</button>
+    <button type="button" class="btn btn-primary" id="btn-submit-booking">🚀 ส่งข้อมูลจองห้องพัก</button>
+  `;
+
+  showModal({
+    title: '📝 ลงชื่อจองห้องพัก / สอบถามห้องว่าง — Tanakrit Dormitory',
+    body,
+    footer,
+    maxWidth: '560px'
+  });
+
+  const submitBtn = document.getElementById('btn-submit-booking');
+  if (submitBtn) {
+    submitBtn.onclick = async () => {
+      const name = document.getElementById('bk-name').value.trim();
+      const phone = document.getElementById('bk-phone').value.trim();
+      const line = document.getElementById('bk-line').value.trim();
+      const type = document.getElementById('bk-type').value;
+      const floor = document.getElementById('bk-floor').value ? Number(document.getElementById('bk-floor').value) : null;
+      const date = document.getElementById('bk-date').value;
+      const notes = document.getElementById('bk-notes').value.trim();
+
+      if (!name || !phone || !type || !date) {
+        toast('กรุณากรอกข้อมูลที่จำเป็น (*) ให้ครบถ้วน', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'กำลังส่งข้อมูล...';
+
+      const bookingId = 'BK-' + Math.floor(1000 + Math.random() * 9000);
+
+      const { error } = await supabase.from('bookings').insert([{
+        id: bookingId,
+        full_name: name,
+        phone,
+        line_id: line,
+        room_type: type,
+        preferred_floor: floor,
+        expected_check_in: date,
+        notes,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }]);
+
+      if (error) {
+        console.error('Booking save error:', error);
+        toast('เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 ส่งข้อมูลจองห้องพัก';
+        return;
+      }
+
+      closeModal();
+      showModal({
+        title: '🎉 ส่งข้อมูลการจองสำเร็จ',
+        body: `
+          <div style="text-align:center; padding: 20px 10px;">
+            <div style="font-size: 3rem; margin-bottom: 12px;">✅</div>
+            <h3 style="color:var(--teal-950); margin-bottom: 8px;">รับข้อมูลการจองเรียบร้อยแล้ว</h3>
+            <p style="color:var(--muted); line-height: 1.6; margin-bottom: 16px;">
+              รหัสการจองของคุณคือ: <strong style="color:var(--teal-900); font-size:1.1rem;">${bookingId}</strong><br>
+              เจ้าหน้าที่หอพักชายธนกฤษฎ์จะติดต่อกลับผ่านเบอร์ <strong>${phone}</strong> เพื่อยืนยันห้องพักและขั้นตอนเข้าพักโดยเร็วที่สุดครับ
+            </p>
+            <div style="font-size:0.85rem; background:#f4fbf7; padding:10px; border-radius:8px; color:var(--teal-900);">
+              📞 หากมีข้อสงสัยเร่งด่วน ติดต่อโทร. 075-345-678 หรือ Line: @tanakritdorm
+            </div>
+          </div>
+        `,
+        footer: `<button type="button" class="btn btn-primary" onclick="window.closeAppModal()" style="width:100%;">ตกลง</button>`,
+        maxWidth: '480px'
+      });
+    };
+  }
+}
+window.openBookingModal = openBookingModal;
+
+// มุมมองหน้าจอจัดการ Bookings สำหรับ Admin & Staff
+async function renderBookingsView() {
+  setTimeout(() => {
+    bindBookingsEvents();
+    loadBookingsData();
+  }, 0);
+
+  return `
+    <div class="card">
+      <div class="card-header-actions">
+        <div>
+          <h3>${ic('calendar')} การจองห้องพักออนไลน์ (Online Bookings)</h3>
+          <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
+            รายการผู้สนใจจองห้องพักที่ส่งมาจากหน้า Landing Page เพื่อให้เจ้าหน้าที่โทรติดต่อกลับ
+          </p>
+        </div>
+        <button class="btn btn-primary" id="btn-admin-add-booking">
+          ${ic('plus')} บันทึกการจองใหม่
+        </button>
+      </div>
+
+      <!-- Stats Summary Strip -->
+      <div class="hero-stats-strip" style="background:#f4fbf7; margin: 18px 0; border: 1px solid var(--line); border-radius:12px; padding:16px;">
+        <div class="hstat-item">
+          <div class="num" id="stat-total-bk" style="color:var(--teal-900); font-size:1.6rem;">-</div>
+          <div class="lbl">คำขอจองทั้งหมด</div>
+        </div>
+        <div class="hstat-item">
+          <div class="num" id="stat-pending-bk" style="color:#d9534f; font-size:1.6rem;">-</div>
+          <div class="lbl">รอติดต่อกลับ ⏳</div>
+        </div>
+        <div class="hstat-item">
+          <div class="num" id="stat-contacted-bk" style="color:#0275d8; font-size:1.6rem;">-</div>
+          <div class="lbl">ติดต่อแล้ว 📞</div>
+        </div>
+        <div class="hstat-item">
+          <div class="num" id="stat-confirmed-bk" style="color:var(--emerald); font-size:1.6rem;">-</div>
+          <div class="lbl">ยืนยันการเข้าพัก 🎉</div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar-filter-grid" style="margin-top: 16px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+        <div class="search-box-wrap" style="flex: 1; min-width: 250px;">
+          ${ic('search')}
+          <input type="text" id="booking-search-input" placeholder="ค้นหาชื่อผู้จอง, เบอร์โทร, LINE ID หรือประเภทห้อง...">
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-sm btn-outline filter-bk-btn active" data-status="all">ทั้งหมด</button>
+          <button class="btn btn-sm btn-outline filter-bk-btn" data-status="pending">รอติดต่อ</button>
+          <button class="btn btn-sm btn-outline filter-bk-btn" data-status="contacted">ติดต่อแล้ว</button>
+          <button class="btn btn-sm btn-outline filter-bk-btn" data-status="confirmed">ยืนยันแล้ว</button>
+          <button class="btn btn-outline" id="btn-refresh-bookings">${ic('check')} รีเฟรช</button>
+        </div>
+      </div>
+
+      <div class="table-responsive" style="margin-top: 16px;">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>รหัส / วันที่ยื่นเรื่อง</th>
+              <th>ผู้สนใจจอง</th>
+              <th>ประเภทห้องที่สนใจ</th>
+              <th>วันที่ต้องการเข้าพัก</th>
+              <th>หมายเหตุ / ความต้องการ</th>
+              <th>สถานะ</th>
+              <th>การกระทำ</th>
+            </tr>
+          </thead>
+          <tbody id="bookings-tbody">
+            <tr><td colspan="7" style="text-align:center; padding: 30px; color:var(--muted);">กำลังโหลดข้อมูลการจอง...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+async function loadBookingsData() {
+  const tbody = document.getElementById('bookings-tbody');
+  if (!tbody) return;
+
+  const { data: bookings, error } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
+
+  if (error || !bookings) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger); padding: 24px;">ไม่สามารถโหลดข้อมูลการจองได้ (ตารางอาจยังไม่ถูกสร้างใน Supabase)</td></tr>`;
+    return;
+  }
+
+  // Update Stats
+  const total = bookings.length;
+  const pending = bookings.filter(b => b.status === 'pending').length;
+  const contacted = bookings.filter(b => b.status === 'contacted').length;
+  const confirmed = bookings.filter(b => b.status === 'confirmed').length;
+
+  const totalEl = document.getElementById('stat-total-bk');
+  const pendingEl = document.getElementById('stat-pending-bk');
+  const contactedEl = document.getElementById('stat-contacted-bk');
+  const confirmedEl = document.getElementById('stat-confirmed-bk');
+
+  if (totalEl) totalEl.textContent = total;
+  if (pendingEl) pendingEl.textContent = pending;
+  if (contactedEl) contactedEl.textContent = contacted;
+  if (confirmedEl) confirmedEl.textContent = confirmed;
+
+  // Filter
+  let filtered = bookings;
+  if (bookingFilterStatus !== 'all') {
+    filtered = filtered.filter(b => b.status === bookingFilterStatus);
+  }
+
+  if (bookingSearchTerm) {
+    const q = bookingSearchTerm.toLowerCase();
+    filtered = filtered.filter(b =>
+      (b.full_name || '').toLowerCase().includes(q) ||
+      (b.phone || '').toLowerCase().includes(q) ||
+      (b.line_id || '').toLowerCase().includes(q) ||
+      (b.room_type || '').toLowerCase().includes(q) ||
+      (b.notes || '').toLowerCase().includes(q)
+    );
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted); padding: 30px;">ไม่พบรายการจองตามเงื่อนไข</td></tr>`;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(b => {
+    let statusBadge = '';
+    if (b.status === 'pending') {
+      statusBadge = `<span class="badge" style="background:#FFF3E0; color:#E65100; font-weight:600;">⏳ รอติดต่อกลับ</span>`;
+    } else if (b.status === 'contacted') {
+      statusBadge = `<span class="badge" style="background:#E3F2FD; color:#0D47A1; font-weight:600;">📞 ติดต่อแล้ว</span>`;
+    } else if (b.status === 'confirmed') {
+      statusBadge = `<span class="badge approved" style="font-weight:600;">🎉 ยืนยันเข้าพัก</span>`;
+    } else {
+      statusBadge = `<span class="badge rejected">ยกเลิก</span>`;
+    }
+
+    html += `
+      <tr>
+        <td>
+          <div style="font-weight: 700; color:var(--teal-950);">${b.id}</div>
+          <small style="color:var(--muted);">${fmtDate(b.created_at)}</small>
+        </td>
+        <td>
+          <div style="font-weight: 600; color:var(--teal-950);">${b.full_name}</div>
+          <div style="font-size:0.85rem; margin-top:2px;">
+            <a href="tel:${b.phone}" style="color:var(--emerald); font-weight:600;">📞 ${b.phone}</a>
+            ${b.line_id ? ` • <span style="color:#00B900;">Line: ${b.line_id}</span>` : ''}
+          </div>
+        </td>
+        <td>
+          <span class="badge" style="background:var(--mint-50); color:var(--teal-900); font-weight:600;">${b.room_type}</span>
+          ${b.preferred_floor ? `<small style="display:block; color:var(--muted); margin-top:2px;">ชั้น ${b.preferred_floor}</small>` : ''}
+        </td>
+        <td>
+          <strong>${fmtDate(b.expected_check_in)}</strong>
+        </td>
+        <td>
+          <div style="font-size:0.85rem; color:var(--teal-950); max-width:240px; word-break:break-word;">
+            ${b.notes || '-'}
+          </div>
+        </td>
+        <td>${statusBadge}</td>
+        <td>
+          <div style="display: flex; gap: 6px; align-items:center;">
+            <select class="form-select status-select-bk" data-id="${b.id}" style="padding:4px 8px; font-size:0.8rem; border-radius:6px; border:1px solid var(--line);">
+              <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>รอติดต่อกลับ</option>
+              <option value="contacted" ${b.status === 'contacted' ? 'selected' : ''}>ติดต่อแล้ว</option>
+              <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>ยืนยันเข้าพัก</option>
+              <option value="cancelled" ${b.status === 'cancelled' ? 'selected' : ''}>ยกเลิก</option>
+            </select>
+            <button class="btn btn-outline btn-sm btn-del-bk" data-id="${b.id}" title="ลบรายการ" style="color:var(--danger); border-color:#fadbd8; padding:4px 8px;">
+              ${ic('trash')}
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+
+  // Bind Status Changer
+  tbody.querySelectorAll('.status-select-bk').forEach(sel => {
+    sel.onchange = async (e) => {
+      const id = sel.getAttribute('data-id');
+      const newStatus = e.target.value;
+      await supabase.from('bookings').eq('id', id).update({ status: newStatus });
+      toast(`อัปเดตสถานะการจอง ${id} เรียบร้อยแล้ว`, 'success');
+      loadBookingsData();
+    };
+  });
+
+  // Bind Delete
+  tbody.querySelectorAll('.btn-del-bk').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute('data-id');
+      if (confirm(`คุณต้องการลบรายการจอง ${id} หรือไม่?`)) {
+        await supabase.from('bookings').eq('id', id).delete();
+        toast('ลบรายการจองเรียบร้อยแล้ว', 'info');
+        loadBookingsData();
+      }
+    };
+  });
+}
+
+function bindBookingsEvents() {
+  const searchInput = document.getElementById('booking-search-input');
+  if (searchInput) {
+    searchInput.oninput = (e) => {
+      bookingSearchTerm = e.target.value.trim();
+      loadBookingsData();
+    };
+  }
+
+  const refreshBtn = document.getElementById('btn-refresh-bookings');
+  if (refreshBtn) {
+    refreshBtn.onclick = () => {
+      toast('รีเฟรชข้อมูลการจอง...', 'info');
+      loadBookingsData();
+    };
+  }
+
+  const adminAddBtn = document.getElementById('btn-admin-add-booking');
+  if (adminAddBtn) {
+    adminAddBtn.onclick = () => openBookingModal();
+  }
+
+  document.querySelectorAll('.filter-bk-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.filter-bk-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      bookingFilterStatus = btn.getAttribute('data-status');
+      loadBookingsData();
+    };
+  });
 }
 
 
@@ -2066,9 +2849,16 @@ async function loadMaintenanceData() {
             ${t.category}
           </span>
         </td>
-        <td style="max-width: 240px;">
-          <div style="font-size:0.9rem; line-height:1.4;">${t.description}</div>
-          <small style="color:var(--muted);">แจ้งเมื่อ: ${fmtDate(t.created_at)}</small>
+        <td style="max-width: 250px;">
+          <div style="font-size:0.9rem; line-height:1.4; color:var(--teal-950);">${t.description}</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+            <small style="color:var(--muted);">${fmtDate(t.created_at)}</small>
+            ${t.image_url ? `
+              <span style="display:inline-flex; align-items:center; gap:4px; font-size:0.8rem; color:var(--teal-900); cursor:pointer; background:#E8F5E9; border:1px solid #C8E6C9; padding:2px 8px; border-radius:6px; font-weight:600;" onclick="window.showImageModal('${t.image_url}', 'รูปจุดชำรุด: ${t.category} (ห้อง ${t.room_number})')">
+                📸 ดูรูปถ่าย
+              </span>
+            ` : ''}
+          </div>
         </td>
         <td>${urgencyBadge}</td>
         <td>${t.technician || '<span style="color:var(--muted);">ยังไม่ระบุ</span>'}</td>
@@ -2157,9 +2947,29 @@ function openCreateTicketModal() {
         </select>
       </div>
 
-      <div class="field">
+      <div class="field" style="margin-bottom: 14px;">
         <label>รายละเอียดอาการที่ชำรุดเสียหาย *</label>
-        <textarea id="tk-desc" rows="4" placeholder="ระบุอาการชำรุด จุดที่เกิดปัญหา เช่น ท่อน้ำใต้ซิงค์รั่ว, แอร์มีน้ำหยด, ปลั๊กหัวเตียงไม่มีไฟ" required></textarea>
+        <textarea id="tk-desc" rows="3" placeholder="ระบุอาการชำรุด จุดที่เกิดปัญหา เช่น ท่อน้ำใต้ซิงค์รั่ว, แอร์มีน้ำหยด, ปลั๊กหัวเตียงไม่มีไฟ" required></textarea>
+      </div>
+
+      <!-- ส่วนแนบรูปภาพจุดชำรุด -->
+      <div class="field">
+        <label>แนบรูปภาพจุดที่ชำรุด (ไม่บังคับ แต่ช่วยให้ช่างเตรียมเครื่องมือได้ตรงจุด)</label>
+        <input type="file" id="tk-photo-input" accept="image/*" style="display:none;">
+        <div class="upload-dropzone" id="tk-photo-dropzone" style="padding:14px;">
+          <div id="tk-dropzone-content">
+            <div style="font-size:1.6rem; margin-bottom:2px;">📸</div>
+            <div style="font-size:0.88rem; font-weight:600; color:var(--teal-950);">คลิกเพื่อถ่ายรูป หรือเลือกรูปภาพความเสียหาย</div>
+            <div style="font-size:0.75rem; color:var(--muted); margin-top:2px;">รองรับ JPG, PNG, WEBP (ระบบจะย่อขนาดให้อัตโนมัติ)</div>
+          </div>
+          <div id="tk-preview-wrap" style="display:none; align-items:center; justify-content:center; gap:12px;">
+            <img id="tk-preview-img" style="max-height:100px; border-radius:8px; border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+            <div>
+              <div id="tk-photo-name" style="font-size:0.8rem; font-weight:600; color:var(--teal-950); margin-bottom:4px;"></div>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-change-tk-photo">เปลี่ยนรูป</button>
+            </div>
+          </div>
+        </div>
       </div>
     </form>
   `;
@@ -2176,7 +2986,39 @@ function openCreateTicketModal() {
     maxWidth: '560px'
   });
 
-  document.getElementById('btn-submit-ticket').onclick = async () => {
+  // Photo Selection
+  let selectedPhotoFile = null;
+  const photoDropzone = document.getElementById('tk-photo-dropzone');
+  const photoInput = document.getElementById('tk-photo-input');
+  const dropzoneContent = document.getElementById('tk-dropzone-content');
+  const previewWrap = document.getElementById('tk-preview-wrap');
+  const previewImg = document.getElementById('tk-preview-img');
+  const photoNameEl = document.getElementById('tk-photo-name');
+  const btnChangePhoto = document.getElementById('btn-change-tk-photo');
+
+  if (photoDropzone && photoInput) {
+    photoDropzone.onclick = () => photoInput.click();
+    if (btnChangePhoto) {
+      btnChangePhoto.onclick = (e) => {
+        e.stopPropagation();
+        photoInput.click();
+      };
+    }
+
+    photoInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      selectedPhotoFile = file;
+
+      previewImg.src = URL.createObjectURL(file);
+      photoNameEl.textContent = file.name;
+      dropzoneContent.style.display = 'none';
+      previewWrap.style.display = 'flex';
+    };
+  }
+
+  const submitTicketBtn = document.getElementById('btn-submit-ticket');
+  submitTicketBtn.onclick = async () => {
     const room = document.getElementById('tk-room').value.trim();
     const cat = document.getElementById('tk-cat').value;
     const name = document.getElementById('tk-name').value.trim();
@@ -2189,9 +3031,21 @@ function openCreateTicketModal() {
       return;
     }
 
+    submitTicketBtn.disabled = true;
+    submitTicketBtn.textContent = 'กำลังส่งข้อมูลแจ้งซ่อม...';
+
+    let imageUrl = null;
+    if (selectedPhotoFile) {
+      try {
+        imageUrl = await compressImage(selectedPhotoFile, 1200, 0.82);
+      } catch (err) {
+        console.warn('Image compress warning:', err);
+      }
+    }
+
     const newTicketId = 'FIX-' + Math.floor(100 + Math.random() * 900);
 
-    await supabase.from('maintenance').insert([{
+    const { error } = await supabase.from('maintenance').insert([{
       id: newTicketId,
       room_number: room,
       requester_name: name,
@@ -2201,8 +3055,17 @@ function openCreateTicketModal() {
       urgency: urgency,
       status: 'pending',
       technician: '',
+      image_url: imageUrl,
       created_at: new Date().toISOString().split('T')[0]
     }]);
+
+    if (error) {
+      console.error('Ticket insert error:', error);
+      toast('เกิดข้อผิดพลาดในการบันทึกแจ้งซ่อม', 'error');
+      submitTicketBtn.disabled = false;
+      submitTicketBtn.textContent = 'ส่งคำขอแจ้งซ่อม';
+      return;
+    }
 
     toast(`เปิดใบแจ้งซ่อม ${newTicketId} เรียบร้อยแล้ว`, 'success');
     closeModal();
@@ -2215,12 +3078,20 @@ function openUpdateTicketModal(ticket) {
     <form id="form-update-ticket">
       <div style="background: var(--mint-50); padding: 14px; border-radius: 10px; margin-bottom: 16px; border: 1px solid var(--line);">
         <div style="display:flex; justify-content:space-between;">
-          <strong style="color:var(--teal-950);">${ticket.id} — ห้อง ${ticket.room_number}</strong>
+          <strong style="color:var(--teal-950); font-size:1.05rem;">${ticket.id} — ห้อง ${ticket.room_number}</strong>
           <span style="font-size:0.85rem; color:var(--muted);">${fmtDate(ticket.created_at)}</span>
         </div>
         <div style="margin-top:6px; font-size:0.9rem; color:var(--teal-900);">หมวดหมู่: <strong>${ticket.category}</strong></div>
         <div style="margin-top:4px; font-size:0.85rem; color:var(--ink);">${ticket.description}</div>
       </div>
+
+      ${ticket.image_url ? `
+        <div style="margin-bottom:16px; background:#FAFDFB; border:1px solid var(--line); border-radius:10px; padding:12px; text-align:center;">
+          <div style="font-size:0.85rem; font-weight:600; color:var(--teal-950); margin-bottom:6px;">📸 รูปถ่ายจุดชำรุดที่ผู้แจ้งแนบมา:</div>
+          <img src="${ticket.image_url}" style="max-height:170px; border-radius:8px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1); object-fit:contain;" onclick="window.showImageModal('${ticket.image_url}', 'รูปถ่ายแจ้งซ่อม: ${ticket.id}')" title="คลิกเพื่อดูรูปขยายใหญ่">
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">(คลิกที่รูปเพื่อดูรูปภาพขยายใหญ่)</div>
+        </div>
+      ` : ''}
 
       <div class="field" style="margin-bottom: 14px;">
         <label>สถานะงานซ่อม</label>
@@ -2862,6 +3733,424 @@ async function loadReportsData() {
 }
 
 
+/* ========== js/users.js ========== */
+// js/users.js
+// ระบบจัดการบัญชีผู้ใช้งาน (User Management) สำหรับ Admin
+
+
+let usersSearchTerm = '';
+let currentRoleFilter = 'all';
+async function renderUsersView() {
+  setTimeout(() => {
+    bindUsersEvents();
+    loadUsersData();
+  }, 0);
+
+  return `
+    <div class="card">
+      <div class="card-header-actions">
+        <div>
+          <h3>${ic('user')} จัดการบัญชีผู้ใช้งาน (User Management)</h3>
+          <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
+            กำหนดสิทธิ์การเข้าใช้งาน เพิ่ม/แก้ไข และรีเซ็ตรหัสผ่านสำหรับ Admin, เจ้าหน้าที่ และผู้พักอาศัย
+          </p>
+        </div>
+        <button class="btn btn-primary" id="btn-add-user">
+          ${ic('plus')} เพิ่มบัญชีผู้ใช้ใหม่
+        </button>
+      </div>
+
+      <!-- User Stats Summary Strip -->
+      <div class="hero-stats-strip" style="background:#f4fbf7; margin: 18px 0; border: 1px solid var(--line); border-radius:12px; padding:16px;">
+        <div class="hstat-item">
+          <div class="num" id="stat-total-users" style="color:var(--teal-900); font-size:1.6rem;">-</div>
+          <div class="lbl">ผู้ใช้งานทั้งหมด</div>
+        </div>
+        <div class="hstat-item">
+          <div class="num" id="stat-admin-users" style="color:#d9534f; font-size:1.6rem;">-</div>
+          <div class="lbl">ผู้ดูแลระบบ (Admin)</div>
+        </div>
+        <div class="hstat-item">
+          <div class="num" id="stat-staff-users" style="color:#0275d8; font-size:1.6rem;">-</div>
+          <div class="lbl">เจ้าหน้าที่ (Staff)</div>
+        </div>
+        <div class="hstat-item">
+          <div class="num" id="stat-student-users" style="color:var(--emerald); font-size:1.6rem;">-</div>
+          <div class="lbl">ผู้พักอาศัย (Student)</div>
+        </div>
+      </div>
+
+      <!-- Search & Filter Toolbar -->
+      <div class="toolbar-filter-grid" style="margin-top: 16px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+        <div class="search-box-wrap" style="flex: 1; min-width: 250px;">
+          ${ic('search')}
+          <input type="text" id="users-search-input" placeholder="ค้นหาชื่อผู้ใช้ (Username), ชื่อ-นามสกุล, ห้อง หรือเบอร์โทร...">
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-sm btn-outline filter-btn active" data-filter="all">ทั้งหมด</button>
+          <button class="btn btn-sm btn-outline filter-btn" data-filter="admin">Admin</button>
+          <button class="btn btn-sm btn-outline filter-btn" data-filter="staff">Staff</button>
+          <button class="btn btn-sm btn-outline filter-btn" data-filter="student">Student</button>
+          <button class="btn btn-outline" id="btn-refresh-users">${ic('check')} รีเฟรช</button>
+        </div>
+      </div>
+
+      <div class="table-responsive" style="margin-top: 16px;">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>ชื่อผู้ใช้ (Username)</th>
+              <th>ชื่อ - นามสกุล</th>
+              <th>สิทธิ์การใช้งาน (Role)</th>
+              <th>ห้องพัก</th>
+              <th>ข้อมูลติดต่อ</th>
+              <th>รหัสผ่าน</th>
+              <th>สถานะ</th>
+              <th>จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <tr><td colspan="8" style="text-align:center; padding: 30px; color:var(--muted);">กำลังโหลดข้อมูลผู้ใช้งาน...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+async function loadUsersData() {
+  const tbody = document.getElementById('users-tbody');
+  if (!tbody) return;
+
+  const { data: users, error } = await supabase.from('users').select('*').order('role', { ascending: true });
+
+  if (error || !users) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger); padding: 24px;">ไม่สามารถโหลดข้อมูลผู้ใช้งานได้</td></tr>`;
+    return;
+  }
+
+  // Update summary counts
+  const total = users.length;
+  const admins = users.filter(u => u.role === 'admin').length;
+  const staff = users.filter(u => u.role === 'staff').length;
+  const students = users.filter(u => u.role === 'student').length;
+
+  const totalEl = document.getElementById('stat-total-users');
+  const adminEl = document.getElementById('stat-admin-users');
+  const staffEl = document.getElementById('stat-staff-users');
+  const studentEl = document.getElementById('stat-student-users');
+
+  if (totalEl) totalEl.textContent = total;
+  if (adminEl) adminEl.textContent = admins;
+  if (staffEl) staffEl.textContent = staff;
+  if (studentEl) studentEl.textContent = students;
+
+  // Filter
+  let filtered = users;
+  if (currentRoleFilter !== 'all') {
+    filtered = filtered.filter(u => u.role === currentRoleFilter);
+  }
+
+  if (usersSearchTerm) {
+    const q = usersSearchTerm.toLowerCase();
+    filtered = filtered.filter(u =>
+      (u.username || '').toLowerCase().includes(q) ||
+      (u.name || '').toLowerCase().includes(q) ||
+      (u.room || '').toLowerCase().includes(q) ||
+      (u.phone || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q)
+    );
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding: 30px;">ไม่พบข้อมูลผู้ใช้ตามเงื่อนไข</td></tr>`;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(u => {
+    let roleBadge = '';
+    if (u.role === 'admin') {
+      roleBadge = `<span class="badge" style="background:#FDE8E7; color:var(--danger); font-weight:600;">👑 Admin</span>`;
+    } else if (u.role === 'staff') {
+      roleBadge = `<span class="badge" style="background:#E3F2FD; color:#0D47A1; font-weight:600;">🛠️ Staff</span>`;
+    } else {
+      roleBadge = `<span class="badge" style="background:var(--mint-50); color:var(--emerald); font-weight:600;">🎓 Student</span>`;
+    }
+
+    const isActive = u.status !== 'suspended';
+    const statusPill = isActive
+      ? `<span class="badge approved" style="font-size:0.8rem;">🟢 ใช้งานได้</span>`
+      : `<span class="badge rejected" style="font-size:0.8rem;">🔴 ระงับชั่วคราว</span>`;
+
+    html += `
+      <tr>
+        <td>
+          <div style="font-weight: 700; color:var(--teal-950); font-family: monospace; font-size:1rem;">
+            ${u.username}
+          </div>
+          <small style="color:var(--muted);">${u.id}</small>
+        </td>
+        <td>
+          <div style="font-weight: 500; color:var(--teal-950);">${u.name}</div>
+          <small style="color:var(--muted);">${u.role_title || '-'}</small>
+        </td>
+        <td>${roleBadge}</td>
+        <td>${u.room ? `<span class="badge room-pill">ห้อง ${u.room}</span>` : '<span style="color:var(--muted);">-</span>'}</td>
+        <td>
+          <div>${u.phone ? `<a href="tel:${u.phone}" style="color:var(--emerald);">${u.phone}</a>` : '-'}</div>
+          <small style="color:var(--muted);">${u.email || ''}</small>
+        </td>
+        <td>
+          <div style="font-family:monospace; background:#f4f6f5; padding:4px 8px; border-radius:6px; display:inline-block; font-size:0.85rem;">
+            ${u.password}
+          </div>
+        </td>
+        <td>${statusPill}</td>
+        <td>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-outline btn-sm btn-edit-user" data-user-id="${u.id}" title="แก้ไขข้อมูล/รหัสผ่าน">
+              ${ic('edit')} แก้ไข
+            </button>
+            <button class="btn btn-outline btn-sm btn-toggle-status" data-user-id="${u.id}" data-active="${isActive}" title="${isActive ? 'ระงับการใช้งาน' : 'เปิดใช้งาน'}">
+              ${isActive ? 'ระงับ' : 'เปิดใช้'}
+            </button>
+            ${u.username !== 'admin' ? `
+              <button class="btn btn-outline btn-sm btn-del-user" data-user-id="${u.id}" data-username="${u.username}" title="ลบบัญชีนี้" style="color:var(--danger); border-color:#fadbd8;">
+                ${ic('trash')}
+              </button>
+            ` : ''}
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+
+  // Bind Row Buttons
+  tbody.querySelectorAll('.btn-edit-user').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-user-id');
+      const target = users.find(x => x.id === id);
+      if (target) openUserModal(target);
+    };
+  });
+
+  tbody.querySelectorAll('.btn-toggle-status').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute('data-user-id');
+      const target = users.find(x => x.id === id);
+      if (!target) return;
+      const nextStatus = target.status === 'suspended' ? 'active' : 'suspended';
+      await supabase.from('users').eq('id', id).update({ status: nextStatus });
+      toast(`เปลี่ยนสถานะบัญชี ${target.username} เป็น ${nextStatus === 'active' ? 'เปิดใช้งาน' : 'ระงับการใช้งาน'} แล้ว`, 'success');
+      loadUsersData();
+    };
+  });
+
+  tbody.querySelectorAll('.btn-del-user').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute('data-user-id');
+      const uName = btn.getAttribute('data-username');
+      if (confirm(`คุณต้องการลบบัญชีผู้ใช้ "${uName}" หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้`)) {
+        await supabase.from('users').eq('id', id).delete();
+        toast(`ลบบัญชีผู้ใช้ ${uName} สำเร็จ`, 'info');
+        loadUsersData();
+      }
+    };
+  });
+}
+
+function bindUsersEvents() {
+  const input = document.getElementById('users-search-input');
+  if (input) {
+    input.oninput = (e) => {
+      usersSearchTerm = e.target.value.trim();
+      loadUsersData();
+    };
+  }
+
+  const refreshBtn = document.getElementById('btn-refresh-users');
+  if (refreshBtn) {
+    refreshBtn.onclick = () => {
+      toast('กำลังดึงข้อมูลผู้ใช้ล่าสุด...', 'info');
+      loadUsersData();
+    };
+  }
+
+  const addBtn = document.getElementById('btn-add-user');
+  if (addBtn) {
+    addBtn.onclick = () => openUserModal(null);
+  }
+
+  // Filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentRoleFilter = btn.getAttribute('data-filter');
+      loadUsersData();
+    };
+  });
+}
+
+function openUserModal(user = null) {
+  const isEdit = !!user;
+  const title = isEdit ? `แก้ไขบัญชีผู้ใช้: ${user.username}` : 'เพิ่มบัญชีผู้ใช้งานใหม่';
+
+  const body = `
+    <form id="form-user-edit">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="field">
+          <label>ชื่อผู้ใช้งาน (Username) *</label>
+          <input type="text" id="u-username" value="${user ? user.username : ''}" ${isEdit ? 'disabled' : 'required'} placeholder="เช่น student103, tech1">
+        </div>
+        <div class="field">
+          <label>รหัสผ่าน (Password) *</label>
+          <input type="text" id="u-password" value="${user ? user.password : ''}" required placeholder="••••••••">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="field">
+          <label>ระดับสิทธิ์ (Role) *</label>
+          <select id="u-role" required>
+            <option value="student" ${user && user.role === 'student' ? 'selected' : ''}>Student (ผู้พักอาศัย)</option>
+            <option value="staff" ${user && user.role === 'staff' ? 'selected' : ''}>Staff (เจ้าหน้าที่/ช่าง)</option>
+            <option value="admin" ${user && user.role === 'admin' ? 'selected' : ''}>Admin (ผู้ดูแลระบบ)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>เลขห้องพัก (เฉพาะ Student)</label>
+          <input type="text" id="u-room" value="${user ? (user.room || '') : ''}" placeholder="เช่น 103, 302">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="field">
+          <label>ชื่อ - นามสกุล *</label>
+          <input type="text" id="u-name" value="${user ? user.name : ''}" required placeholder="นาย/นาง/น.ส. ...">
+        </div>
+        <div class="field">
+          <label>ตำแหน่ง / คำอธิบายสิทธิ์</label>
+          <input type="text" id="u-title" value="${user ? (user.role_title || '') : ''}" placeholder="เช่น ผู้พักอาศัย, ช่างเทคนิค">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="field">
+          <label>เบอร์โทรศัพท์</label>
+          <input type="tel" id="u-phone" value="${user ? (user.phone || '') : ''}" placeholder="08x-xxx-xxxx">
+        </div>
+        <div class="field">
+          <label>อีเมล</label>
+          <input type="email" id="u-email" value="${user ? (user.email || '') : ''}" placeholder="example@email.com">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+        <div class="field">
+          <label>รหัสนักศึกษา / ผู้เช่า (ถ้ามี)</label>
+          <input type="text" id="u-tenant-id" value="${user ? (user.tenant_id || '') : ''}" placeholder="เช่น 66565632">
+        </div>
+        <div class="field">
+          <label>สถานะบัญชี</label>
+          <select id="u-status">
+            <option value="active" ${!user || user.status !== 'suspended' ? 'selected' : ''}>🟢 ใช้งานปกติ (Active)</option>
+            <option value="suspended" ${user && user.status === 'suspended' ? 'selected' : ''}>🔴 ระงับการใช้งาน (Suspended)</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  `;
+
+  const footer = `
+    <button type="button" class="btn btn-outline" id="btn-cancel-modal">ยกเลิก</button>
+    <button type="button" class="btn btn-primary" id="btn-submit-user">${isEdit ? 'บันทึกการแก้ไข' : 'สร้างบัญชีผู้ใช้'}</button>
+  `;
+
+  showModal({
+    title,
+    body,
+    footer,
+    maxWidth: '580px'
+  });
+
+  const cancelBtn = document.getElementById('btn-cancel-modal');
+  if (cancelBtn) cancelBtn.onclick = closeModal;
+
+  document.getElementById('btn-submit-user').onclick = async () => {
+    const username = document.getElementById('u-username').value.trim();
+    const password = document.getElementById('u-password').value.trim();
+    const role = document.getElementById('u-role').value;
+    const room = document.getElementById('u-room').value.trim();
+    const name = document.getElementById('u-name').value.trim();
+    const title = document.getElementById('u-title').value.trim();
+    const phone = document.getElementById('u-phone').value.trim();
+    const email = document.getElementById('u-email').value.trim();
+    const tenant_id = document.getElementById('u-tenant-id').value.trim();
+    const status = document.getElementById('u-status').value;
+
+    if (!username || !password || !name) {
+      toast('กรุณากรอก Username, Password และชื่อ-นามสกุลให้ครบถ้วน', 'error');
+      return;
+    }
+
+    if (isEdit) {
+      const { error } = await supabase.from('users').eq('id', user.id).update({
+        password,
+        role,
+        room: role === 'student' ? room : null,
+        name,
+        role_title: title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`)),
+        phone,
+        email,
+        tenant_id,
+        status
+      });
+
+      if (error) {
+        toast('เกิดข้อผิดพลาดในการแก้ไขบัญชีผู้ใช้', 'error');
+        return;
+      }
+      toast(`แก้ไขบัญชี ${user.username} เรียบร้อยแล้ว`, 'success');
+    } else {
+      // Check duplicate username
+      const { data: exist } = await supabase.from('users').eq('username', username);
+      if (exist && exist.length > 0) {
+        toast('ชื่อผู้ใช้นี้ (Username) มีอยู่ในระบบแล้ว', 'error');
+        return;
+      }
+
+      const newId = 'U-' + Math.floor(1000 + Math.random() * 9000);
+      const { error } = await supabase.from('users').insert([{
+        id: newId,
+        username,
+        password,
+        role,
+        room: role === 'student' ? room : null,
+        name,
+        role_title: title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`)),
+        phone,
+        email,
+        tenant_id,
+        status
+      }]);
+
+      if (error) {
+        toast('เกิดข้อผิดพลาดในการสร้างบัญชีผู้ใช้', 'error');
+        return;
+      }
+      toast(`สร้างบัญชีผู้ใช้ ${username} สำเร็จ`, 'success');
+    }
+
+    closeModal();
+    loadUsersData();
+  };
+}
+
+
 /* ========== js/settings.js ========== */
 // js/settings.js
 async function renderSettingsView() {
@@ -3274,10 +4563,14 @@ async function loadStudentDashboardData() {
   if (billBox && bills && bills.length > 0) {
     const b = bills[0];
     const isPaid = b.status === 'paid';
+    const isVerifying = b.status === 'verifying';
+    let badgeClass = isPaid ? 'approved' : (isVerifying ? 'verifying' : 'pending');
+    let badgeText = isPaid ? 'ชำระแล้ว' : (isVerifying ? '⏳ รอตรวจสลิป' : 'รอชำระเงิน');
+
     billBox.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <h3>${ic('bill')} ยอดชำระค่าน้ำ-ค่าไฟ (${b.month_label || b.billing_month})</h3>
-        <span class="badge ${isPaid ? 'approved' : 'pending'}">${isPaid ? 'ชำระแล้ว' : 'รอชำระเงิน'}</span>
+        <span class="badge ${badgeClass}">${badgeText}</span>
       </div>
       <div style="background:var(--mint-50); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px;">
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.9rem;">
@@ -3293,7 +4586,7 @@ async function loadStudentDashboardData() {
       </div>
       <div style="display:flex; gap:10px;">
         <button class="btn btn-primary" id="btn-open-student-invoice" style="flex:1;">
-          ${ic('qr')} ดูใบแจ้งหนี้ / สแกนจ่าย
+          ${isVerifying ? `${ic('eye')} ดูสลิป / ตรวจสอบสถานะ` : `${ic('qr')} ดูใบแจ้งหนี้ / แนบสลิปโอนเงิน`}
         </button>
       </div>
     `;
@@ -3427,9 +4720,12 @@ function renderProfileView() {
 
 
 
+
+
 // กู้คืนฟังก์ชันปิด Modal สากล
 window.closeAppModal = closeModal;
 window.toggleLoginModal = toggleLoginModal;
+window.openBookingModal = openBookingModal;
 window.quickLoginAs = (role) => {
   quickLoginAs(role, (user) => {
     setupSidebarMenu(user);
@@ -3529,6 +4825,7 @@ function setupSidebarMenu(user) {
       <a href="#" class="nav-item active" data-view="dashboard">${ic('home')} ภาพรวมระบบ (Dashboard)</a>
       <a href="#" class="nav-item" data-view="rooms">${ic('door')} ผังห้องพัก (Floor Plan)</a>
       <a href="#" class="nav-item" data-view="tenants">${ic('users')} ทะเบียนผู้พักอาศัย</a>
+      <a href="#" class="nav-item" data-view="bookings">${ic('calendar')} การจองห้องพัก (Bookings)</a>
       
       <div class="sidebar-section-title">งานบริการและธุรกรรม</div>
       <a href="#" class="nav-item" data-view="utilities">${ic('bill')} ค่าน้ำ-ค่าไฟ & บิล</a>
@@ -3538,6 +4835,7 @@ function setupSidebarMenu(user) {
       
       <div class="sidebar-section-title">การจัดการ</div>
       <a href="#" class="nav-item" data-view="reports">${ic('chart')} รายงานและสถิติ</a>
+      ${user.role === 'admin' ? `<a href="#" class="nav-item" data-view="users">${ic('user')} จัดการผู้ใช้งาน (Users)</a>` : ''}
       <a href="#" class="nav-item" data-view="settings">${ic('gear')} ตั้งค่าระบบ</a>
     `;
   } else if (user.role === 'student') {
@@ -3595,6 +4893,9 @@ window.switchView = async function(viewName) {
   } else if (viewName === 'tenants') {
     titleEl.textContent = 'ทะเบียนและประวัติผู้พักอาศัย';
     bodyEl.innerHTML = await renderTenantsView();
+  } else if (viewName === 'bookings') {
+    titleEl.textContent = 'การจองห้องพักออนไลน์ (Online Bookings)';
+    bodyEl.innerHTML = await renderBookingsView();
   } else if (viewName === 'requests') {
     titleEl.textContent = 'จัดการคำร้องขอสลับห้องพัก';
     bodyEl.innerHTML = renderRequestsView();
@@ -3617,6 +4918,9 @@ window.switchView = async function(viewName) {
   } else if (viewName === 'reports') {
     titleEl.textContent = 'รายงานสถิติและผลการดำเนินงาน';
     bodyEl.innerHTML = await renderReportsView();
+  } else if (viewName === 'users') {
+    titleEl.textContent = 'จัดการบัญชีผู้ใช้งานระบบ (User Management)';
+    bodyEl.innerHTML = await renderUsersView();
   } else if (viewName === 'profile') {
     titleEl.textContent = 'ข้อมูลส่วนตัวผู้พักอาศัย';
     bodyEl.innerHTML = renderProfileView();

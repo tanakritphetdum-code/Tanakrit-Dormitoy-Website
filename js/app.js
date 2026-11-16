@@ -10,11 +10,14 @@ import { renderParcelsView } from './parcels.js';
 import { renderAnnouncementsView } from './announcements.js';
 import { renderReportsView } from './reports.js';
 import { renderSettingsView } from './settings.js';
+import { renderUsersView } from './users.js';
+import { renderBookingsView, openBookingModal } from './bookings.js';
 import { toast, ic, closeModal } from './api.js';
 
 // กู้คืนฟังก์ชันปิด Modal สากล
 window.closeAppModal = closeModal;
 window.toggleLoginModal = toggleLoginModal;
+window.openBookingModal = openBookingModal;
 window.quickLoginAs = (role) => {
   quickLoginAs(role, (user) => {
     setupSidebarMenu(user);
@@ -114,6 +117,7 @@ export function setupSidebarMenu(user) {
       <a href="#" class="nav-item active" data-view="dashboard">${ic('home')} ภาพรวมระบบ (Dashboard)</a>
       <a href="#" class="nav-item" data-view="rooms">${ic('door')} ผังห้องพัก (Floor Plan)</a>
       <a href="#" class="nav-item" data-view="tenants">${ic('users')} ทะเบียนผู้พักอาศัย</a>
+      <a href="#" class="nav-item" data-view="bookings">${ic('calendar')} การจองห้องพัก (Bookings)</a>
       
       <div class="sidebar-section-title">งานบริการและธุรกรรม</div>
       <a href="#" class="nav-item" data-view="utilities">${ic('bill')} ค่าน้ำ-ค่าไฟ & บิล</a>
@@ -123,6 +127,7 @@ export function setupSidebarMenu(user) {
       
       <div class="sidebar-section-title">การจัดการ</div>
       <a href="#" class="nav-item" data-view="reports">${ic('chart')} รายงานและสถิติ</a>
+      ${user.role === 'admin' ? `<a href="#" class="nav-item" data-view="users">${ic('user')} จัดการผู้ใช้งาน (Users)</a>` : ''}
       <a href="#" class="nav-item" data-view="settings">${ic('gear')} ตั้งค่าระบบ</a>
     `;
   } else if (user.role === 'student') {
@@ -180,6 +185,9 @@ window.switchView = async function(viewName) {
   } else if (viewName === 'tenants') {
     titleEl.textContent = 'ทะเบียนและประวัติผู้พักอาศัย';
     bodyEl.innerHTML = await renderTenantsView();
+  } else if (viewName === 'bookings') {
+    titleEl.textContent = 'การจองห้องพักออนไลน์ (Online Bookings)';
+    bodyEl.innerHTML = await renderBookingsView();
   } else if (viewName === 'requests') {
     titleEl.textContent = 'จัดการคำร้องขอสลับห้องพัก';
     bodyEl.innerHTML = renderRequestsView();
@@ -202,6 +210,9 @@ window.switchView = async function(viewName) {
   } else if (viewName === 'reports') {
     titleEl.textContent = 'รายงานสถิติและผลการดำเนินงาน';
     bodyEl.innerHTML = await renderReportsView();
+  } else if (viewName === 'users') {
+    titleEl.textContent = 'จัดการบัญชีผู้ใช้งานระบบ (User Management)';
+    bodyEl.innerHTML = await renderUsersView();
   } else if (viewName === 'profile') {
     titleEl.textContent = 'ข้อมูลส่วนตัวผู้พักอาศัย';
     bodyEl.innerHTML = renderProfileView();

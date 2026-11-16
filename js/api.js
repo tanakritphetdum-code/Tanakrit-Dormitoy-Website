@@ -25,8 +25,12 @@ export const ICONS = {
   phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
   sparkles: '<path d="M12 3l1.91 5.89a1 1 0 0 0 .95.69h6.19l-5.01 3.64a1 1 0 0 0-.36 1.12l1.91 5.89-5.01-3.64a1 1 0 0 0-1.18 0l-5.01 3.64 1.91-5.89a1 1 0 0 0-.36-1.12L1.95 9.58h6.19a1 1 0 0 0 .95-.69L12 3z"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  key: '<path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5-3 3 1.5 1.5-2 2-1.5-1.5-3 3 1.5 1.5-2 2-1.5-1.5L2 19v3h3l1.5-1.5-1.5-1.5 2-2 1.5 1.5 3-3-1.5-1.5 2-2 1.5 1.5 3-3-1.5-1.5L19 4l2-2z"/>',
   trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
-  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'
 };
 
 export function ic(name, cls = '') {
@@ -104,3 +108,60 @@ export function closeModal() {
     modalBackdrop.classList.remove('active');
   }
 }
+
+// ย่อขนาดรูปภาพและแปลงเป็น Data URL สำหรับเก็บในฐานข้อมูลอย่างมีประสิทธิภาพ
+export function compressImage(file, maxDimension = 1000, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    if (!file.type || !file.type.startsWith('image/')) {
+      return reject(new Error('ไฟล์ที่เลือกไม่ใช่รูปภาพ'));
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = () => reject(new Error('ไม่สามารถประมวลผลรูปภาพได้'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('ไม่สามารถอ่านไฟล์ได้'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// แสดงรูปภาพขนาดใหญ่ใน Modal
+export function showImageModal(imgUrl, title = 'ดูรูปภาพขยายใหญ่') {
+  showModal({
+    title,
+    body: `
+      <div style="text-align:center; padding:8px 0;">
+        <img src="${imgUrl}" alt="Preview" style="max-width:100%; max-height:72vh; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.12); object-fit:contain;">
+      </div>
+    `,
+    footer: `
+      <a href="${imgUrl}" download="image.jpg" class="btn btn-outline" style="margin-right:auto;">${ic('printer')} บันทึกรูปภาพ</a>
+      <button type="button" class="btn btn-primary" onclick="window.closeAppModal()">ปิดหน้าต่าง</button>
+    `,
+    maxWidth: '680px'
+  });
+}
+window.showImageModal = showImageModal;

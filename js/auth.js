@@ -1,6 +1,9 @@
 // js/auth.js
+// ระบบยืนยันตัวตน (Authentication) เชื่อมต่อตาราง users ใน Supabase Cloud
 import { toast } from './api.js';
+import { supabase } from './supabase.js';
 
+// รายชื่อบัญชีเริ่มต้นสำรอง (สำหรับกรณีออฟไลน์)
 export const USERS = [
   { username: 'admin', password: 'admin123', role: 'admin', name: 'นายเกียรติศักดิ์ บริหาร (ผู้จัดการหอพัก)', initial: 'ผ', tenantId: null, room: null, roleTitle: 'ผู้ดูแลระบบสูงสุด' },
   { username: 'staff', password: 'staff123', role: 'staff', name: 'นางสาวสมหญิง เจ้าหน้าที่หอพัก', initial: 'ส', tenantId: null, room: null, roleTitle: 'เจ้าหน้าที่ธุรการ/ช่าง' },
@@ -23,41 +26,117 @@ export function initAuth() {
   return null;
 }
 
-export function handleLogin(e, onSuccess) {
+// ตรวจสอบการ Login ผ่าน Supabase users table
+export async function handleLogin(e, onSuccess) {
   if (e) e.preventDefault();
   const u = document.getElementById('login-username').value.trim();
   const p = document.getElementById('login-password').value;
-  const found = USERS.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
   const errBox = document.getElementById('login-error');
+  const btnSubmit = document.querySelector('#login-form button[type="submit"]');
 
-  if (!found) {
-    if (errBox) {
-      errBox.classList.remove('hidden');
-      errBox.style.display = 'block';
+  if (btnSubmit) {
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'กำลังตรวจสอบ...';
+  }
+
+  try {
+    let found = null;
+
+    // 1. ตรวจสอบผ่านตาราง users บน Supabase
+    const { data, error } = await supabase.from('users').eq('username', u);
+    if (!error && data && data.length > 0) {
+      const user = data[0];
+      if (user.password === p) {
+        found = {
+          ...user,
+          tenantId: user.tenant_id,
+          roleTitle: user.role_title || (user.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (user.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${user.room || '-'})`)),
+          initial: user.name ? user.name.trim().charAt(0) : 'U'
+        };
+      }
     }
-    toast('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
-    return;
+
+    // 2. สำรอง: ถ้าไม่พบใน Supabase ให้ดูใน USERS อาเรย์เริ่มต้น
+    if (!found) {
+      found = USERS.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
+    }
+
+    if (!found) {
+      if (errBox) {
+        errBox.textContent = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
+        errBox.classList.remove('hidden');
+        errBox.style.display = 'block';
+      }
+      toast('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+      return;
+    }
+
+    if (found.status === 'suspended') {
+      if (errBox) {
+        errBox.textContent = 'บัญชีผู้ใช้นี้ถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ';
+        errBox.classList.remove('hidden');
+        errBox.style.display = 'block';
+      }
+      toast('บัญชีผู้ใช้นี้ถูกระงับการใช้งาน', 'error');
+      return;
+    }
+
+    if (errBox) {
+      errBox.classList.add('hidden');
+      errBox.style.display = 'none';
+    }
+
+    if (!found.initial && found.name) {
+      found.initial = found.name.trim().charAt(0);
+    }
+
+    setCurrentUser(found);
+    toggleLoginModal(false);
+
+    if (onSuccess) onSuccess(found);
+    toast(`ยินดีต้อนรับ ${found.name}`, 'success');
+  } catch (err) {
+    console.error('Login process error:', err);
+    toast('เกิดข้อผิดพลาดในการตรวจสอบบัญชีผู้ใช้', 'error');
+  } finally {
+    if (btnSubmit) {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'เข้าสู่ระบบ';
+    }
   }
-
-  if (errBox) {
-    errBox.classList.add('hidden');
-    errBox.style.display = 'none';
-  }
-
-  setCurrentUser(found);
-  toggleLoginModal(false);
-
-  if (onSuccess) onSuccess(found);
-  toast(`ยินดีต้อนรับ ${found.name}`, 'success');
 }
 
-export function quickLoginAs(roleName, onSuccess) {
-  const found = USERS.find(x => x.role === roleName);
-  if (!found) return;
-  setCurrentUser(found);
-  toggleLoginModal(false);
-  if (onSuccess) onSuccess(found);
-  toast(`เข้าสู่ระบบในฐานะ ${found.name} (${found.roleTitle})`, 'success');
+// 1-Click Quick Demo Login (ดึงข้อมูลล่าสุดจาก Supabase)
+export async function quickLoginAs(roleName, onSuccess) {
+  try {
+    let found = null;
+    const { data } = await supabase.from('users').eq('role', roleName);
+    if (data && data.length > 0) {
+      const u = data[0];
+      found = {
+        ...u,
+        tenantId: u.tenant_id,
+        roleTitle: u.role_title || (u.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (u.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${u.room || '302'})`)),
+        initial: u.name ? u.name.trim().charAt(0) : 'U'
+      };
+    } else {
+      found = USERS.find(x => x.role === roleName);
+    }
+
+    if (!found) return;
+
+    setCurrentUser(found);
+    toggleLoginModal(false);
+    if (onSuccess) onSuccess(found);
+    toast(`เข้าสู่ระบบในฐานะ ${found.name} (${found.roleTitle || found.role})`, 'success');
+  } catch (e) {
+    const fallback = USERS.find(x => x.role === roleName);
+    if (fallback) {
+      setCurrentUser(fallback);
+      toggleLoginModal(false);
+      if (onSuccess) onSuccess(fallback);
+    }
+  }
 }
 
 export function setCurrentUser(user) {

@@ -782,6 +782,11 @@ img, svg { display: block; max-width: 100%; }
 .badge.approved { background: var(--mint-50); color: var(--emerald); }
 .badge.rejected { background: #FDE8E7; color: var(--danger); }
 .badge.in-progress { background: var(--sky-100); color: #166479; }
+.badge.verifying { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; font-weight: 600; }
+.upload-dropzone { border: 2px dashed var(--line); border-radius: 12px; padding: 18px; text-align: center; background: #FAFDFB; cursor: pointer; transition: all 0.2s ease; }
+.upload-dropzone:hover { border-color: var(--teal-900); background: #F0F8F5; }
+.img-thumb-preview { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; border: 1px solid var(--line); cursor: pointer; transition: transform 0.2s; vertical-align: middle; }
+.img-thumb-preview:hover { transform: scale(1.08); box-shadow: 0 4px 10px rgba(0,0,0,0.12); }
 .room-pill { background: var(--mint-50); color: var(--teal-950); font-weight: 600; padding: 4px 10px; border-radius: 8px; font-size: 0.82rem; }
 .room-swap-indicator { display: flex; align-items: center; gap: 8px; }
 .room-swap-indicator .arrow { color: var(--emerald); font-weight: bold; }

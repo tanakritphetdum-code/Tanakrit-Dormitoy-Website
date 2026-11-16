@@ -245,10 +245,14 @@ async function loadStudentDashboardData() {
   if (billBox && bills && bills.length > 0) {
     const b = bills[0];
     const isPaid = b.status === 'paid';
+    const isVerifying = b.status === 'verifying';
+    let badgeClass = isPaid ? 'approved' : (isVerifying ? 'verifying' : 'pending');
+    let badgeText = isPaid ? 'ชำระแล้ว' : (isVerifying ? '⏳ รอตรวจสลิป' : 'รอชำระเงิน');
+
     billBox.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <h3>${ic('bill')} ยอดชำระค่าน้ำ-ค่าไฟ (${b.month_label || b.billing_month})</h3>
-        <span class="badge ${isPaid ? 'approved' : 'pending'}">${isPaid ? 'ชำระแล้ว' : 'รอชำระเงิน'}</span>
+        <span class="badge ${badgeClass}">${badgeText}</span>
       </div>
       <div style="background:var(--mint-50); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px;">
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.9rem;">
@@ -264,7 +268,7 @@ async function loadStudentDashboardData() {
       </div>
       <div style="display:flex; gap:10px;">
         <button class="btn btn-primary" id="btn-open-student-invoice" style="flex:1;">
-          ${ic('qr')} ดูใบแจ้งหนี้ / สแกนจ่าย
+          ${isVerifying ? `${ic('eye')} ดูสลิป / ตรวจสอบสถานะ` : `${ic('qr')} ดูใบแจ้งหนี้ / แนบสลิปโอนเงิน`}
         </button>
       </div>
     `;

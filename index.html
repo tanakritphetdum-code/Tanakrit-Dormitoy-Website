@@ -73,7 +73,7 @@
                     ระบบแจ้งซ่อมอุปกรณ์ด่วน ออกบิลพร้อม QR Code สแกนจ่าย และจุดรับพัสดุไปรษณีย์ที่ปลอดภัยตลอด 24 ชั่วโมง
                 </p>
                 <div class="hero-actions">
-                    <a href="#rooms" class="btn btn-sand">ดูห้องพักว่างและอัตราค่าเช่า</a>
+                    <button class="btn btn-sand" onclick="window.openBookingModal && window.openBookingModal()">📝 สนใจจองห้องพักออนไลน์</button>
                     <button class="btn btn-outline-white" onclick="document.getElementById('btn-toggle-login').click()">
                         เข้าสู่ระบบผู้พักและเจ้าหน้าที่
                     </button>
@@ -128,7 +128,7 @@
                             <span class="rcard-pill">🚿 เครื่องทำน้ำอุ่น</span>
                             <span class="rcard-pill">🛜 Free Wi-Fi</span>
                         </div>
-                        <button class="btn btn-outline" style="width:100%;" onclick="document.getElementById('btn-toggle-login').click()">จองห้องพัก / สอบถาม</button>
+                        <button class="btn btn-outline" style="width:100%;" onclick="window.openBookingModal && window.openBookingModal('Standard Air')">จองห้องพัก / สอบถาม</button>
                     </div>
                 </div>
 
@@ -150,7 +150,7 @@
                             <span class="rcard-pill">🪟 ระเบียงกว้าง</span>
                             <span class="rcard-pill">🛜 Wi-Fi ความเร็วสูง</span>
                         </div>
-                        <button class="btn btn-outline" style="width:100%;" onclick="document.getElementById('btn-toggle-login').click()">จองห้องพัก / สอบถาม</button>
+                        <button class="btn btn-outline" style="width:100%;" onclick="window.openBookingModal && window.openBookingModal('Deluxe Corner')">จองห้องพัก / สอบถาม</button>
                     </div>
                 </div>
 
@@ -172,7 +172,7 @@
                             <span class="rcard-pill">🚿 ห้องน้ำส่วนตัว</span>
                             <span class="rcard-pill">🛜 Free Wi-Fi</span>
                         </div>
-                        <button class="btn btn-outline" style="width:100%;" onclick="document.getElementById('btn-toggle-login').click()">จองห้องพัก / สอบถาม</button>
+                        <button class="btn btn-outline" style="width:100%;" onclick="window.openBookingModal && window.openBookingModal('Standard Fan')">จองห้องพัก / สอบถาม</button>
                     </div>
                 </div>
             </div>
@@ -283,8 +283,8 @@
                             <span style="font-size:1.1rem; font-weight:600; color:var(--teal-950);">ยอดรวมแรกเข้าทั้งหมด:</span>
                             <span style="font-family:'Kanit'; font-size:1.9rem; font-weight:700; color:var(--emerald);" id="calc-total-show">7,400 ฿</span>
                         </div>
-                        <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="document.getElementById('btn-toggle-login').click()">
-                            ติดต่อจองห้องพักทันที
+                        <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="window.openBookingModal && window.openBookingModal()">
+                            📝 ติดต่อจองห้องพักทันที
                         </button>
                     </div>
                 </div>
@@ -423,7 +423,7 @@
                 <form id="login-form">
                     <div class="field">
                         <label>ชื่อผู้ใช้งาน (Username)</label>
-                        <input type="text" id="login-username" required placeholder="admin / staff / student">
+                        <input type="text" id="login-username" required placeholder="admin / staff / รหัสนักศึกษา / เลขห้อง">
                     </div>
                     <div class="field">
                         <label>รหัสผ่าน (Password)</label>

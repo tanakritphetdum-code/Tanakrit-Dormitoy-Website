@@ -1,6 +1,7 @@
 // js/utilities.js
 import { supabase } from './supabase.js';
-import { ic, fmtCurrency, fmtDate, showModal, closeModal, toast } from './api.js';
+import { ic, fmtCurrency, fmtDate, showModal, closeModal, toast, compressImage, showImageModal } from './api.js';
+import { currentUser } from './auth.js';
 
 let utilityStatusFilter = 'all';
 
@@ -16,7 +17,7 @@ export async function renderUtilitiesView() {
         <div>
           <h3>${ic('bill')} ระบบบันทึกมิเตอร์น้ำ-ไฟ และออกใบแจ้งหนี้ (Billing & Utilities)</h3>
           <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
-            คำนวณค่าน้ำ ค่าไฟ ค่าเช่าห้อง ออกใบเสร็จรับเงิน และสร้าง QR Code สแกนจ่าย
+            คำนวณค่าน้ำ ค่าไฟ ค่าเช่าห้อง ตรวจสอบสลิปโอนเงิน และสร้าง QR Code สแกนจ่าย
           </p>
         </div>
         <button class="btn btn-primary" id="btn-add-meter">
@@ -34,6 +35,7 @@ export async function renderUtilitiesView() {
         <div class="filter-tabs" id="utility-status-tabs">
           <button class="filter-tab-btn active" data-status="all">ทั้งหมด</button>
           <button class="filter-tab-btn" data-status="pending">รอชำระเงิน</button>
+          <button class="filter-tab-btn" data-status="verifying" style="color:#E65100;">รอตรวจสลิป ⏳</button>
           <button class="filter-tab-btn" data-status="paid">ชำระแล้ว</button>
         </div>
         <div style="margin-left: auto;">
@@ -81,6 +83,7 @@ async function loadUtilitiesData() {
   // Summary counters
   const totalBills = readings.length;
   const pendingBills = readings.filter(r => r.status === 'pending');
+  const verifyingBills = readings.filter(r => r.status === 'verifying');
   const paidBills = readings.filter(r => r.status === 'paid');
   const totalRevenue = readings.reduce((acc, cur) => acc + (cur.total_price || 0), 0);
   const pendingAmount = pendingBills.reduce((acc, cur) => acc + (cur.total_price || 0), 0);
@@ -93,7 +96,11 @@ async function loadUtilitiesData() {
       </div>
       <div class="rstat-item vacant">
         <span class="num" style="color:var(--danger);">${fmtCurrency(pendingAmount)}</span>
-        <span class="lbl">ค้างชำระ (${pendingBills.length} บิล)</span>
+        <span class="lbl">รอชำระ (${pendingBills.length} บิล)</span>
+      </div>
+      <div class="rstat-item" style="background:#FFF8E1; border:1px solid #FFE082;">
+        <span class="num" style="color:#E65100;">${verifyingBills.length}</span>
+        <span class="lbl" style="color:#B78103; font-weight:600;">รอตรวจสลิป ⏳</span>
       </div>
       <div class="rstat-item occupied">
         <span class="num">${paidBills.length}</span>
@@ -115,8 +122,17 @@ async function loadUtilitiesData() {
   let html = '';
   filtered.forEach(r => {
     const isPaid = r.status === 'paid';
-    const badgeClass = isPaid ? 'approved' : 'pending';
-    const badgeText = isPaid ? 'ชำระแล้ว' : 'รอชำระ';
+    const isVerifying = r.status === 'verifying';
+    let badgeClass = 'pending';
+    let badgeText = 'รอชำระ';
+
+    if (isPaid) {
+      badgeClass = 'approved';
+      badgeText = '✓ ชำระแล้ว';
+    } else if (isVerifying) {
+      badgeClass = 'verifying';
+      badgeText = '⏳ รอตรวจสลิป';
+    }
 
     html += `
       <tr>
@@ -141,10 +157,19 @@ async function loadUtilitiesData() {
         </td>
         <td><span class="badge ${badgeClass}">${badgeText}</span></td>
         <td>
-          <div style="display: flex; gap: 6px;">
-            <button class="btn btn-outline btn-sm btn-view-invoice" data-id="${r.id}" title="เปิดดูใบแจ้งหนี้ / สแกนจ่าย">
-              ${ic('bill')} ใบแจ้งหนี้
-            </button>
+          <div style="display: flex; gap: 6px; align-items:center;">
+            ${isVerifying ? `
+              <button class="btn btn-primary btn-sm btn-view-invoice" data-id="${r.id}" style="background:#E65100; border-color:#E65100;" title="ตรวจสอบสลิปโอนเงิน">
+                ${ic('eye')} ตรวจสลิป
+              </button>
+            ` : `
+              <button class="btn btn-outline btn-sm btn-view-invoice" data-id="${r.id}" title="เปิดดูใบแจ้งหนี้ / สแกนจ่าย">
+                ${ic('bill')} ใบแจ้งหนี้
+              </button>
+            `}
+            ${r.slip_url ? `
+              <img src="${r.slip_url}" class="img-thumb-preview" alt="สลิป" onclick="event.stopPropagation(); window.showImageModal('${r.slip_url}', 'สลิปโอนเงิน ห้อง ${r.room_number}')" title="คลิกดูสลิปขนาดเต็ม">
+            ` : ''}
             <button class="btn ${isPaid ? 'btn-outline' : 'btn-primary'} btn-sm btn-toggle-pay" data-id="${r.id}" title="${isPaid ? 'เปลี่ยนเป็นยังไม่ชำระ' : 'ยืนยันรับชำระเงิน'}">
               ${isPaid ? ic('x') : ic('check')}
             </button>
@@ -205,7 +230,16 @@ function bindUtilitiesEvents() {
 // Modal ใบแจ้งหนี้และ QR Code สแกนจ่าย
 export function openInvoiceModal(bill) {
   const isPaid = bill.status === 'paid';
+  const isVerifying = bill.status === 'verifying';
+  const isAdminOrStaff = currentUser && (currentUser.role === 'admin' || currentUser.role === 'staff');
   const qrMockUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PROMPTPAY-0899998877-AMOUNT-${bill.total_price}`;
+
+  let statusBadgeHtml = '<div class="invoice-badge unpaid">รอชำระเงิน</div>';
+  if (isPaid) {
+    statusBadgeHtml = '<div class="invoice-badge paid">✓ ชำระเงินแล้ว</div>';
+  } else if (isVerifying) {
+    statusBadgeHtml = '<div class="invoice-badge" style="background:#FFF3E0; color:#E65100; border:1px solid #FFE0B2;">⏳ รอตรวจสลิป</div>';
+  }
 
   const body = `
     <div class="invoice-container" id="printable-invoice">
@@ -219,9 +253,7 @@ export function openInvoiceModal(bill) {
             <div style="font-size: 0.8rem; color: var(--muted);">123 หมู่ 4 ต.ท่าเรือ อ.เมือง จ.นครศรีธรรมราช โทร. 075-345-678</div>
           </div>
           <div style="text-align: right;">
-            <div class="invoice-badge ${isPaid ? 'paid' : 'unpaid'}">
-              ${isPaid ? '✓ ชำระเงินแล้ว' : 'รอชำระเงิน'}
-            </div>
+            ${statusBadgeHtml}
             <div style="font-size: 0.85rem; margin-top: 6px; color: var(--muted);">เลขที่: <strong>${bill.id}</strong></div>
             <div style="font-size: 0.85rem; color: var(--muted);">รอบบิล: <strong>${bill.month_label || bill.billing_month}</strong></div>
           </div>
@@ -291,15 +323,46 @@ export function openInvoiceModal(bill) {
         </tfoot>
       </table>
 
+      <!-- กล่องสถานะสลิปที่แนบแล้ว (ถ้ามี) -->
+      ${isVerifying ? `
+        <div style="background:#FFF9E6; border:1.5px solid #FFC107; border-radius:12px; padding:16px; margin-top:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+            <div>
+              <div style="font-weight:700; color:#E65100; font-size:1.02rem;">
+                ⏳ มีการแนบสลิปแล้ว — อยู่ระหว่างรอเจ้าหน้าที่ตรวจสอบ
+              </div>
+              <div style="font-size:0.85rem; color:var(--muted); margin-top:4px;">
+                แนบเมื่อ: ${fmtDate(bill.slip_uploaded_at || bill.created_at)}
+                ${bill.payment_notes ? `<br>หมายเหตุจากผู้โอน: <strong>${bill.payment_notes}</strong>` : ''}
+              </div>
+            </div>
+            ${bill.slip_url ? `
+              <img src="${bill.slip_url}" class="img-thumb-preview" alt="สลิป" onclick="window.showImageModal('${bill.slip_url}', 'สลิปโอนเงิน ห้อง ${bill.room_number}')" title="คลิกดูสลิปขนาดเต็ม" style="width:72px; height:72px;">
+            ` : ''}
+          </div>
+          ${isAdminOrStaff ? `
+            <div style="display:flex; gap:10px; margin-top:14px; padding-top:12px; border-top:1px dashed #FFE082;">
+              <button type="button" class="btn btn-primary" id="btn-approve-slip" style="flex:1;">
+                ${ic('check')} ✅ อนุมัติการชำระเงิน (ออกใบเสร็จ)
+              </button>
+              <button type="button" class="btn btn-outline" id="btn-reject-slip" style="color:var(--danger); border-color:#fadbd8;">
+                ${ic('x')} ❌ ปฏิเสธสลิป / แจ้งโอนใหม่
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      <!-- ส่วนชำระเงิน และแนบสลิปโอนเงิน -->
       ${!isPaid ? `
-        <div class="qr-payment-box">
+        <div class="qr-payment-box" style="margin-top:20px;">
           <div style="flex: 1;">
             <div style="font-weight: 600; color: var(--teal-950); margin-bottom: 6px; font-size: 1rem;">
               📱 สแกนจ่ายผ่าน Thai QR PromptPay
             </div>
             <p style="font-size: 0.85rem; color: var(--muted); margin: 0 0 8px 0; line-height: 1.5;">
               รองรับทุกแอปพลิเคชันธนาคาร (พร้อมเพย์: 089-999-8877 นายเกียรติศักดิ์ บริหาร)<br>
-              เมื่อโอนชำระเรียบร้อย กรุณาส่งสลิปผ่าน Line OA: <strong>@tanakritdorm</strong>
+              เมื่อโอนชำระเรียบร้อย สามารถแนบสลิปด้านล่างเพื่อให้เจ้าหน้าที่อนุมัติทันที
             </p>
           </div>
           <div style="text-align: center;">
@@ -307,13 +370,56 @@ export function openInvoiceModal(bill) {
             <div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">สแกนเพื่อจ่ายเงิน</div>
           </div>
         </div>
-      ` : `
-        <div style="background: var(--mint-50); border: 1.5px solid var(--emerald); border-radius: 12px; padding: 16px; text-align: center; margin-top: 20px;">
-          <div style="color: var(--emerald); font-weight: 600; font-size: 1.1rem;">
-            ✓ ได้รับการชำระเงินเรียบร้อยแล้ว
+
+        <!-- ฟอร์มอัปโหลดสลิป -->
+        <div style="margin-top:18px; background:#FAFDFB; border:1.5px solid var(--line); border-radius:12px; padding:18px;">
+          <h4 style="margin:0 0 8px 0; color:var(--teal-950); display:flex; align-items:center; gap:8px;">
+            ${ic('image')} แนบสลิปหลักฐานการโอนเงิน (Upload Payment Slip)
+          </h4>
+          <p style="font-size:0.85rem; color:var(--muted); margin:0 0 14px 0;">
+            คลิกกล่องด้านล่างเพื่อเลือกรูปสลิปจากเครื่อง หรือถ่ายรูปสลิป
+          </p>
+
+          <input type="file" id="slip-file-input" accept="image/*" style="display:none;">
+
+          <div class="upload-dropzone" id="slip-dropzone">
+            <div id="slip-dropzone-content">
+              <div style="font-size:2rem; margin-bottom:4px;">📸</div>
+              <div style="font-weight:600; color:var(--teal-950); font-size:0.95rem;">คลิกเพื่อเลือกไฟล์รูปภาพสลิป</div>
+              <div style="font-size:0.8rem; color:var(--muted); margin-top:4px;">รองรับ JPG, PNG, WEBP (ระบบบีบอัดขนาดให้อัตโนมัติ)</div>
+            </div>
+            <div id="slip-preview-wrap" style="display:none; align-items:center; justify-content:center; gap:14px;">
+              <img id="slip-preview-img" style="max-height:120px; border-radius:8px; border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+              <div>
+                <div id="slip-filename" style="font-size:0.85rem; font-weight:600; color:var(--teal-950); margin-bottom:6px;"></div>
+                <button type="button" class="btn btn-outline btn-sm" id="btn-change-slip">เปลี่ยนรูปภาพ</button>
+              </div>
+            </div>
           </div>
-          <div style="font-size: 0.85rem; color: var(--muted); margin-top: 4px;">
-            ขอบคุณที่ชำระค่าบริการตรงเวลา ออกใบเสร็จโดย Tanakrit Dormitory System
+
+          <div class="field" style="margin-top:12px;">
+            <label style="font-size:0.85rem;">หมายเหตุเพิ่มเติม (ถ้ามี เช่น เวลาที่โอน หรือชื่อธนาคาร)</label>
+            <input type="text" id="slip-notes-input" placeholder="เช่น โอนจาก SCB เวลา 09:45 น.">
+          </div>
+
+          <button type="button" class="btn btn-primary" id="btn-submit-slip" style="width:100%; margin-top:14px;" disabled>
+            🚀 ส่งหลักฐานการชำระเงินให้เจ้าหน้าที่
+          </button>
+        </div>
+      ` : `
+        <div style="background: var(--mint-50); border: 1.5px solid var(--emerald); border-radius: 12px; padding: 16px; margin-top: 20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+            <div>
+              <div style="color: var(--emerald); font-weight: 600; font-size: 1.1rem;">
+                ✓ ได้รับการชำระเงินเรียบร้อยแล้ว
+              </div>
+              <div style="font-size: 0.85rem; color: var(--muted); margin-top: 4px;">
+                ขอบคุณที่ชำระค่าบริการตรงเวลา ออกใบเสร็จโดย Tanakrit Dormitory System
+              </div>
+            </div>
+            ${bill.slip_url ? `
+              <img src="${bill.slip_url}" class="img-thumb-preview" alt="สลิป" onclick="window.showImageModal('${bill.slip_url}', 'สลิปการชำระเงิน ห้อง ${bill.room_number}')" title="คลิกดูสลิปที่แนบไว้" style="width:64px; height:64px;">
+            ` : ''}
           </div>
         </div>
       `}
@@ -331,6 +437,110 @@ export function openInvoiceModal(bill) {
     footer,
     maxWidth: '640px'
   });
+
+  // Bind Events สำหรับอัปโหลดสลิป
+  let selectedSlipFile = null;
+  const dropzone = document.getElementById('slip-dropzone');
+  const fileInput = document.getElementById('slip-file-input');
+  const dropzoneContent = document.getElementById('slip-dropzone-content');
+  const previewWrap = document.getElementById('slip-preview-wrap');
+  const previewImg = document.getElementById('slip-preview-img');
+  const filenameEl = document.getElementById('slip-filename');
+  const btnSubmitSlip = document.getElementById('btn-submit-slip');
+  const btnChangeSlip = document.getElementById('btn-change-slip');
+
+  if (dropzone && fileInput) {
+    dropzone.onclick = () => fileInput.click();
+    if (btnChangeSlip) {
+      btnChangeSlip.onclick = (e) => {
+        e.stopPropagation();
+        fileInput.click();
+      };
+    }
+
+    fileInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      selectedSlipFile = file;
+
+      const objUrl = URL.createObjectURL(file);
+      previewImg.src = objUrl;
+      filenameEl.textContent = file.name;
+      dropzoneContent.style.display = 'none';
+      previewWrap.style.display = 'flex';
+      btnSubmitSlip.disabled = false;
+    };
+  }
+
+  if (btnSubmitSlip) {
+    btnSubmitSlip.onclick = async () => {
+      if (!selectedSlipFile) {
+        toast('กรุณาเลือกไฟล์สลิปก่อนส่ง', 'error');
+        return;
+      }
+
+      btnSubmitSlip.disabled = true;
+      btnSubmitSlip.textContent = '⏳ กำลังประมวลผลรูปภาพและส่งสลิป...';
+
+      try {
+        const dataUrl = await compressImage(selectedSlipFile, 1200, 0.85);
+        const notes = document.getElementById('slip-notes-input') ? document.getElementById('slip-notes-input').value.trim() : '';
+
+        const { error } = await supabase.from('meter_readings').eq('id', bill.id).update({
+          status: 'verifying',
+          slip_url: dataUrl,
+          slip_uploaded_at: new Date().toISOString(),
+          payment_notes: notes
+        });
+
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการบันทึกสลิป', 'error');
+          btnSubmitSlip.disabled = false;
+          btnSubmitSlip.textContent = '🚀 ส่งหลักฐานการชำระเงินให้เจ้าหน้าที่';
+          return;
+        }
+
+        toast('ส่งหลักฐานสลิปโอนเงินเรียบร้อยแล้ว อยู่ระหว่างเจ้าหน้าที่ตรวจสอบ', 'success');
+        closeModal();
+        if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+      } catch (err) {
+        console.error('Slip upload error:', err);
+        toast('ไม่สามารถประมวลผลรูปภาพสลิปได้', 'error');
+        btnSubmitSlip.disabled = false;
+      }
+    };
+  }
+
+  // Bind Events อนุมัติ / ปฏิเสธ สำหรับ Admin & Staff
+  const btnApproveSlip = document.getElementById('btn-approve-slip');
+  if (btnApproveSlip) {
+    btnApproveSlip.onclick = async () => {
+      btnApproveSlip.disabled = true;
+      await supabase.from('meter_readings').eq('id', bill.id).update({
+        status: 'paid'
+      });
+      toast(`อนุมัติการชำระเงินห้อง ${bill.room_number} สำเร็จ`, 'success');
+      closeModal();
+      if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+    };
+  }
+
+  const btnRejectSlip = document.getElementById('btn-reject-slip');
+  if (btnRejectSlip) {
+    btnRejectSlip.onclick = async () => {
+      const reason = prompt('ระบุเหตุผลในการปฏิเสธสลิป (เช่น ยอดเงินไม่ตรง หรือสลิปไม่ชัดเจน):', 'สลิปไม่ชัดเจน กรุณาแนบใหม่อีกครั้ง');
+      if (reason === null) return;
+
+      btnRejectSlip.disabled = true;
+      await supabase.from('meter_readings').eq('id', bill.id).update({
+        status: 'pending',
+        payment_notes: `[ปฏิเสธ]: ${reason}`
+      });
+      toast(`ปฏิเสธสลิปและแจ้งให้ห้อง ${bill.room_number} โอนใหม่แล้ว`, 'info');
+      closeModal();
+      if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+    };
+  }
 }
 
 // Modal จดมิเตอร์ใหม่

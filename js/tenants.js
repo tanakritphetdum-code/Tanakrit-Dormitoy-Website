@@ -125,6 +125,13 @@ async function loadTenantsData() {
       if (!target) return;
       if (confirm(`ยืนยันการแจ้งย้ายออก / ลบข้อมูลผู้พัก "${target.name}" ห้อง ${target.room}?`)) {
         await supabase.from('tenants').eq('id', id).delete();
+        // ลบบัญชีผู้ใช้งานที่ผูกกับห้องหรือรหัสผู้เช่านี้ด้วย
+        if (target.tenant_id) {
+          await supabase.from('users').eq('username', target.tenant_id).delete();
+        }
+        if (target.room) {
+          await supabase.from('users').eq('room', target.room).delete();
+        }
         // Update room status to vacant if needed
         const { data: matchedRooms } = await supabase.from('rooms').eq('room_number', target.room);
         if (matchedRooms && matchedRooms.length > 0) {
@@ -233,6 +240,23 @@ function openAddTenantModal() {
       role: 'student'
     }]);
 
+    // สร้างบัญชีผู้ใช้สำหรับ Login ให้อัตโนมัติ (Username: รหัสนักศึกษา/เบอร์โทร, Password: เลขห้อง)
+    const username = tid || phone || ('student' + room);
+    const initialPassword = room;
+    await supabase.from('users').insert([{
+      id: 'U-' + Math.floor(1000 + Math.random() * 9000),
+      username: username,
+      password: initialPassword,
+      role: 'student',
+      name: name,
+      room: room,
+      phone: phone,
+      email: email,
+      tenant_id: tid,
+      role_title: `ผู้พักอาศัย (ห้อง ${room})`,
+      status: 'active'
+    }]);
+
     // Update room status
     await supabase.from('rooms').eq('room_number', room).update({
       status: 'occupied',
@@ -240,7 +264,7 @@ function openAddTenantModal() {
       tenant_phone: phone
     });
 
-    toast(`ลงทะเบียน ${name} เข้าห้อง ${room} สำเร็จ`, 'success');
+    toast(`ลงทะเบียน ${name} เข้าห้อง ${room} และสร้างบัญชีผู้ใช้ (Username: ${username}, Password: ${initialPassword}) สำเร็จ`, 'success');
     closeModal();
     loadTenantsData();
   };
@@ -313,7 +337,26 @@ function openEditTenantModal(tenant) {
       check_in: checkin
     });
 
-    toast('แก้ไขข้อมูลผู้เช่าเรียบร้อยแล้ว', 'success');
+    // อัปเดตข้อมูลในตาราง users ด้วย
+    if (tenant.tenant_id) {
+      await supabase.from('users').eq('username', tenant.tenant_id).update({
+        name,
+        room,
+        phone,
+        email,
+        tenant_id: tid
+      });
+    } else if (tenant.room) {
+      await supabase.from('users').eq('room', tenant.room).update({
+        name,
+        room,
+        phone,
+        email,
+        tenant_id: tid
+      });
+    }
+
+    toast('แก้ไขข้อมูลผู้เช่าและซิงค์บัญชีผู้ใช้เรียบร้อยแล้ว', 'success');
     closeModal();
     loadTenantsData();
   };

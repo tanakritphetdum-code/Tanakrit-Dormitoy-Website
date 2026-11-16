@@ -1,6 +1,6 @@
 // js/maintenance.js
 import { supabase } from './supabase.js';
-import { ic, fmtDate, showModal, closeModal, toast } from './api.js';
+import { ic, fmtDate, showModal, closeModal, toast, compressImage, showImageModal } from './api.js';
 import { currentUser } from './auth.js';
 
 let maintenanceFilter = 'all';
@@ -113,9 +113,16 @@ async function loadMaintenanceData() {
             ${t.category}
           </span>
         </td>
-        <td style="max-width: 240px;">
-          <div style="font-size:0.9rem; line-height:1.4;">${t.description}</div>
-          <small style="color:var(--muted);">แจ้งเมื่อ: ${fmtDate(t.created_at)}</small>
+        <td style="max-width: 250px;">
+          <div style="font-size:0.9rem; line-height:1.4; color:var(--teal-950);">${t.description}</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+            <small style="color:var(--muted);">${fmtDate(t.created_at)}</small>
+            ${t.image_url ? `
+              <span style="display:inline-flex; align-items:center; gap:4px; font-size:0.8rem; color:var(--teal-900); cursor:pointer; background:#E8F5E9; border:1px solid #C8E6C9; padding:2px 8px; border-radius:6px; font-weight:600;" onclick="window.showImageModal('${t.image_url}', 'รูปจุดชำรุด: ${t.category} (ห้อง ${t.room_number})')">
+                📸 ดูรูปถ่าย
+              </span>
+            ` : ''}
+          </div>
         </td>
         <td>${urgencyBadge}</td>
         <td>${t.technician || '<span style="color:var(--muted);">ยังไม่ระบุ</span>'}</td>
@@ -204,9 +211,29 @@ function openCreateTicketModal() {
         </select>
       </div>
 
-      <div class="field">
+      <div class="field" style="margin-bottom: 14px;">
         <label>รายละเอียดอาการที่ชำรุดเสียหาย *</label>
-        <textarea id="tk-desc" rows="4" placeholder="ระบุอาการชำรุด จุดที่เกิดปัญหา เช่น ท่อน้ำใต้ซิงค์รั่ว, แอร์มีน้ำหยด, ปลั๊กหัวเตียงไม่มีไฟ" required></textarea>
+        <textarea id="tk-desc" rows="3" placeholder="ระบุอาการชำรุด จุดที่เกิดปัญหา เช่น ท่อน้ำใต้ซิงค์รั่ว, แอร์มีน้ำหยด, ปลั๊กหัวเตียงไม่มีไฟ" required></textarea>
+      </div>
+
+      <!-- ส่วนแนบรูปภาพจุดชำรุด -->
+      <div class="field">
+        <label>แนบรูปภาพจุดที่ชำรุด (ไม่บังคับ แต่ช่วยให้ช่างเตรียมเครื่องมือได้ตรงจุด)</label>
+        <input type="file" id="tk-photo-input" accept="image/*" style="display:none;">
+        <div class="upload-dropzone" id="tk-photo-dropzone" style="padding:14px;">
+          <div id="tk-dropzone-content">
+            <div style="font-size:1.6rem; margin-bottom:2px;">📸</div>
+            <div style="font-size:0.88rem; font-weight:600; color:var(--teal-950);">คลิกเพื่อถ่ายรูป หรือเลือกรูปภาพความเสียหาย</div>
+            <div style="font-size:0.75rem; color:var(--muted); margin-top:2px;">รองรับ JPG, PNG, WEBP (ระบบจะย่อขนาดให้อัตโนมัติ)</div>
+          </div>
+          <div id="tk-preview-wrap" style="display:none; align-items:center; justify-content:center; gap:12px;">
+            <img id="tk-preview-img" style="max-height:100px; border-radius:8px; border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+            <div>
+              <div id="tk-photo-name" style="font-size:0.8rem; font-weight:600; color:var(--teal-950); margin-bottom:4px;"></div>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-change-tk-photo">เปลี่ยนรูป</button>
+            </div>
+          </div>
+        </div>
       </div>
     </form>
   `;
@@ -223,7 +250,39 @@ function openCreateTicketModal() {
     maxWidth: '560px'
   });
 
-  document.getElementById('btn-submit-ticket').onclick = async () => {
+  // Photo Selection
+  let selectedPhotoFile = null;
+  const photoDropzone = document.getElementById('tk-photo-dropzone');
+  const photoInput = document.getElementById('tk-photo-input');
+  const dropzoneContent = document.getElementById('tk-dropzone-content');
+  const previewWrap = document.getElementById('tk-preview-wrap');
+  const previewImg = document.getElementById('tk-preview-img');
+  const photoNameEl = document.getElementById('tk-photo-name');
+  const btnChangePhoto = document.getElementById('btn-change-tk-photo');
+
+  if (photoDropzone && photoInput) {
+    photoDropzone.onclick = () => photoInput.click();
+    if (btnChangePhoto) {
+      btnChangePhoto.onclick = (e) => {
+        e.stopPropagation();
+        photoInput.click();
+      };
+    }
+
+    photoInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      selectedPhotoFile = file;
+
+      previewImg.src = URL.createObjectURL(file);
+      photoNameEl.textContent = file.name;
+      dropzoneContent.style.display = 'none';
+      previewWrap.style.display = 'flex';
+    };
+  }
+
+  const submitTicketBtn = document.getElementById('btn-submit-ticket');
+  submitTicketBtn.onclick = async () => {
     const room = document.getElementById('tk-room').value.trim();
     const cat = document.getElementById('tk-cat').value;
     const name = document.getElementById('tk-name').value.trim();
@@ -236,9 +295,21 @@ function openCreateTicketModal() {
       return;
     }
 
+    submitTicketBtn.disabled = true;
+    submitTicketBtn.textContent = 'กำลังส่งข้อมูลแจ้งซ่อม...';
+
+    let imageUrl = null;
+    if (selectedPhotoFile) {
+      try {
+        imageUrl = await compressImage(selectedPhotoFile, 1200, 0.82);
+      } catch (err) {
+        console.warn('Image compress warning:', err);
+      }
+    }
+
     const newTicketId = 'FIX-' + Math.floor(100 + Math.random() * 900);
 
-    await supabase.from('maintenance').insert([{
+    const { error } = await supabase.from('maintenance').insert([{
       id: newTicketId,
       room_number: room,
       requester_name: name,
@@ -248,8 +319,17 @@ function openCreateTicketModal() {
       urgency: urgency,
       status: 'pending',
       technician: '',
+      image_url: imageUrl,
       created_at: new Date().toISOString().split('T')[0]
     }]);
+
+    if (error) {
+      console.error('Ticket insert error:', error);
+      toast('เกิดข้อผิดพลาดในการบันทึกแจ้งซ่อม', 'error');
+      submitTicketBtn.disabled = false;
+      submitTicketBtn.textContent = 'ส่งคำขอแจ้งซ่อม';
+      return;
+    }
 
     toast(`เปิดใบแจ้งซ่อม ${newTicketId} เรียบร้อยแล้ว`, 'success');
     closeModal();
@@ -262,12 +342,20 @@ function openUpdateTicketModal(ticket) {
     <form id="form-update-ticket">
       <div style="background: var(--mint-50); padding: 14px; border-radius: 10px; margin-bottom: 16px; border: 1px solid var(--line);">
         <div style="display:flex; justify-content:space-between;">
-          <strong style="color:var(--teal-950);">${ticket.id} — ห้อง ${ticket.room_number}</strong>
+          <strong style="color:var(--teal-950); font-size:1.05rem;">${ticket.id} — ห้อง ${ticket.room_number}</strong>
           <span style="font-size:0.85rem; color:var(--muted);">${fmtDate(ticket.created_at)}</span>
         </div>
         <div style="margin-top:6px; font-size:0.9rem; color:var(--teal-900);">หมวดหมู่: <strong>${ticket.category}</strong></div>
         <div style="margin-top:4px; font-size:0.85rem; color:var(--ink);">${ticket.description}</div>
       </div>
+
+      ${ticket.image_url ? `
+        <div style="margin-bottom:16px; background:#FAFDFB; border:1px solid var(--line); border-radius:10px; padding:12px; text-align:center;">
+          <div style="font-size:0.85rem; font-weight:600; color:var(--teal-950); margin-bottom:6px;">📸 รูปถ่ายจุดชำรุดที่ผู้แจ้งแนบมา:</div>
+          <img src="${ticket.image_url}" style="max-height:170px; border-radius:8px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1); object-fit:contain;" onclick="window.showImageModal('${ticket.image_url}', 'รูปถ่ายแจ้งซ่อม: ${ticket.id}')" title="คลิกเพื่อดูรูปขยายใหญ่">
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">(คลิกที่รูปเพื่อดูรูปภาพขยายใหญ่)</div>
+        </div>
+      ` : ''}
 
       <div class="field" style="margin-bottom: 14px;">
         <label>สถานะงานซ่อม</label>

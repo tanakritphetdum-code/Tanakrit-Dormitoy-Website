@@ -13,11 +13,13 @@ const files = [
   'utilities.js',
   'rooms.js',
   'tenants.js',
+  'bookings.js',
   'requests.js',
   'maintenance.js',
   'parcels.js',
   'announcements.js',
   'reports.js',
+  'users.js',
   'settings.js',
   'dashboard.js',
   'app.js'
