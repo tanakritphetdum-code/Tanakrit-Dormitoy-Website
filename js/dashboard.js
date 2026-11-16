@@ -164,7 +164,7 @@ export function renderStudentDashboard() {
           ✨ ผู้พักอาศัย Tanakrit Dormitory (หอพักชายธนกฤษฎ์)
         </span>
         <h2>ยินดีต้อนรับ, ${name}</h2>
-        <p>ห้องพักปัจจุบัน: <strong>ห้อง ${room} (ชั้น 3 อาคารหลัก)</strong> | สัญญาเช่าประเภท: Standard Air</p>
+        <p>ห้องพักปัจจุบัน: <strong>ห้อง ${room} (${room.startsWith('B') ? 'อาคาร UnderGround' : (Number(room) >= 200 ? 'อาคาร KingPhetch' : 'อาคาร Tanakrit')})</strong> | ประเภท: ห้องพัดลม</p>
       </div>
       <div style="display:flex; gap:10px;">
         <button class="btn btn-outline-white" onclick="window.switchView('maintenance')">

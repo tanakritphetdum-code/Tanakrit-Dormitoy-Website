@@ -33,23 +33,23 @@ export function openBookingModal(preselectedType = '') {
           <input type="text" id="bk-line" placeholder="เช่น @line_id หรือเบอร์โทร">
         </div>
         <div class="field">
-          <label>ประเภทห้องพักที่สนใจ *</label>
+          <label>อาคารและห้องพักที่สนใจ *</label>
           <select id="bk-type" required>
-            <option value="Standard Air" ${preselectedType === 'Standard Air' ? 'selected' : ''}>Standard Air (ห้องแอร์) 3,500 - 3,700 ฿</option>
-            <option value="Standard Fan" ${preselectedType === 'Standard Fan' ? 'selected' : ''}>Standard Fan (ห้องพัดลม) 2,800 - 3,000 ฿</option>
-            <option value="Deluxe Corner" ${preselectedType === 'Deluxe Corner' ? 'selected' : ''}>Deluxe Corner (ห้องมุมกว้าง) 4,200 - 4,400 ฿</option>
+            <option value="อาคาร Tanakrit" ${preselectedType.includes('Tanakrit') ? 'selected' : ''}>อาคาร Tanakrit (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
+            <option value="อาคาร KingPhetch" ${preselectedType.includes('KingPhetch') ? 'selected' : ''}>อาคาร KingPhetch (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
+            <option value="อาคาร UnderGround" ${preselectedType.includes('UnderGround') ? 'selected' : ''}>อาคาร UnderGround (ห้องพัดลม 3×4 ม. ห้องน้ำรวม) 800 ฿</option>
           </select>
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
         <div class="field">
-          <label>ชั้นที่ต้องการ (ถ้ามีในใจ)</label>
+          <label>ความต้องการอาคาร</label>
           <select id="bk-floor">
-            <option value="">ชั้นไหนก็ได้ (ตามห้องว่าง)</option>
-            <option value="1">ชั้น 1 (เข้า-ออกสะดวก)</option>
-            <option value="2">ชั้น 2 (บรรยากาศกำลังดี)</option>
-            <option value="3">ชั้น 3 (วิวสูง เงียบสงบ)</option>
+            <option value="">เลือกอาคารใดก็ได้ (ตามห้องว่าง)</option>
+            <option value="Tanakrit">เฉพาะอาคาร Tanakrit (9 ห้อง)</option>
+            <option value="KingPhetch">เฉพาะอาคาร KingPhetch (5 ห้อง)</option>
+            <option value="UnderGround">เฉพาะอาคาร UnderGround (3 ห้อง)</option>
           </select>
         </div>
         <div class="field">

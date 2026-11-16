@@ -7,7 +7,7 @@ import { supabase } from './supabase.js';
 export const USERS = [
   { username: 'admin', password: 'admin123', role: 'admin', name: 'นายเกียรติศักดิ์ บริหาร (ผู้จัดการหอพัก)', initial: 'ผ', tenantId: null, room: null, roleTitle: 'ผู้ดูแลระบบสูงสุด' },
   { username: 'staff', password: 'staff123', role: 'staff', name: 'นางสาวสมหญิง เจ้าหน้าที่หอพัก', initial: 'ส', tenantId: null, room: null, roleTitle: 'เจ้าหน้าที่ธุรการ/ช่าง' },
-  { username: 'student', password: 'student123', role: 'student', name: 'นายสมชาย ธนกฤษฎ์', initial: 'ส', tenantId: '6512345', room: '302', phone: '089-123-4567', roleTitle: 'ผู้พักอาศัย (ห้อง 302)' },
+  { username: 'student', password: 'student123', role: 'student', name: 'นายสมชาย ธนกฤษฎ์', initial: 'ส', tenantId: '6512345', room: '101', phone: '089-123-4567', roleTitle: 'ผู้พักอาศัย (ห้อง 101 อาคาร Tanakrit)' },
 ];
 
 export let currentUser = null;
