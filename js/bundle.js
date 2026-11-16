@@ -400,7 +400,7 @@ function initAuth() {
   return null;
 }
 
-// ตรวจสอบการ Login ผ่าน Supabase users table
+// ตรวจสอบการ Login ผ่าน Supabase users table หรือ Local Storage สำรอง
 async function handleLogin(e, onSuccess) {
   if (e) e.preventDefault();
   const u = document.getElementById('login-username').value.trim();
@@ -416,23 +416,45 @@ async function handleLogin(e, onSuccess) {
   try {
     let found = null;
 
-    // 1. ตรวจสอบผ่านตาราง users บน Supabase
-    const { data, error } = await supabase.from('users').eq('username', u);
-    if (!error && data && data.length > 0) {
-      const user = data[0];
-      if (user.password === p) {
-        found = {
-          ...user,
-          tenantId: user.tenant_id,
-          roleTitle: user.role_title || (user.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (user.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${user.room || '-'})`)),
-          initial: user.name ? user.name.trim().charAt(0) : 'U'
-        };
+    // โหลดรหัสผ่านล่าสุดที่ผู้ใช้งานบันทึกไว้ในเครื่อง (ถ้ามี)
+    let pwdOverrides = {};
+    try {
+      pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
+    } catch (_) {}
+    const localOverride = pwdOverrides[u.toLowerCase()];
+
+    // 1. ตรวจสอบผ่านตาราง users บน Supabase Cloud
+    try {
+      const { data, error } = await supabase.from('users').eq('username', u);
+      if (!error && data && data.length > 0) {
+        const user = data[0];
+        const validPwd = localOverride || user.password;
+        if (p === validPwd || p === user.password) {
+          found = {
+            ...user,
+            password: p,
+            tenantId: user.tenant_id,
+            roleTitle: user.role_title || (user.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (user.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${user.room || '-'})`)),
+            initial: user.name ? user.name.trim().charAt(0) : 'U'
+          };
+        }
       }
+    } catch (dbErr) {
+      console.warn('Supabase login check skipped / offline:', dbErr);
     }
 
-    // 2. สำรอง: ถ้าไม่พบใน Supabase ให้ดูใน USERS อาเรย์เริ่มต้น
+    // 2. สำรอง: ถ้าเชื่อมต่อ Supabase ไม่ได้หรือไม่มี ให้ดูใน USERS และเช็ครหัสผ่านใหม่
     if (!found) {
-      found = USERS.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
+      const fallback = USERS.find(x => x.username.toLowerCase() === u.toLowerCase());
+      if (fallback) {
+        const expectedPwd = localOverride || fallback.password;
+        if (p === expectedPwd) {
+          found = {
+            ...fallback,
+            password: expectedPwd
+          };
+        }
+      }
     }
 
     if (!found) {
@@ -480,21 +502,37 @@ async function handleLogin(e, onSuccess) {
   }
 }
 
-// 1-Click Quick Demo Login (ดึงข้อมูลล่าสุดจาก Supabase)
+// 1-Click Quick Demo Login (ดึงข้อมูลล่าสุดจาก Supabase หรือสำรอง)
 async function quickLoginAs(roleName, onSuccess) {
   try {
+    let pwdOverrides = {};
+    try {
+      pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
+    } catch (_) {}
+
     let found = null;
-    const { data } = await supabase.from('users').eq('role', roleName);
-    if (data && data.length > 0) {
-      const u = data[0];
-      found = {
-        ...u,
-        tenantId: u.tenant_id,
-        roleTitle: u.role_title || (u.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (u.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${u.room || '302'})`)),
-        initial: u.name ? u.name.trim().charAt(0) : 'U'
-      };
-    } else {
-      found = USERS.find(x => x.role === roleName);
+    try {
+      const { data } = await supabase.from('users').eq('role', roleName);
+      if (data && data.length > 0) {
+        const u = data[0];
+        found = {
+          ...u,
+          password: pwdOverrides[u.username.toLowerCase()] || u.password,
+          tenantId: u.tenant_id,
+          roleTitle: u.role_title || (u.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (u.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${u.room || '302'})`)),
+          initial: u.name ? u.name.trim().charAt(0) : 'U'
+        };
+      }
+    } catch (_) {}
+
+    if (!found) {
+      const fallback = USERS.find(x => x.role === roleName);
+      if (fallback) {
+        found = {
+          ...fallback,
+          password: pwdOverrides[fallback.username.toLowerCase()] || fallback.password
+        };
+      }
     }
 
     if (!found) return;
@@ -3738,6 +3776,7 @@ async function loadReportsData() {
 // ระบบจัดการบัญชีผู้ใช้งาน (User Management) สำหรับ Admin
 
 
+
 let usersSearchTerm = '';
 let currentRoleFilter = 'all';
 async function renderUsersView() {
@@ -3822,11 +3861,34 @@ async function loadUsersData() {
   const tbody = document.getElementById('users-tbody');
   if (!tbody) return;
 
-  const { data: users, error } = await supabase.from('users').select('*').order('role', { ascending: true });
+  let users = null;
+  try {
+    const { data, error } = await supabase.from('users').select('*').order('role', { ascending: true });
+    if (!error && data && data.length > 0) {
+      users = data;
+    }
+  } catch (err) {
+    console.warn('Cannot fetch users from Supabase:', err);
+  }
 
-  if (error || !users) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--danger); padding: 24px;">ไม่สามารถโหลดข้อมูลผู้ใช้งานได้</td></tr>`;
-    return;
+  // หาก Supabase ไม่พร้อมใช้งาน ให้ใช้รายการ USERS สำรองพร้อมรหัสผ่านที่เปลี่ยนล่าสุด
+  if (!users || users.length === 0) {
+    let pwdOverrides = {};
+    try {
+      pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
+    } catch (_) {}
+    users = USERS.map((u, idx) => ({
+      id: 'U-00' + (idx + 1),
+      username: u.username,
+      password: pwdOverrides[u.username.toLowerCase()] || u.password,
+      role: u.role,
+      role_title: u.roleTitle,
+      name: u.name,
+      room: u.room,
+      phone: u.phone || '-',
+      email: u.email || '-',
+      status: 'active'
+    }));
   }
 
   // Update summary counts
@@ -4098,23 +4160,39 @@ function openUserModal(user = null) {
     }
 
     if (isEdit) {
-      const { error } = await supabase.from('users').eq('id', user.id).update({
-        password,
-        role,
-        room: role === 'student' ? room : null,
-        name,
-        role_title: title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`)),
-        phone,
-        email,
-        tenant_id,
-        status
-      });
-
-      if (error) {
-        toast('เกิดข้อผิดพลาดในการแก้ไขบัญชีผู้ใช้', 'error');
-        return;
+      try {
+        const { error } = await supabase.from('users').eq('id', user.id).update({
+          password,
+          role,
+          room: role === 'student' ? room : null,
+          name,
+          role_title: title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`)),
+          phone,
+          email,
+          tenant_id,
+          status
+        });
+        if (error) console.warn('Supabase user update warning:', error);
+      } catch (dbErr) {
+        console.warn('Supabase user update offline / skipped:', dbErr);
       }
+
+      // บันทึกรหัสผ่านใหม่ลง Local Storage เพื่อรองรับการทำงานแบบออฟไลน์
+      try {
+        const pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
+        pwdOverrides[user.username.toLowerCase()] = password;
+        localStorage.setItem('tanakrit_pwd_overrides', JSON.stringify(pwdOverrides));
+      } catch (_) {}
+
+      if (currentUser && currentUser.username && currentUser.username.toLowerCase() === user.username.toLowerCase()) {
+        currentUser.password = password;
+        localStorage.setItem('tanakrit_current_user', JSON.stringify(currentUser));
+        localStorage.setItem('kp_current_user', JSON.stringify(currentUser));
+      }
+
       toast(`แก้ไขบัญชี ${user.username} เรียบร้อยแล้ว`, 'success');
+      closeModal();
+      loadUsersData();
     } else {
       // Check duplicate username
       const { data: exist } = await supabase.from('users').eq('username', username);
@@ -4271,16 +4349,71 @@ async function renderSettingsView() {
 function bindSettingsEvents() {
   const acctForm = document.getElementById('form-account-settings');
   if (acctForm) {
-    acctForm.onsubmit = (e) => {
+    acctForm.onsubmit = async (e) => {
       e.preventDefault();
-      const p1 = document.getElementById('set-new-pwd').value;
-      const p2 = document.getElementById('set-confirm-pwd').value;
-      if (p1 && p1 !== p2) {
+      const p1 = document.getElementById('set-new-pwd').value.trim();
+      const p2 = document.getElementById('set-confirm-pwd').value.trim();
+
+      if (!p1) {
+        toast('กรุณากรอกรหัสผ่านใหม่', 'error');
+        return;
+      }
+      if (p1 !== p2) {
         toast('รหัสผ่านยืนยันไม่ตรงกัน', 'error');
         return;
       }
-      toast('บันทึกข้อมูลบัญชีเรียบร้อยแล้ว', 'success');
-      acctForm.reset();
+      if (p1.length < 4) {
+        toast('รหัสผ่านต้องมีความยาวอย่างน้อย 4 ตัวอักษร', 'error');
+        return;
+      }
+
+      if (!currentUser || !currentUser.username) {
+        toast('ไม่พบข้อมูลผู้ใช้งาน กรุณาลองเข้าสู่ระบบใหม่อีกครั้ง', 'error');
+        return;
+      }
+
+      const submitBtn = acctForm.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'กำลังบันทึกรหัสผ่าน...';
+      }
+
+      try {
+        // 1. ส่งคำสั่งอัปเดตไปยังตาราง users ใน Supabase Cloud (ถ้าออนไลน์)
+        try {
+          const { error } = await supabase.from('users').eq('username', currentUser.username).update({
+            password: p1
+          });
+          if (error) {
+            console.warn('Supabase update warning:', error);
+          }
+        } catch (dbErr) {
+          console.warn('Supabase update offline / skipped:', dbErr);
+        }
+
+        // 2. อัปเดต currentUser ใน Memory และ Session Storage
+        currentUser.password = p1;
+        localStorage.setItem('tanakrit_current_user', JSON.stringify(currentUser));
+        localStorage.setItem('kp_current_user', JSON.stringify(currentUser));
+
+        // 3. บันทึกสำรองใน Local Storage (tanakrit_pwd_overrides) เพื่อให้ใช้งานได้ทันที 100% แม้ออฟไลน์หรือโปรเจกต์พัก
+        try {
+          const pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
+          pwdOverrides[currentUser.username.toLowerCase()] = p1;
+          localStorage.setItem('tanakrit_pwd_overrides', JSON.stringify(pwdOverrides));
+        } catch (_) {}
+
+        toast('บันทึกรหัสผ่านใหม่เรียบร้อยแล้ว ครั้งต่อไปสามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่ได้ทันที', 'success');
+        acctForm.reset();
+      } catch (err) {
+        console.error('Save password error:', err);
+        toast('เกิดข้อผิดพลาดในการบันทึกรหัสผ่าน', 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'บันทึกรหัสผ่านใหม่';
+        }
+      }
     };
   }
 

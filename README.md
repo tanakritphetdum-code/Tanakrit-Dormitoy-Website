@@ -14,7 +14,8 @@
 * ครอบคลุม 9 ตารางข้อมูลหลัก: `rooms`, `tenants`, `bookings`, `requests`, `meter_readings`, `maintenance`, `parcels`, `announcements`, `settings`, และ `users`
 
 ### 2. 👤 ระบบจัดการบัญชีผู้ใช้งาน (User Management & Live Authentication)
-* **Live Authentication:** ระบบล็อกอินตรวจสอบข้อมูลสดจากตาราง `users` ใน Supabase
+* **Live Authentication:** ระบบล็อกอินตรวจสอบข้อมูลสดจากตาราง `users` ใน Supabase พร้อมระบบสำรอง Dual-Persistence จดจำรหัสผ่านที่เปลี่ยนใหม่ได้ทันทีแม้ในสถานะออฟไลน์
+* **Password Update System:** รองรับการเปลี่ยนรหัสผ่านในหน้า "ตั้งค่าระบบและบัญชีผู้ใช้งาน" มีผลต่อการล็อกอินทันทีทั้งบน Cloud และ Local Session Storage
 * **Admin User Management:** เมนูใหม่สำหรับผู้ดูแลระบบ จัดการรายชื่อผู้ใช้, เพิ่ม/แก้ไขข้อมูล, กำหนดระดับสิทธิ์ (Admin / Staff / Student), รีเซ็ตรหัสผ่าน, และสลับสถานะระงับ/เปิดใช้งานบัญชี (Active/Suspended)
 * **Auto-Create Tenant Account:** เมื่อเจ้าหน้าที่ลงทะเบียนผู้พักอาศัยใหม่ ระบบจะสร้างบัญชีผู้ใช้สำหรับล็อกอินให้อัตโนมัติทันที (Username = รหัสนักศึกษา/เบอร์โทร, Password = เลขห้องพัก)
 

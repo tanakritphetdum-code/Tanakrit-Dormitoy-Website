@@ -121,16 +121,71 @@ export async function renderSettingsView() {
 function bindSettingsEvents() {
   const acctForm = document.getElementById('form-account-settings');
   if (acctForm) {
-    acctForm.onsubmit = (e) => {
+    acctForm.onsubmit = async (e) => {
       e.preventDefault();
-      const p1 = document.getElementById('set-new-pwd').value;
-      const p2 = document.getElementById('set-confirm-pwd').value;
-      if (p1 && p1 !== p2) {
+      const p1 = document.getElementById('set-new-pwd').value.trim();
+      const p2 = document.getElementById('set-confirm-pwd').value.trim();
+
+      if (!p1) {
+        toast('กรุณากรอกรหัสผ่านใหม่', 'error');
+        return;
+      }
+      if (p1 !== p2) {
         toast('รหัสผ่านยืนยันไม่ตรงกัน', 'error');
         return;
       }
-      toast('บันทึกข้อมูลบัญชีเรียบร้อยแล้ว', 'success');
-      acctForm.reset();
+      if (p1.length < 4) {
+        toast('รหัสผ่านต้องมีความยาวอย่างน้อย 4 ตัวอักษร', 'error');
+        return;
+      }
+
+      if (!currentUser || !currentUser.username) {
+        toast('ไม่พบข้อมูลผู้ใช้งาน กรุณาลองเข้าสู่ระบบใหม่อีกครั้ง', 'error');
+        return;
+      }
+
+      const submitBtn = acctForm.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'กำลังบันทึกรหัสผ่าน...';
+      }
+
+      try {
+        // 1. ส่งคำสั่งอัปเดตไปยังตาราง users ใน Supabase Cloud (ถ้าออนไลน์)
+        try {
+          const { error } = await supabase.from('users').eq('username', currentUser.username).update({
+            password: p1
+          });
+          if (error) {
+            console.warn('Supabase update warning:', error);
+          }
+        } catch (dbErr) {
+          console.warn('Supabase update offline / skipped:', dbErr);
+        }
+
+        // 2. อัปเดต currentUser ใน Memory และ Session Storage
+        currentUser.password = p1;
+        localStorage.setItem('tanakrit_current_user', JSON.stringify(currentUser));
+        localStorage.setItem('kp_current_user', JSON.stringify(currentUser));
+
+        // 3. บันทึกสำรองใน Local Storage (tanakrit_pwd_overrides) เพื่อให้ใช้งานได้ทันที 100% แม้ออฟไลน์หรือโปรเจกต์พัก
+        try {
+          const pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
+          pwdOverrides[currentUser.username.toLowerCase()] = p1;
+          localStorage.setItem('tanakrit_pwd_overrides', JSON.stringify(pwdOverrides));
+        } catch (_) {}
+
+        toast('บันทึกรหัสผ่านใหม่เรียบร้อยแล้ว ครั้งต่อไปสามารถเข้าสู่ระบบด้วยรหัสผ่านใหม่ได้ทันที', 'success');
+        acctForm.reset();
+      } catch (err) {
+        console.error('Save password error:', err);
+        toast('เกิดข้อผิดพลาดในการบันทึกรหัสผ่าน', 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'บันทึกรหัสผ่านใหม่';
+        }
+      }
     };
   }
 

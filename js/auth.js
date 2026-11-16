@@ -26,7 +26,7 @@ export function initAuth() {
   return null;
 }
 
-// ตรวจสอบการ Login ผ่าน Supabase users table
+// ตรวจสอบการ Login ผ่าน Supabase users table หรือ Local Storage สำรอง
 export async function handleLogin(e, onSuccess) {
   if (e) e.preventDefault();
   const u = document.getElementById('login-username').value.trim();
@@ -42,23 +42,45 @@ export async function handleLogin(e, onSuccess) {
   try {
     let found = null;
 
-    // 1. ตรวจสอบผ่านตาราง users บน Supabase
-    const { data, error } = await supabase.from('users').eq('username', u);
-    if (!error && data && data.length > 0) {
-      const user = data[0];
-      if (user.password === p) {
-        found = {
-          ...user,
-          tenantId: user.tenant_id,
-          roleTitle: user.role_title || (user.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (user.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${user.room || '-'})`)),
-          initial: user.name ? user.name.trim().charAt(0) : 'U'
-        };
+    // โหลดรหัสผ่านล่าสุดที่ผู้ใช้งานบันทึกไว้ในเครื่อง (ถ้ามี)
+    let pwdOverrides = {};
+    try {
+      pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
+    } catch (_) {}
+    const localOverride = pwdOverrides[u.toLowerCase()];
+
+    // 1. ตรวจสอบผ่านตาราง users บน Supabase Cloud
+    try {
+      const { data, error } = await supabase.from('users').eq('username', u);
+      if (!error && data && data.length > 0) {
+        const user = data[0];
+        const validPwd = localOverride || user.password;
+        if (p === validPwd || p === user.password) {
+          found = {
+            ...user,
+            password: p,
+            tenantId: user.tenant_id,
+            roleTitle: user.role_title || (user.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (user.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${user.room || '-'})`)),
+            initial: user.name ? user.name.trim().charAt(0) : 'U'
+          };
+        }
       }
+    } catch (dbErr) {
+      console.warn('Supabase login check skipped / offline:', dbErr);
     }
 
-    // 2. สำรอง: ถ้าไม่พบใน Supabase ให้ดูใน USERS อาเรย์เริ่มต้น
+    // 2. สำรอง: ถ้าเชื่อมต่อ Supabase ไม่ได้หรือไม่มี ให้ดูใน USERS และเช็ครหัสผ่านใหม่
     if (!found) {
-      found = USERS.find(x => x.username.toLowerCase() === u.toLowerCase() && x.password === p);
+      const fallback = USERS.find(x => x.username.toLowerCase() === u.toLowerCase());
+      if (fallback) {
+        const expectedPwd = localOverride || fallback.password;
+        if (p === expectedPwd) {
+          found = {
+            ...fallback,
+            password: expectedPwd
+          };
+        }
+      }
     }
 
     if (!found) {
@@ -106,21 +128,37 @@ export async function handleLogin(e, onSuccess) {
   }
 }
 
-// 1-Click Quick Demo Login (ดึงข้อมูลล่าสุดจาก Supabase)
+// 1-Click Quick Demo Login (ดึงข้อมูลล่าสุดจาก Supabase หรือสำรอง)
 export async function quickLoginAs(roleName, onSuccess) {
   try {
+    let pwdOverrides = {};
+    try {
+      pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
+    } catch (_) {}
+
     let found = null;
-    const { data } = await supabase.from('users').eq('role', roleName);
-    if (data && data.length > 0) {
-      const u = data[0];
-      found = {
-        ...u,
-        tenantId: u.tenant_id,
-        roleTitle: u.role_title || (u.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (u.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${u.room || '302'})`)),
-        initial: u.name ? u.name.trim().charAt(0) : 'U'
-      };
-    } else {
-      found = USERS.find(x => x.role === roleName);
+    try {
+      const { data } = await supabase.from('users').eq('role', roleName);
+      if (data && data.length > 0) {
+        const u = data[0];
+        found = {
+          ...u,
+          password: pwdOverrides[u.username.toLowerCase()] || u.password,
+          tenantId: u.tenant_id,
+          roleTitle: u.role_title || (u.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (u.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${u.room || '302'})`)),
+          initial: u.name ? u.name.trim().charAt(0) : 'U'
+        };
+      }
+    } catch (_) {}
+
+    if (!found) {
+      const fallback = USERS.find(x => x.role === roleName);
+      if (fallback) {
+        found = {
+          ...fallback,
+          password: pwdOverrides[fallback.username.toLowerCase()] || fallback.password
+        };
+      }
     }
 
     if (!found) return;
