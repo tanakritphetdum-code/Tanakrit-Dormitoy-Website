@@ -91,7 +91,7 @@ export async function renderSettingsView() {
             </div>
             <div class="field">
               <label>Line Official Account</label>
-              <input type="text" id="set-line" value="${s.line_id || '@tanakritdorm'}">
+              <input type="text" id="set-line" value="${s.line_id || 'Tonyeiei'}">
             </div>
           </div>
 

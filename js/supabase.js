@@ -12,7 +12,7 @@ let cachedSettings = {
   dorm_name: 'Tanakrit Dormitory',
   sub_title: 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช',
   phone: '075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985',
-  line_id: '@tanakritdorm',
+  line_id: 'Tonyeiei',
   address: '69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320',
   water_rate: 18,
   electric_rate: 8,

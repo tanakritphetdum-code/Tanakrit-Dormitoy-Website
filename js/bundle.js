@@ -17,7 +17,7 @@ let cachedSettings = {
   dorm_name: 'Tanakrit Dormitory',
   sub_title: 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช',
   phone: '075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985',
-  line_id: '@tanakritdorm',
+  line_id: 'Tonyeiei',
   address: '69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320',
   water_rate: 18,
   electric_rate: 8,
@@ -2379,7 +2379,7 @@ function openBookingModal(preselectedType = '') {
               เจ้าหน้าที่หอพักชายธนกฤษฎ์จะติดต่อกลับผ่านเบอร์ <strong>${phone}</strong> เพื่อยืนยันห้องพักและขั้นตอนเข้าพักโดยเร็วที่สุดครับ
             </p>
             <div style="font-size:0.85rem; background:#f4fbf7; padding:10px; border-radius:8px; color:var(--teal-900);">
-              📞 หากมีข้อสงสัยเร่งด่วน ติดต่อโทร. 075-355-289, 089-590-0478 หรือ Line: @tanakritdorm
+              📞 หากมีข้อสงสัยเร่งด่วน ติดต่อโทร. 075-355-289, 089-590-0478 หรือ Line: Tonyeiei
             </div>
           </div>
         `,
@@ -4489,7 +4489,7 @@ async function renderSettingsView() {
             </div>
             <div class="field">
               <label>Line Official Account</label>
-              <input type="text" id="set-line" value="${s.line_id || '@tanakritdorm'}">
+              <input type="text" id="set-line" value="${s.line_id || 'Tonyeiei'}">
             </div>
           </div>
 

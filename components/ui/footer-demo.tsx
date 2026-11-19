@@ -35,7 +35,7 @@ export default function FooterDemo() {
             links: [
               { label: "ติดต่อหอพัก 075-355-289", href: "#contact" },
               { label: "เปิดแผนที่ Google Maps", href: "https://maps.app.goo.gl/AtzLYkyYmNba4XBh8" },
-              { label: "Line: @tanakritdorm", href: "#contact" },
+              { label: "Line: Tonyeiei", href: "#contact" },
               { label: "เข้าสู่ระบบจัดการหอพัก", href: "#" },
             ],
           },
