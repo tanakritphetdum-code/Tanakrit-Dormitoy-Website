@@ -304,11 +304,25 @@ export function openInvoiceModal(bill) {
             <td style="text-align: right;">${fmtCurrency(bill.electric_total)}</td>
           </tr>
           <tr>
-            <td>ค่าบริการส่วนกลางและอินเทอร์เน็ต Wi-Fi</td>
+            <td>ค่าบริการส่วนกลาง</td>
             <td style="text-align: center;">-</td>
-            <td style="text-align: center;">1 เหมาจ่าย</td>
+            <td style="text-align: center;">1 เดือน</td>
             <td style="text-align: right;">100 ฿</td>
             <td style="text-align: right;">100 ฿</td>
+          </tr>
+          <tr>
+            <td>Wi-Fi</td>
+            <td style="text-align: center;">-</td>
+            <td style="text-align: center;">1 เดือน</td>
+            <td style="text-align: right;">100 ฿</td>
+            <td style="text-align: right;">100 ฿</td>
+          </tr>
+          <tr>
+            <td>ค่าบริการกำจัดขยะ</td>
+            <td style="text-align: center;">-</td>
+            <td style="text-align: center;">1 เดือน</td>
+            <td style="text-align: right;">20 ฿</td>
+            <td style="text-align: right;">20 ฿</td>
           </tr>
         </tbody>
         <tfoot>
@@ -611,8 +625,8 @@ async function openAddMeterModal() {
       </div>
 
       <div style="background: var(--sky-100); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: 600; color: var(--teal-950);">ยอดรวมทั้งสิ้น (รวมค่าห้อง + ส่วนกลาง 100฿):</span>
-        <strong style="font-size: 1.3rem; color: var(--teal-900);" id="mr-grand-total">4,050 ฿</strong>
+        <span style="font-weight: 600; color: var(--teal-950);">ยอดรวมทั้งสิ้น (รวมค่าห้อง + ส่วนกลาง 100฿ + Wi-Fi 100฿ + ขยะ 20฿):</span>
+        <strong style="font-size: 1.3rem; color: var(--teal-900);" id="mr-grand-total">4,170 ฿</strong>
       </div>
     </form>
   `;
@@ -642,7 +656,8 @@ async function openAddMeterModal() {
     const eUnits = Math.max(0, eCurr - ePrev);
     const eCost = eUnits * 8;
 
-    const grand = roomPrice + wCost + eCost + 100;
+    const fixedFees = 100 + 100 + 20; // ค่าบริการส่วนกลาง 100 + Wi-Fi 100 + กำจัดขยะ 20
+    const grand = roomPrice + wCost + eCost + fixedFees;
 
     document.getElementById('mr-water-total').value = wCost + ' ฿';
     document.getElementById('mr-elec-total').value = eCost + ' ฿';

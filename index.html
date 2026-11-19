@@ -301,10 +301,12 @@
                     </div>
                     <div style="background:var(--mint-50); border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:20px;">
                         <span style="font-size:0.85rem; color:var(--muted); display:block; margin-bottom:4px;">เงื่อนไขอัตราค่าสาธารณูปโภค:</span>
-                        <div style="font-size:0.88rem; color:var(--teal-900); font-weight:500;">
+                        <div style="font-size:0.88rem; color:var(--teal-900); font-weight:500; line-height:1.7;">
                             • ค่าน้ำประปา: 18 บาท/หน่วย<br>
                             • ค่าไฟฟ้า: 8 บาท/หน่วย<br>
-                            • ค่าบริการส่วนกลาง & Wi-Fi: 100 บาท/เดือน
+                            • ค่าบริการส่วนกลาง  : 100 บาท/เดือน<br>
+                            • Wi-Fi : 100 บาท/เดือน<br>
+                            • ค่าบริการกำจัดขยะ  : 20 บาท/เดือน
                         </div>
                     </div>
                 </div>
@@ -328,12 +330,20 @@
                             <span>ค่าบริการส่วนกลางเดือนแรก:</span>
                             <strong>100 ฿</strong>
                         </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
+                            <span>ค่าบริการ Wi-Fi เดือนแรก:</span>
+                            <strong>100 ฿</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
+                            <span>ค่าบริการกำจัดขยะเดือนแรก:</span>
+                            <strong>20 ฿</strong>
+                        </div>
                     </div>
 
                     <div style="border-top:2px dashed var(--line); padding-top:16px; margin-top:20px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="font-size:1.1rem; font-weight:600; color:var(--teal-950);">ยอดรวมแรกเข้าทั้งหมด:</span>
-                            <span style="font-family:'Kanit'; font-size:1.9rem; font-weight:700; color:var(--emerald);" id="calc-total-show">3,400 ฿</span>
+                            <span style="font-family:'Kanit'; font-size:1.9rem; font-weight:700; color:var(--emerald);" id="calc-total-show">3,520 ฿</span>
                         </div>
                         <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="window.openBookingModal && window.openBookingModal()">
                             📝 ติดต่อจองห้องพักทันที
@@ -648,7 +658,9 @@
                 const deposit = rent;
                 const keycard = 300;
                 const common = 100;
-                const total = rent + deposit + keycard + common;
+                const wifi = 100;
+                const garbage = 20;
+                const total = rent + deposit + keycard + common + wifi + garbage;
                 document.getElementById('calc-rent-show').textContent = rent.toLocaleString() + ' ฿';
                 document.getElementById('calc-deposit-show').textContent = deposit.toLocaleString() + ' ฿';
                 document.getElementById('calc-total-show').textContent = total.toLocaleString() + ' ฿';
