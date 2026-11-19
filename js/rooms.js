@@ -45,7 +45,7 @@ export async function renderRoomsView() {
         <div>
           <h3>${ic('door')} สถานะและการจัดการห้องพัก (Floor Plan — 3 อาคาร)</h3>
           <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
-            ผังห้องพักทั้งหมด 17 ห้อง ครอบคลุมอาคาร Tanakrit (9 ห้อง), อาคาร KingPhetch (5 ห้อง) และอาคาร UnderGround (3 ห้อง)
+            ผังห้องพักทั้งหมด 17 ห้อง ครอบคลุมอาคาร ธนกฤษฎ์ (9 ห้อง), อาคาร กิ่งเพชร (5 ห้อง) และอาคาร ใต้บ้าน (3 ห้อง)
           </p>
         </div>
         <div style="display: flex; gap: 10px;">

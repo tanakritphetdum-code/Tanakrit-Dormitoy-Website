@@ -1373,7 +1373,7 @@ async function renderRoomsView() {
         <div>
           <h3>${ic('door')} สถานะและการจัดการห้องพัก (Floor Plan — 3 อาคาร)</h3>
           <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
-            ผังห้องพักทั้งหมด 17 ห้อง ครอบคลุมอาคาร Tanakrit (9 ห้อง), อาคาร KingPhetch (5 ห้อง) และอาคาร UnderGround (3 ห้อง)
+            ผังห้องพักทั้งหมด 17 ห้อง ครอบคลุมอาคาร ธนกฤษฎ์ (9 ห้อง), อาคาร กิ่งเพชร (5 ห้อง) และอาคาร ใต้บ้าน (3 ห้อง)
           </p>
         </div>
         <div style="display: flex; gap: 10px;">
@@ -4690,13 +4690,13 @@ function renderStaffDashboard() {
         <div class="smoky-card" id="card-team">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <span class="smoky-meta-label">Active Crew</span>
+              <span class="smoky-meta-label">ทีมงานดูแลหอพัก</span>
               <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px #34D399;"></span>
-                <span style="font-size: 0.92rem; font-weight: 600; color: #fff;">4 online now</span>
+                <span style="font-size: 0.92rem; font-weight: 600; color: #fff;">4 คน ประจำการ</span>
               </div>
             </div>
-            <button class="smoky-round-dashed-btn" title="Invite member" onclick="window.switchView('users')">
+            <button class="smoky-round-dashed-btn" title="จัดการเจ้าหน้าที่" onclick="window.switchView('users')">
               ${ic('plus')}
             </button>
           </div>
@@ -4704,10 +4704,10 @@ function renderStaffDashboard() {
           <!-- Overlapping Avatars + 3 -->
           <div style="margin-top: 18px; display: flex; align-items: center;">
             <div style="display: flex; margin-left: 6px;">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Alex" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -6px;" title="Alex Morgan (Head of Admin)">
-              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" alt="Sarah" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="Sarah Chen (Account Manager)">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="David" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="David Kim (Facility Tech)">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Elena" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="Elena Rostova (Tenant Support)">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="ผู้จัดการ" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -6px;" title="นายเกียรติศักดิ์ (ผู้จัดการหอพัก)">
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" alt="ธุรการ" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="นางสาวสมหญิง (เจ้าหน้าที่ธุรการ)">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="ช่างซ่อม" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="นายสมศักดิ์ (ช่างเทคนิคอาคาร)">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="บริการ" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="เจ้าหน้าที่ดูแลผู้พักอาศัย">
               <div style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-left: -8px;">
                 +3
               </div>
@@ -4722,8 +4722,8 @@ function renderStaffDashboard() {
         <div class="smoky-card" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;" id="card-quarterly-target">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <span class="smoky-meta-label">Performance Goal</span>
-              <h3 class="smoky-card-title">Quarterly Target</h3>
+              <span class="smoky-meta-label">เป้าหมายอัตราการเข้าพัก</span>
+              <h3 class="smoky-card-title">Occupancy Target (3 อาคาร)</h3>
             </div>
             <button class="smoky-toggle checked" id="btn-toggle-target" onclick="window.toggleTargetGoal()">
               <span class="smoky-toggle-knob"></span>
@@ -4736,40 +4736,40 @@ function renderStaffDashboard() {
               <!-- Dashed Background Track -->
               <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7" stroke-dasharray="2 3"></circle>
               <!-- Glowing Blue Progress Circle -->
-              <circle id="target-progress-ring" cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" stroke-dasharray="251.32" stroke-dashoffset="92.9" style="filter: drop-shadow(0 0 10px rgba(59,130,246,0.7)); transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></circle>
+              <circle id="target-progress-ring" cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" stroke-dasharray="251.32" stroke-dashoffset="30.1" style="filter: drop-shadow(0 0 10px rgba(59,130,246,0.7)); transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></circle>
             </svg>
 
             <!-- Center KPI Label -->
             <div class="smoky-ring-center">
-              <span class="smoky-kpi-num" id="target-percent-text">63%</span>
-              <span class="smoky-meta-label" style="margin-top: 2px;">Achieved</span>
+              <span class="smoky-kpi-num" id="target-percent-text">88%</span>
+              <span class="smoky-meta-label" style="margin-top: 2px;">เข้าพักแล้ว 14/17 ห้อง</span>
             </div>
           </div>
 
           <!-- - / + Buttons to Adjust Target -->
           <div class="smoky-ring-btn-group">
             <button class="smoky-pill-btn" onclick="window.adjustTargetPercent(-5)" title="ลด 5%">−</button>
-            <span style="font-size: 0.78rem; font-family: monospace; color: rgba(255,255,255,0.6);" id="target-sub-label">Goal: 63%</span>
+            <span style="font-size: 0.78rem; font-family: monospace; color: rgba(255,255,255,0.6);" id="target-sub-label">เป้าหมาย: 88%</span>
             <button class="smoky-pill-btn" onclick="window.adjustTargetPercent(5)" title="เพิ่ม 5%">+</button>
           </div>
 
-          <!-- Bottom Row of Round Metric Chips: Revenue, Deals, Calls, Meetings -->
+          <!-- Bottom Row of Round Metric Chips -->
           <div class="smoky-metric-chips" id="metric-chips-row">
             <div class="smoky-chip active" data-metric="revenue" onclick="window.selectMetricChip('revenue')">
-              <span class="chip-lbl">Revenue</span>
-              <span class="chip-val">$840k</span>
+              <span class="chip-lbl">รายรับ</span>
+              <span class="chip-val">23,100 ฿</span>
             </div>
             <div class="smoky-chip" data-metric="deals" onclick="window.selectMetricChip('deals')">
-              <span class="chip-lbl">Deals</span>
-              <span class="chip-val">42 closed</span>
+              <span class="chip-lbl">ห้องว่าง</span>
+              <span class="chip-val">3 ห้อง</span>
             </div>
             <div class="smoky-chip" data-metric="calls" onclick="window.selectMetricChip('calls')">
-              <span class="chip-lbl">Calls</span>
-              <span class="chip-val">318 log</span>
+              <span class="chip-lbl">สัญญา</span>
+              <span class="chip-val">12 เดือน</span>
             </div>
             <div class="smoky-chip" data-metric="meetings" onclick="window.selectMetricChip('meetings')">
-              <span class="chip-lbl">Meetings</span>
-              <span class="chip-val">94 held</span>
+              <span class="chip-lbl">แจ้งซ่อม</span>
+              <span class="chip-val">2 งาน</span>
             </div>
           </div>
         </div>
@@ -4783,21 +4783,21 @@ function renderStaffDashboard() {
         <div class="smoky-card" id="card-revenue">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
             <div>
-              <span class="smoky-meta-label">Gross Collections</span>
+              <span class="smoky-meta-label">รายรับค่าเช่า & มิเตอร์น้ำไฟ</span>
               <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
-                <span class="smoky-kpi-num" id="revenue-val-main">$23.1k</span>
-                <span style="font-size: 0.88rem; color: rgba(255,255,255,0.4);">/ $27k</span>
+                <span class="smoky-kpi-num" id="revenue-val-main">฿37,200</span>
+                <span style="font-size: 0.88rem; color: rgba(255,255,255,0.4);">/ ฿42,500</span>
               </div>
               <div style="margin-top: 4px;">
-                <span class="smoky-delta-pos">${ic('trendingUp')} +12.4% vs yesterday</span>
+                <span class="smoky-delta-pos">${ic('trendingUp')} +12.4% จากงวดก่อน</span>
               </div>
             </div>
 
-            <!-- Segmented Control Today/Week/Month -->
+            <!-- Segmented Control วันนี้/สัปดาห์/เดือน -->
             <div class="smoky-segmented" id="revenue-segmented">
-              <button class="smoky-seg-btn active" data-period="Today" onclick="window.selectRevenuePeriod('Today')">Today</button>
-              <button class="smoky-seg-btn" data-period="Week" onclick="window.selectRevenuePeriod('Week')">Week</button>
-              <button class="smoky-seg-btn" data-period="Month" onclick="window.selectRevenuePeriod('Month')">Month</button>
+              <button class="smoky-seg-btn active" data-period="Today" onclick="window.selectRevenuePeriod('Today')">วันนี้</button>
+              <button class="smoky-seg-btn" data-period="Week" onclick="window.selectRevenuePeriod('Week')">สัปดาห์</button>
+              <button class="smoky-seg-btn" data-period="Month" onclick="window.selectRevenuePeriod('Month')">เดือนนี้</button>
             </div>
           </div>
 
@@ -4817,28 +4817,28 @@ function renderStaffDashboard() {
 
           <!-- Row of Hourly Values -->
           <div style="display: grid; grid-template-columns: repeat(6, 1fr); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; text-align: center;" id="revenue-hourly-row">
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">09:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$1.8k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">11:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$4.2k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">13:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$8.6k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">15:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$14.1k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">17:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$19.3k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">19:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">$23.1k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">09:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿4.2k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">11:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿8.5k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">13:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿14.2k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">15:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿22.6k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">17:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿31.0k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">19:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿37.2k</div></div>
           </div>
         </div>
 
-        <!-- 4. New Leads Card & 5. Approvals Card -->
+        <!-- 4. Inbound Leads & 5. Approvals Card -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           
-          <!-- 4. New Leads "1,186" with green delta pill & mini bar chart -->
+          <!-- 4. Inbound Leads / ผู้ติดต่อสอบถามจองห้องพัก -->
           <div class="smoky-card" id="card-new-leads">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span class="smoky-meta-label">Inbound</span>
+              <span class="smoky-meta-label">ผู้ติดต่อจองห้อง</span>
               <span class="smoky-delta-pos">+18.2%</span>
             </div>
 
             <div style="margin-top: 10px;">
-              <div class="smoky-kpi-num" id="leads-num-count">1,186</div>
-              <span class="smoky-kpi-sub">New Leads / ผู้สนใจ</span>
+              <div class="smoky-kpi-num" id="leads-num-count">28</div>
+              <span class="smoky-kpi-sub">ผู้สนใจจองรอบใหม่</span>
             </div>
 
             <!-- Mini bar chart with last bar blue -->
@@ -4853,24 +4853,24 @@ function renderStaffDashboard() {
             </div>
           </div>
 
-          <!-- 5. Approvals Card: "4 pending", blue DISCOUNT badge, "$4,800" -->
+          <!-- 5. รายการรออนุมัติ: 2 รายการรอตรวจ, คืนเงินประกัน ฿2,800 -->
           <div class="smoky-card" id="card-approvals" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.5);">4 Pending</span>
-                <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.05em;">DISCOUNT</span>
+                <span style="font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.5);">2 รายการรอตรวจ</span>
+                <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.05em;">คืนเงินประกัน</span>
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px;">
-                <div class="smoky-kpi-num" style="font-size: 1.65rem;">$4,800</div>
-                <button style="background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 2px;" onclick="window.dismissApproval()" title="Dismiss">✕</button>
+                <div class="smoky-kpi-num" style="font-size: 1.65rem;">฿2,800</div>
+                <button style="background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 2px;" onclick="window.dismissApproval()" title="ปิด">✕</button>
               </div>
-              <span class="smoky-kpi-sub" style="font-size: 0.74rem;">Northwind Co. · 20% approval</span>
+              <span class="smoky-kpi-sub" style="font-size: 0.74rem;">ห้อง TK-104 · ตรวจเช็คห้องผ่าน</span>
             </div>
 
             <!-- Swipe to Approve Slider Pill -->
             <div class="smoky-swipe-container" id="swipe-approve-box" onclick="window.triggerSwipeApprove()">
-              <span class="smoky-swipe-track-text" id="swipe-track-label">Slide to Approve →</span>
+              <span class="smoky-swipe-track-text" id="swipe-track-label">เลื่อนเพื่ออนุมัติคืนเงิน →</span>
               <div class="smoky-swipe-thumb" id="swipe-thumb-btn">
                 ${ic('chevronRight')}
               </div>
@@ -4879,19 +4879,19 @@ function renderStaffDashboard() {
 
         </div>
 
-        <!-- 7. Sales (k$) Bar Chart Mon-Sun -->
+        <!-- 7. สรุปรายรับ 7 วันล่าสุด -->
         <div class="smoky-card" id="card-sales-weekly">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <span class="smoky-meta-label">Revenue Stream</span>
-              <h3 class="smoky-card-title">Sales (k$)</h3>
+              <span class="smoky-meta-label">สถิติรายรับ</span>
+              <h3 class="smoky-card-title">รายรับประจำวัน (พันบาท)</h3>
             </div>
 
             <!-- Week/Month/Year Control -->
             <div class="smoky-segmented" id="sales-segmented">
-              <button class="smoky-seg-btn active" data-period="Week" onclick="window.selectSalesPeriod('Week')">Week</button>
-              <button class="smoky-seg-btn" data-period="Month" onclick="window.selectSalesPeriod('Month')">Month</button>
-              <button class="smoky-seg-btn" data-period="Year" onclick="window.selectSalesPeriod('Year')">Year</button>
+              <button class="smoky-seg-btn active" data-period="Week" onclick="window.selectSalesPeriod('Week')">สัปดาห์</button>
+              <button class="smoky-seg-btn" data-period="Month" onclick="window.selectSalesPeriod('Month')">เดือน</button>
+              <button class="smoky-seg-btn" data-period="Year" onclick="window.selectSalesPeriod('Year')">ปี</button>
             </div>
           </div>
 
@@ -4901,46 +4901,46 @@ function renderStaffDashboard() {
             <!-- Mon -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
               <div style="width: 100%; max-width: 30px; height: 50%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Mon</span>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">จ.</span>
             </div>
 
             <!-- Tue -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
               <div style="width: 100%; max-width: 30px; height: 65%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Tue</span>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">อ.</span>
             </div>
 
             <!-- Wed (Active Blue with Floating Tooltip) -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
               <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
-                $24.8k
+                ฿8.4k
               </div>
               <div style="width: 100%; max-width: 30px; height: 88%; background: #3B82F6; box-shadow: 0 0 15px rgba(59,130,246,0.6); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
-              <span style="font-size: 0.72rem; font-weight: 700; color: #ffffff; margin-top: 6px;">Wed</span>
+              <span style="font-size: 0.72rem; font-weight: 700; color: #ffffff; margin-top: 6px;">พ.</span>
             </div>
 
             <!-- Thu -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
               <div style="width: 100%; max-width: 30px; height: 68%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Thu</span>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">พฤ.</span>
             </div>
 
             <!-- Fri -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
               <div style="width: 100%; max-width: 30px; height: 80%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Fri</span>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">ศ.</span>
             </div>
 
             <!-- Sat -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
               <div style="width: 100%; max-width: 30px; height: 42%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Sat</span>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">ส.</span>
             </div>
 
             <!-- Sun -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
               <div style="width: 100%; max-width: 30px; height: 35%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Sun</span>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">อา.</span>
             </div>
 
           </div>
@@ -4954,7 +4954,7 @@ function renderStaffDashboard() {
         <!-- 6. Right Column 2x2 KPI Tiles -->
         <div class="smoky-2x2-grid">
           
-          <!-- Tile 1: Customers 2,739 -->
+          <!-- Tile 1: ผู้พักอาศัย -->
           <div class="smoky-tile" id="tile-customers">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
@@ -4965,56 +4965,53 @@ function renderStaffDashboard() {
               </button>
             </div>
             <div style="margin-top: 12px;">
-              <span class="smoky-meta-label">Customers</span>
-              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-customers-count">2,739</div>
-              <span class="smoky-delta-pos" style="margin-top: 4px;">+8.4%</span>
+              <span class="smoky-meta-label">ผู้พักอาศัย</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-customers-count">19 คน</div>
+              <span class="smoky-delta-pos" style="margin-top: 4px;">14 ห้องเช่า</span>
             </div>
           </div>
 
-          <!-- Tile 2: Pipeline $1.19M with mini horizontal funnel bars -->
+          <!-- Tile 2: สถานะ 3 อาคาร (Building Funnel) -->
           <div class="smoky-tile" id="tile-pipeline">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
-                ${ic('flame')}
+                ${ic('door')}
               </div>
               <button class="smoky-toggle checked" onclick="window.toggleKpiTile('pipeline', this)">
                 <span class="smoky-toggle-knob"></span>
               </button>
             </div>
             <div style="margin-top: 12px;">
-              <span class="smoky-meta-label">Pipeline</span>
-              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;">$1.19M</div>
+              <span class="smoky-meta-label">ผัง 3 อาคาร</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;">14/17 ห้อง</div>
               <!-- Mini horizontal funnel bars -->
               <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">
                 <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
-                  <span style="width: 32px;">Lead</span>
+                  <span style="width: 44px;">ธนกฤษฎ์</span>
                   <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                    <div style="width: 90%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
+                    <div style="width: 89%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
                   </div>
+                  <span style="font-size: 0.62rem; color: #fff;">8/9</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
-                  <span style="width: 32px;">Qual</span>
+                  <span style="width: 44px;">กิ่งเพชร</span>
                   <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                    <div style="width: 68%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
+                    <div style="width: 80%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
                   </div>
+                  <span style="font-size: 0.62rem; color: #fff;">4/5</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
-                  <span style="width: 32px;">Prop</span>
+                  <span style="width: 44px;">ใต้บ้าน</span>
                   <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                    <div style="width: 45%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
+                    <div style="width: 67%; height: 100%; background: #34D399; border-radius: 9999px;"></div>
                   </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
-                  <span style="width: 32px;">Won</span>
-                  <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                    <div style="width: 25%; height: 100%; background: #34D399; border-radius: 9999px;"></div>
-                  </div>
+                  <span style="font-size: 0.62rem; color: #fff;">2/3</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Tile 3: Active Users 300 with blue sparkline (toggled ON = card lights up) -->
+          <!-- Tile 3: มิเตอร์น้ำไฟ (จดครบแล้ว) -->
           <div class="smoky-tile active-spark" id="tile-active-users">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(59,130,246,0.25); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
@@ -5025,8 +5022,8 @@ function renderStaffDashboard() {
               </button>
             </div>
             <div style="margin-top: 12px;">
-              <span class="smoky-meta-label">Active Users</span>
-              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;">300</div>
+              <span class="smoky-meta-label">จดมิเตอร์น้ำ-ไฟ</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;">17 ห้อง</div>
               <!-- Blue Sparkline -->
               <div style="height: 24px; width: 100%; margin-top: 6px;">
                 <svg viewBox="0 0 100 25" style="width: 100%; height: 100%; overflow: visible;">
@@ -5036,7 +5033,7 @@ function renderStaffDashboard() {
             </div>
           </div>
 
-          <!-- Tile 4: Open Tickets 17 (red delta) -->
+          <!-- Tile 4: รายการแจ้งซ่อม -->
           <div class="smoky-tile" id="tile-open-tickets">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
@@ -5047,23 +5044,23 @@ function renderStaffDashboard() {
               </button>
             </div>
             <div style="margin-top: 12px;">
-              <span class="smoky-meta-label">Open Tickets</span>
-              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-tickets-count">17</div>
-              <span class="smoky-delta-neg" style="margin-top: 4px;">−3 today</span>
+              <span class="smoky-meta-label">แจ้งซ่อมรอดำเนินการ</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-tickets-count">2 งาน</div>
+              <span class="smoky-delta-neg" style="margin-top: 4px;">−3 งานเสร็จวันนี้</span>
             </div>
           </div>
 
         </div>
 
-        <!-- 8. "Discovery Call · Northwind Co." Media Card -->
+        <!-- 8. สายด่วนฉุกเฉิน & บันทึกเสียงแจ้งเหตุ -->
         <div class="smoky-card" id="card-media-discovery">
-          <span class="smoky-meta-label">Discovery Call · Northwind Co.</span>
+          <span class="smoky-meta-label">สายด่วนฉุกเฉิน · ผู้จัดการหอพัก</span>
           
           <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80" alt="Marcus" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="ผู้จัดการ" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);">
             <div>
-              <div style="font-size: 0.90rem; font-weight: 600; color: #fff;">Marcus Vance</div>
-              <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">VP of Operations</div>
+              <div style="font-size: 0.90rem; font-weight: 600; color: #fff;">นายเกียรติศักดิ์ บริหาร</div>
+              <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">โทร 086-946-1654 (24 ชม.)</div>
             </div>
           </div>
 
@@ -5101,16 +5098,16 @@ function renderStaffDashboard() {
 
           <!-- Audio Controls: prev / play-pause / next -->
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-            <span style="font-size: 0.76rem; font-family: monospace; color: rgba(255,255,255,0.4);" id="audio-duration-txt">04:32</span>
+            <span style="font-size: 0.76rem; font-family: monospace; color: rgba(255,255,255,0.4);" id="audio-duration-txt">01:24</span>
 
             <div style="display: flex; align-items: center; gap: 8px;">
-              <button class="smoky-round-glass-btn" style="width: 32px; height: 32px;" onclick="window.seekAudio(0)" title="Previous">
+              <button class="smoky-round-glass-btn" style="width: 32px; height: 32px;" onclick="window.seekAudio(0)" title="ย้อนกลับ">
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
               </button>
-              <button class="smoky-round-glass-btn" id="btn-audio-play" style="width: 38px; height: 38px; background: #3B82F6; color: #fff; box-shadow: 0 0 15px rgba(59,130,246,0.6);" onclick="window.toggleAudioPlay()" title="Play / Pause">
+              <button class="smoky-round-glass-btn" id="btn-audio-play" style="width: 38px; height: 38px; background: #3B82F6; color: #fff; box-shadow: 0 0 15px rgba(59,130,246,0.6);" onclick="window.toggleAudioPlay()" title="เล่น / หยุด">
                 ${ic('play')}
               </button>
-              <button class="smoky-round-glass-btn" style="width: 32px; height: 32px;" onclick="window.seekAudio(100)" title="Next">
+              <button class="smoky-round-glass-btn" style="width: 32px; height: 32px;" onclick="window.seekAudio(100)" title="ถัดไป">
                 <svg class="icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
               </button>
             </div>
@@ -5162,7 +5159,7 @@ async function initStaffDashboard() {
 
   // 2. Animate KPI numbers count-up from 0
   animateNumberCountUp('target-percent-text', dashboardState.targetPercent, '%');
-  animateNumberCountUp('leads-num-count', 1186);
+  animateNumberCountUp('leads-num-count', 28);
 }
 
 // Animated Counter Utility
@@ -5204,7 +5201,7 @@ function updateTargetRingUI() {
   const ring = document.getElementById('target-progress-ring');
   
   if (textEl) textEl.textContent = `${dashboardState.targetPercent}%`;
-  if (subEl) subEl.textContent = `Goal: ${dashboardState.targetPercent}%`;
+  if (subEl) subEl.textContent = `เป้าหมาย: ${dashboardState.targetPercent}%`;
   
   if (ring) {
     const radius = 40;
@@ -5238,15 +5235,15 @@ window.selectRevenuePeriod = function(period) {
   const linePath = document.getElementById('revenue-line-path');
 
   if (period === 'Today') {
-    if (revMain) revMain.textContent = '$23.1k';
+    if (revMain) revMain.textContent = '฿37,200';
     if (areaPath) areaPath.setAttribute('d', 'M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10 L300,90 L0,90 Z');
     if (linePath) linePath.setAttribute('d', 'M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10');
   } else if (period === 'Week') {
-    if (revMain) revMain.textContent = '$148.5k';
+    if (revMain) revMain.textContent = '฿148,500';
     if (areaPath) areaPath.setAttribute('d', 'M0,60 C40,70 100,35 150,45 C200,55 250,25 300,5 L300,90 L0,90 Z');
     if (linePath) linePath.setAttribute('d', 'M0,60 C40,70 100,35 150,45 C200,55 250,25 300,5');
   } else {
-    if (revMain) revMain.textContent = '$620.0k';
+    if (revMain) revMain.textContent = '฿420,000';
     if (areaPath) areaPath.setAttribute('d', 'M0,80 C60,50 120,40 180,30 C220,25 260,15 300,2 L300,90 L0,90 Z');
     if (linePath) linePath.setAttribute('d', 'M0,80 C60,50 120,40 180,30 C220,25 260,15 300,2');
   }
@@ -5269,11 +5266,11 @@ window.triggerSwipeApprove = function() {
     thumb.innerHTML = dashboardState.isApproved ? ic('check') : ic('chevronRight');
   }
   if (label) {
-    label.textContent = dashboardState.isApproved ? 'Approved ✓' : 'Slide to Approve →';
+    label.textContent = dashboardState.isApproved ? 'อนุมัติเรียบร้อย ✓' : 'เลื่อนเพื่ออนุมัติคืนเงิน →';
     label.style.color = dashboardState.isApproved ? '#34D399' : 'rgba(255,255,255,0.5)';
   }
   if (dashboardState.isApproved) {
-    toast('อนุมัติส่วนลดพิเศษ $4,800 เรียบร้อยแล้ว', 'success');
+    toast('อนุมัติคืนเงินประกัน ฿2,800 ให้ห้อง TK-104 เรียบร้อยแล้ว', 'success');
   }
 };
 
@@ -5283,7 +5280,7 @@ window.dismissApproval = function() {
     card.style.opacity = '0';
     card.style.transform = 'scale(0.95)';
     setTimeout(() => {
-      card.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:rgba(255,255,255,0.4); font-size:0.82rem;">No pending approvals</div>`;
+      card.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:rgba(255,255,255,0.4); font-size:0.82rem;">ไม่มีรายการรอตรวจอนุมัติ</div>`;
       card.style.opacity = '1';
     }, 250);
   }

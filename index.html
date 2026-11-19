@@ -89,7 +89,7 @@
                 <!-- Gradient overlay -->
                 <div class="gradient-overlay"></div>
 
-                <!-- Floating Navbar Pill (เหลือเฉพาะที่ใช้งานจริง กับระบบหลังบ้านของหอพัก) -->
+                <!-- Floating Navbar Pill -->
                 <nav class="prisma-navbar">
                     <div class="prisma-nav-inner">
                         <a href="#" class="prisma-brand">
@@ -98,13 +98,13 @@
                             <span class="brand-sub-badge">นครศรีธรรมราช</span>
                         </a>
                         <div class="prisma-nav-links">
-                            <a href="#rooms" class="prisma-link">ห้องพัก</a>
+                            <a href="#rooms" class="prisma-link">3 อาคารห้องพัก</a>
+                            <a href="#features" class="prisma-link">สิ่งอำนวยความสะดวก</a>
                             <a href="#rates" class="prisma-link">อัตราค่าเช่า</a>
                             <a href="#contact" class="prisma-link">ติดต่อเรา</a>
                         </div>
-                        <button class="prisma-login-btn" id="btn-toggle-login" onclick="openBackendSystem()" title="เข้าสู่ระบบหลังบ้านหอพัก">
-                            <svg class="icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.2; margin-right: 5px; vertical-align: middle;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                            ระบบหลังบ้านหอพัก
+                        <button class="prisma-login-btn" id="btn-toggle-login" onclick="toggleLoginModal(true)">
+                            เข้าสู่ระบบจัดการ
                         </button>
                     </div>
                 </nav>
