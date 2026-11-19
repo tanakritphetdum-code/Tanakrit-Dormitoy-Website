@@ -87,7 +87,7 @@ export async function renderSettingsView() {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
             <div class="field">
               <label>เบอร์โทรศัพท์ติดต่อ</label>
-              <input type="text" id="set-phone" value="${s.phone || '075-345-678, 089-999-8877'}">
+              <input type="text" id="set-phone" value="${s.phone || '075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985'}">
             </div>
             <div class="field">
               <label>Line Official Account</label>

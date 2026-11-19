@@ -250,7 +250,7 @@ export function openInvoiceModal(bill) {
               Tanakrit Dormitory
             </div>
             <div style="font-size: 0.85rem; color: var(--muted);">หอพักชายธนกฤษฎ์ นครศรีธรรมราช</div>
-            <div style="font-size: 0.8rem; color: var(--muted);">123 หมู่ 4 ต.ท่าเรือ อ.เมือง จ.นครศรีธรรมราช โทร. 075-345-678</div>
+            <div style="font-size: 0.8rem; color: var(--muted);">69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320 โทร. 075-355-289</div>
           </div>
           <div style="text-align: right;">
             ${statusBadgeHtml}

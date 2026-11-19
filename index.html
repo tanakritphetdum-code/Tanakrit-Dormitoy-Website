@@ -100,18 +100,18 @@
                         <!-- Right: Story, CTA & Fast Actions -->
                         <div class="prisma-right">
                             <p class="prisma-desc">
-                                หอพักชายธนกฤษฎ์ — บริการห้องพักรายเดือนคุณภาพสูง 3 อาคาร (Tanakrit, KingPhetch, UnderGround) บรรยากาศเงียบสงบ เป็นส่วนตัว ปลอดภัยตลอด 24 ชั่วโมง พร้อมระบบจัดการหอพักดิจิทัล คำนวณค่าน้ำ-ค่าไฟอัตโนมัติ และสแกนจ่ายผ่าน Thai QR PromptPay
+                                หอพักชายธนกฤษฎ์ — บริการห้องพักรายเดือนคุณภาพสูง 3 อาคาร บรรยากาศเงียบสงบ เป็นส่วนตัว ปลอดภัยตลอด 24 ชั่วโมง พร้อมระบบจัดการหอพักดิจิทัล และสแกนจ่ายผ่าน Thai QR PromptPay
                             </p>
 
                             <div class="prisma-action-row">
                                 <button class="prisma-cta-btn" onclick="window.openBookingModal && window.openBookingModal()">
-                                    <span>สนใจจองห้องพักออนไลน์</span>
+                                    <span>จองห้องพัก</span>
                                     <span class="prisma-arrow-circle">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="arrow-svg"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                                     </span>
                                 </button>
-                                <button class="prisma-secondary-btn" onclick="toggleLoginModal(true)">
-                                    เข้าสู่ระบบผู้พักและเจ้าหน้าที่
+                                <button class="prisma-secondary-btn" onclick="document.getElementById('rooms').scrollIntoView({ behavior: 'smooth' })">
+                                    ดูห้องพัก
                                 </button>
                             </div>
                         </div>
@@ -127,7 +127,7 @@
                 </div>
                 <div class="hstat-item">
                     <div class="num">3 อาคาร</div>
-                    <div class="lbl">Tanakrit / KingPhetch / UnderGround</div>
+                    <div class="lbl">อาคารทั้งหมด</div>
                 </div>
                 <div class="hstat-item">
                     <div class="num">800 - 1,500 ฿</div>
@@ -144,7 +144,7 @@
         <section id="rooms" class="section">
             <div class="section-header">
                 <div class="sub">Room Types & Rates (3 Buildings)</div>
-                <h2>ห้องพักทั้ง 3 อาคารของหอพัก</h2>
+                <h2>ห้องพักทั้ง 3 อาคาร</h2>
                 <p>ห้องพักพัดลมโปร่งสบาย บรรยากาศร่มรื่น เฟอร์นิเจอร์ครบ พร้อมเข้าอยู่ทันที</p>
             </div>
 
@@ -253,8 +253,15 @@
                         <p>พื้นที่จอดรถกว้างขวาง เป็นสัดส่วน ปลอดภัย รองรับทั้งรถจักรยานยนต์และรถยนต์ส่วนตัว พร้อมไฟส่องสว่าง</p>
                     </div>
                     <div class="fcard">
-                        <div class="f-icon-box">🛜</div>
-                        <h3>ฟรีอินเทอร์เน็ต High-Speed Wi-Fi</h3>
+                        <div class="f-icon-box" style="display:flex; align-items:center; justify-content:center;">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--emerald);">
+                                <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                                <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                                <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                            </svg>
+                        </div>
+                        <h3>บริการอินเทอร์เน็ต High-Speed Wi-Fi</h3>
                         <p>สัญญาณอินเทอร์เน็ต Wi-Fi ความเร็วสูง ครอบคลุมทั่วทุกอาคารและห้องพัก รองรับการเรียนและท่องเว็บไม่สะดุด</p>
                     </div>
                     <div class="fcard">
@@ -352,13 +359,13 @@
                             <span style="font-size:1.2rem;">📍</span>
                             <div>
                                 <strong>ที่อยู่หอพัก:</strong><br>
-                                123 หมู่ 4 ต.ท่าเรือ อ.เมือง จ.นครศรีธรรมราช 80000
+                                69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320
                             </div>
                         </div>
                         <div style="display:flex; gap:12px; align-items:center;">
                             <span style="font-size:1.2rem;">📞</span>
                             <div>
-                                <strong>โทรศัพท์:</strong> 075-345-678, 089-999-8877
+                                <strong>โทรศัพท์:</strong> 075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985
                             </div>
                         </div>
                         <div style="display:flex; gap:12px; align-items:center;">

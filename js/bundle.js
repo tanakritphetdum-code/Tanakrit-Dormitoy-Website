@@ -16,9 +16,9 @@ let cachedSettings = {
   id: 'default',
   dorm_name: 'Tanakrit Dormitory',
   sub_title: 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช',
-  phone: '075-345-678, 089-999-8877',
+  phone: '075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985',
   line_id: '@tanakritdorm',
-  address: '123 หมู่ 4 ต.ท่าเรือ อ.เมือง จ.นครศรีธรรมราช 80000',
+  address: '69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320',
   water_rate: 18,
   electric_rate: 8,
   common_fee: 100,
@@ -845,7 +845,7 @@ function openInvoiceModal(bill) {
               Tanakrit Dormitory
             </div>
             <div style="font-size: 0.85rem; color: var(--muted);">หอพักชายธนกฤษฎ์ นครศรีธรรมราช</div>
-            <div style="font-size: 0.8rem; color: var(--muted);">123 หมู่ 4 ต.ท่าเรือ อ.เมือง จ.นครศรีธรรมราช โทร. 075-345-678</div>
+            <div style="font-size: 0.8rem; color: var(--muted);">69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320 โทร. 075-355-289</div>
           </div>
           <div style="text-align: right;">
             ${statusBadgeHtml}
@@ -2376,7 +2376,7 @@ function openBookingModal(preselectedType = '') {
               เจ้าหน้าที่หอพักชายธนกฤษฎ์จะติดต่อกลับผ่านเบอร์ <strong>${phone}</strong> เพื่อยืนยันห้องพักและขั้นตอนเข้าพักโดยเร็วที่สุดครับ
             </p>
             <div style="font-size:0.85rem; background:#f4fbf7; padding:10px; border-radius:8px; color:var(--teal-900);">
-              📞 หากมีข้อสงสัยเร่งด่วน ติดต่อโทร. 075-345-678 หรือ Line: @tanakritdorm
+              📞 หากมีข้อสงสัยเร่งด่วน ติดต่อโทร. 075-355-289, 089-590-0478 หรือ Line: @tanakritdorm
             </div>
           </div>
         `,
@@ -4482,7 +4482,7 @@ async function renderSettingsView() {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
             <div class="field">
               <label>เบอร์โทรศัพท์ติดต่อ</label>
-              <input type="text" id="set-phone" value="${s.phone || '075-345-678, 089-999-8877'}">
+              <input type="text" id="set-phone" value="${s.phone || '075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985'}">
             </div>
             <div class="field">
               <label>Line Official Account</label>
