@@ -1330,36 +1330,141 @@ async function openAddMeterModal() {
 /* ========== js/rooms.js ========== */
 // js/rooms.js
 // ระบบผังห้องพักและสถานะห้องพัก 3 อาคาร (Tanakrit, KingPhetch, UnderGround)
+// ออกแบบด้วย Smoky Frosted Glass Design System
 
 
 let currentBuildingFilter = 'all';
 let currentStatusFilter = 'all';
 let currentSearch = '';
 
-// รายชื่อห้องพักมาตรฐานทั้ง 17 ห้อง (3 อาคาร) ตามโครงสร้างจริงของหอพัก
+const CACHE_KEY = 'tanakrit_rooms_cache_v3';
+
+// รายชื่อห้องพักมาตรฐานทั้ง 17 ห้อง (3 อาคาร) ตามโครงสร้างจริงและราคาที่ถูกต้องของหอพัก
 const DEFAULT_ROOMS = [
-  // 1. อาคาร Tanakrit (9 ห้อง: 101 - 109)
-  { id: 'RM-T101', room_number: '101', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'occupied', tenant_name: 'นายสมชาย ธนกฤษฎ์', tenant_phone: '089-123-4567', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-T102', room_number: '102', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'occupied', tenant_name: 'นายเกียรติภูมิ ภักดี', tenant_phone: '081-222-3344', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-T103', room_number: '103', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-T104', room_number: '104', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-T105', room_number: '105', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'occupied', tenant_name: 'นายวรเมธ แก้วมณี', tenant_phone: '086-555-7788', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-T106', room_number: '106', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-T107', room_number: '107', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'maintenance', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-T108', room_number: '108', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-T109', room_number: '109', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
+  // 1. อาคาร ธนกฤษฎ์ (9 ห้อง: 101 - 109) — 2,800 บาท/เดือน
+  { 
+    id: 'RM-T101', room_number: '101', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายสมชาย ธนกฤษฎ์', tenant_phone: '089-123-4567', 
+    condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
+  },
+  { 
+    id: 'RM-T102', room_number: '102', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายเกียรติภูมิ ภักดี', tenant_phone: '081-222-3344', 
+    condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
+  },
+  { 
+    id: 'RM-T103', room_number: '103', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
+    condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
+  },
+  { 
+    id: 'RM-T104', room_number: '104', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายวรเมธ แก้วมณี', tenant_phone: '086-555-7788', 
+    condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
+  },
+  { 
+    id: 'RM-T105', room_number: '105', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายภานุเดช ชัยโรจน์', tenant_phone: '084-333-1122', 
+    condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
+  },
+  { 
+    id: 'RM-T106', room_number: '106', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายพงศธร ใจซื่อ', tenant_phone: '082-777-8899', 
+    condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
+  },
+  { 
+    id: 'RM-T107', room_number: '107', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'maintenance', 
+    tenant_name: '', tenant_phone: '', 
+    condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
+  },
+  { 
+    id: 'RM-T108', room_number: '108', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายกมลวรรธน์ สดใส', tenant_phone: '085-444-9900', 
+    condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
+  },
+  { 
+    id: 'RM-T109', room_number: '109', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายธีรศักดิ์ ศรีสุข', tenant_phone: '087-111-4455', 
+    condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
+  },
 
-  // 2. อาคาร KingPhetch (5 ห้อง: 201 - 205)
-  { id: 'RM-K201', room_number: '201', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'occupied', tenant_name: 'นายชินวัตร ประเสริฐ', tenant_phone: '083-444-1122', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-K202', room_number: '202', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'occupied', tenant_name: 'นายธีรพัฒน์ สุขใจ', tenant_phone: '082-888-9900', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-K203', room_number: '203', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-K204', room_number: '204', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
-  { id: 'RM-K205', room_number: '205', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, size: 'กว้าง 3.5 M × ยาว 8 M', bathroom: 'ห้องน้ำในตัว', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' },
+  // 2. อาคาร กิ่งเพชร (5 ห้อง: 201 - 205) — 2,600 บาท/เดือน
+  { 
+    id: 'RM-K201', room_number: '201', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายชินวัตร ประเสริฐ', tenant_phone: '083-444-1122', 
+    condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
+  },
+  { 
+    id: 'RM-K202', room_number: '202', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายธีรพัฒน์ สุขใจ', tenant_phone: '082-888-9900', 
+    condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
+  },
+  { 
+    id: 'RM-K203', room_number: '203', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายณัฐพล เจริญผล', tenant_phone: '089-666-5544', 
+    condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
+  },
+  { 
+    id: 'RM-K204', room_number: '204', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
+    condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
+  },
+  { 
+    id: 'RM-K205', room_number: '205', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
+    tenant_name: 'นายจิรวัฒน์ พิพัฒน์', tenant_phone: '088-222-3311', 
+    condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
+  },
 
-  // 3. อาคาร UnderGround (3 ห้อง: B01 - B03)
-  { id: 'RM-UG01', room_number: 'B01', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 800, size: 'กว้าง 3 M × ยาว 4 M', bathroom: 'ห้องน้ำรวม', status: 'occupied', tenant_name: 'นายปกรณ์ รัตนพันธุ์', tenant_phone: '087-333-2211', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำรวม' },
-  { id: 'RM-UG02', room_number: 'B02', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 800, size: 'กว้าง 3 M × ยาว 4 M', bathroom: 'ห้องน้ำรวม', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำรวม' },
-  { id: 'RM-UG03', room_number: 'B03', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 800, size: 'กว้าง 3 M × ยาว 4 M', bathroom: 'ห้องน้ำรวม', status: 'vacant', tenant_name: '', tenant_phone: '', amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำรวม' }
+  // 3. อาคาร ใต้บ้าน (3 ห้อง: B01 - B03) — 1,500 บาท/เดือน
+  { 
+    id: 'RM-UG01', room_number: 'B01', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
+    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'occupied', 
+    tenant_name: 'นายปกรณ์ รัตนพันธุ์', tenant_phone: '087-333-2211', 
+    condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
+  },
+  { 
+    id: 'RM-UG02', room_number: 'B02', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
+    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'occupied', 
+    tenant_name: 'นายศุภกฤต บุญเกิด', tenant_phone: '081-777-6655', 
+    condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
+  },
+  { 
+    id: 'RM-UG03', room_number: 'B03', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
+    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
+    condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
+    amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
+  }
 ];
 async function renderRoomsView() {
   setTimeout(() => {
@@ -1368,54 +1473,77 @@ async function renderRoomsView() {
   }, 0);
 
   return `
-    <div class="card">
-      <div class="card-header-actions">
-        <div>
-          <h3>${ic('door')} สถานะและการจัดการห้องพัก (Floor Plan — 3 อาคาร)</h3>
-          <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
-            ผังห้องพักทั้งหมด 17 ห้อง ครอบคลุมอาคาร ธนกฤษฎ์ (9 ห้อง), อาคาร กิ่งเพชร (5 ห้อง) และอาคาร ใต้บ้าน (3 ห้อง)
-          </p>
+    <div style="display: flex; flex-direction: column; gap: 22px;">
+      
+      <!-- 1. Header Card (Smoky Glass) -->
+      <div class="smoky-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.32); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
+            ${ic('door')}
+          </div>
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: #ffffff; margin: 0; letter-spacing: -0.02em;">
+              ผังห้องพัก 3 อาคาร (Floor Plan — 17 ห้อง)
+            </h2>
+            <span style="font-size: 0.82rem; color: rgba(255,255,255,0.48); margin-top: 3px; display: block;">
+              อาคาร ธนกฤษฎ์ (9 ห้อง) · อาคาร กิ่งเพชร (5 ห้อง) · อาคาร ใต้บ้าน (3 ห้อง)
+            </span>
+          </div>
         </div>
-        <div style="display: flex; gap: 10px;">
-          <button class="btn btn-primary" id="btn-add-room">${ic('plus')} เพิ่มห้องพักใหม่</button>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button class="smoky-round-glass-btn" id="btn-add-room" style="width: auto; border-radius: 9999px; padding: 0 18px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 0 20px rgba(59,130,246,0.4); font-size: 0.82rem; font-weight: 600; gap: 6px;">
+            ${ic('plus')}
+            <span>เพิ่มห้องพักใหม่</span>
+          </button>
         </div>
       </div>
 
-      <!-- Quick Room Stat Counters -->
-      <div class="room-stats-summary" id="room-stats-summary">
+      <!-- 2. KPI Summary Tiles (Smoky Glass) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px;" id="room-stats-summary">
         <!-- Will be populated via JS -->
       </div>
 
-      <!-- Filters & Search Toolbar -->
-      <div class="toolbar-filter-grid">
-        <div class="search-box-wrap">
-          ${ic('search')}
-          <input type="text" id="rooms-search-input" placeholder="ค้นหาเลขห้อง หรือชื่อผู้เช่า...">
-        </div>
+      <!-- 3. Filters & Search Toolbar (Smoky Glass) -->
+      <div class="smoky-card" style="padding: 16px 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+          
+          <!-- Search Box -->
+          <div style="position: relative; min-width: 240px; flex: 1; max-width: 320px;">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); display: flex; align-items: center;">
+              ${ic('search')}
+            </span>
+            <input type="text" id="rooms-search-input" class="smoky-glass-input" placeholder="ค้นหาเลขห้อง หรือชื่อผู้เช่า..." style="width: 100%; padding-left: 38px;">
+          </div>
 
-        <div class="filter-tabs" id="building-tabs">
-          <button class="filter-tab-btn active" data-building="all">ทุกอาคาร (17 ห้อง)</button>
-          <button class="filter-tab-btn" data-building="Tanakrit">🏢 อาคาร ธนกฤษฎ์ (9 ห้อง)</button>
-          <button class="filter-tab-btn" data-building="KingPhetch">🏡 อาคาร กิ่งเพชร (5 ห้อง)</button>
-          <button class="filter-tab-btn" data-building="UnderGround">🛋️ อาคารใต้บ้าน (3 ห้อง)</button>
-        </div>
+          <!-- Building Tabs (Segmented Control) -->
+          <div class="smoky-segmented" id="building-tabs" style="overflow-x: auto; max-width: 100%;">
+            <button class="smoky-seg-btn active" data-building="all">ทุกอาคาร (17 ห้อง)</button>
+            <button class="smoky-seg-btn" data-building="Tanakrit">🏢 อาคาร ธนกฤษฎ์ (9)</button>
+            <button class="smoky-seg-btn" data-building="KingPhetch">🏡 อาคาร กิ่งเพชร (5)</button>
+            <button class="smoky-seg-btn" data-building="UnderGround">🛋️ อาคาร ใต้บ้าน (3)</button>
+          </div>
 
-        <div class="filter-select-wrap">
-          <select id="rooms-status-select" class="form-select">
-            <option value="all">สถานะทั้งหมด</option>
-            <option value="vacant">เฉพาะห้องว่าง (พร้อมเข้าอยู่)</option>
-            <option value="occupied">เฉพาะห้องที่มีผู้เช่าแล้ว</option>
-            <option value="maintenance">เฉพาะห้องที่กำลังซ่อมบำรุง</option>
-          </select>
+          <!-- Status Dropdown Filter -->
+          <div>
+            <select id="rooms-status-select" class="smoky-glass-select">
+              <option value="all">สถานะทั้งหมด</option>
+              <option value="occupied">เฉพาะห้องที่มีผู้เช่า (14 ห้อง)</option>
+              <option value="vacant">เฉพาะห้องว่างพร้อมอยู่ (3 ห้อง)</option>
+              <option value="maintenance">เฉพาะห้องที่กำลังซ่อมบำรุง (1 ห้อง)</option>
+            </select>
+          </div>
+
         </div>
       </div>
 
-      <!-- Visual Rooms Grid -->
-      <div id="rooms-container" class="room-cards-grid">
-        <div style="text-align:center; padding: 40px; color: var(--muted); grid-column: 1/-1;">
-          กำลังโหลดข้อมูลห้องพัก...
+      <!-- 4. Visual Rooms Grid (Smoky Glass) -->
+      <div id="rooms-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(285px, 1fr)); gap: 20px;">
+        <div style="text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.4); grid-column: 1/-1;">
+          กำลังโหลดข้อมูลห้องพัก 3 อาคาร...
         </div>
       </div>
+
     </div>
   `;
 }
@@ -1427,33 +1555,28 @@ async function loadRoomsData() {
 
   let rooms = null;
 
-  // 1. ลองดึงข้อมูลจาก Supabase
+  // 1. ดึงจาก Cache รุ่นล่าสุด (v3) หรือ Supabase
   try {
-    const { data, error } = await supabase.from('rooms').select('*').order('room_number', { ascending: true });
-    // ถ้า Supabase มีข้อมูล และมีข้อมูล 3 อาคาร
-    if (!error && data && data.length > 0) {
-      rooms = data;
-    }
-  } catch (err) {
-    console.warn('Cannot fetch rooms from Supabase Cloud:', err);
-  }
-
-  // 2. ถ้า Supabase ยังเป็นห้องชุดเดิม หรือออฟไลน์ ให้ใช้แคชท้องถิ่นหรือ DEFAULT_ROOMS 17 ห้อง
-  if (!rooms || rooms.length !== 17) {
-    try {
-      const cached = localStorage.getItem('tanakrit_rooms_cache');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed && parsed.length === 17) {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (parsed && parsed.length === 17) {
+        // ตรวจสอบว่าราคาถูกต้อง (ธนกฤษฎ์ 2,800)
+        const t1 = parsed.find(x => x.room_number === '101');
+        if (t1 && t1.price === 2800) {
           rooms = parsed;
         }
       }
-    } catch (_) {}
-  }
+    }
+  } catch (_) {}
 
+  // 2. ถ้ายังไม่มี หรือเป็นแคชเก่า ให้ใช้ DEFAULT_ROOMS 17 ห้องมาตรฐาน
   if (!rooms) {
     rooms = DEFAULT_ROOMS;
-    localStorage.setItem('tanakrit_rooms_cache', JSON.stringify(rooms));
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(rooms));
+      localStorage.removeItem('tanakrit_rooms_cache'); // ลบแคชรุ่นเก่าที่ราคาผิด
+    } catch (_) {}
   }
 
   // Update Summary Stats
@@ -1465,21 +1588,50 @@ async function loadRoomsData() {
 
   if (summary) {
     summary.innerHTML = `
-      <div class="rstat-item total">
-        <span class="num">${total}</span>
-        <span class="lbl">ห้องพักทั้งหมด (3 อาคาร)</span>
+      <div class="smoky-tile" style="padding: 16px 18px; border-radius: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="smoky-meta-label">ห้องพักทั้งหมด</span>
+          <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85);">
+            ${ic('door')}
+          </div>
+        </div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 8px;">
+          <span class="smoky-kpi-num" style="font-size: 1.7rem;">${total}</span>
+          <span style="font-size: 0.78rem; color: rgba(255,255,255,0.45);">ห้อง (3 อาคาร)</span>
+        </div>
       </div>
-      <div class="rstat-item occupied">
-        <span class="num">${occupied}</span>
-        <span class="lbl">มีผู้เช่าแล้ว (${occupancyRate}%)</span>
+
+      <div class="smoky-tile" style="padding: 16px 18px; border-radius: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="smoky-meta-label">เข้าพักแล้ว</span>
+          <span class="smoky-delta-pos" style="font-size: 0.70rem;">${occupancyRate}%</span>
+        </div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 8px;">
+          <span class="smoky-kpi-num" style="font-size: 1.7rem; color: #3B82F6;">${occupied}</span>
+          <span style="font-size: 0.78rem; color: rgba(255,255,255,0.45);">ห้องเช่า</span>
+        </div>
       </div>
-      <div class="rstat-item vacant">
-        <span class="num">${vacant}</span>
-        <span class="lbl">ห้องว่างพร้อมอยู่</span>
+
+      <div class="smoky-tile" style="padding: 16px 18px; border-radius: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="smoky-meta-label">ห้องว่างพร้อมอยู่</span>
+          <span style="background: rgba(52,211,153,0.18); color: #34D399; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px;">พร้อมจอง</span>
+        </div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 8px;">
+          <span class="smoky-kpi-num" style="font-size: 1.7rem; color: #34D399;">${vacant}</span>
+          <span style="font-size: 0.78rem; color: rgba(255,255,255,0.45);">ห้อง (สัญญา 12 ด.)</span>
+        </div>
       </div>
-      <div class="rstat-item maintenance">
-        <span class="num">${maintenance}</span>
-        <span class="lbl">ปิดปรับปรุง/ซ่อม</span>
+
+      <div class="smoky-tile" style="padding: 16px 18px; border-radius: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="smoky-meta-label">ปิดปรับปรุง / ซ่อมบำรุง</span>
+          <span style="background: rgba(245,158,11,0.18); color: #F59E0B; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px;">Service</span>
+        </div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 8px;">
+          <span class="smoky-kpi-num" style="font-size: 1.7rem; color: #F59E0B;">${maintenance}</span>
+          <span style="font-size: 0.78rem; color: rgba(255,255,255,0.45);">ห้อง</span>
+        </div>
       </div>
     `;
   }
@@ -1507,8 +1659,8 @@ async function loadRoomsData() {
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div style="text-align:center; padding: 40px; color: var(--muted); grid-column: 1/-1;">
-        <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
+      <div style="text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.4); grid-column: 1/-1;">
+        <div style="font-size: 2.2rem; margin-bottom: 8px;">🔍</div>
         ไม่พบห้องพักตามเงื่อนไขที่ค้นหา
       </div>
     `;
@@ -1518,74 +1670,132 @@ async function loadRoomsData() {
   let html = '';
   filtered.forEach(r => {
     let statusClass = 'vacant';
-    let statusLabel = 'ห้องว่าง';
-    let dotColor = 'var(--emerald)';
+    let statusLabel = 'ห้องว่างพร้อมอยู่';
+    let statusColor = '#34D399';
+    let statusBadgeBg = 'rgba(52,211,153,0.14)';
+    let statusBadgeBorder = 'rgba(52,211,153,0.28)';
 
     if (r.status === 'occupied') {
       statusClass = 'occupied';
-      statusLabel = 'มีผู้เช่า';
-      dotColor = 'var(--sky)';
+      statusLabel = 'มีผู้พักอาศัย';
+      statusColor = '#3B82F6';
+      statusBadgeBg = 'rgba(59,130,246,0.16)';
+      statusBadgeBorder = 'rgba(59,130,246,0.30)';
     } else if (r.status === 'maintenance') {
       statusClass = 'maintenance';
-      statusLabel = 'กำลังซ่อม';
-      dotColor = 'var(--sand-600)';
+      statusLabel = 'กำลังซ่อมบำรุง';
+      statusColor = '#F59E0B';
+      statusBadgeBg = 'rgba(245,158,11,0.16)';
+      statusBadgeBorder = 'rgba(245,158,11,0.30)';
     }
 
     const buildingName = r.building || (r.room_number.startsWith('B') ? 'UnderGround' : (Number(r.room_number) >= 200 ? 'KingPhetch' : 'Tanakrit'));
-    const roomSize = r.size || (buildingName === 'UnderGround' ? 'กว้าง 3 M × ยาว 4 M' : 'กว้าง 3.5 M × ยาว 8 M');
-    const bathroomType = r.bathroom || (buildingName === 'UnderGround' ? 'ห้องน้ำรวม' : 'ห้องน้ำในตัว');
-    const roomAmenities = r.amenities || (buildingName === 'UnderGround' ? 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำรวม' : 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง');
-
+    
     let buildingDisplayName = 'อาคาร ธนกฤษฎ์';
-    let buildingBadgeColor = 'background:#E8F5E9; color:#1B5E20;';
+    let buildingBadgeBg = 'rgba(52,211,153,0.15)';
+    let buildingBadgeColor = '#34D399';
+    let cardAccentColor = '#3B82F6';
+
     if (buildingName === 'KingPhetch' || buildingName === 'กิ่งเพชร' || buildingName === 'อาคาร กิ่งเพชร') {
       buildingDisplayName = 'อาคาร กิ่งเพชร';
-      buildingBadgeColor = 'background:#E3F2FD; color:#0D47A1;';
+      buildingBadgeBg = 'rgba(96,165,250,0.15)';
+      buildingBadgeColor = '#60A5FA';
+      cardAccentColor = '#60A5FA';
     } else if (buildingName === 'UnderGround' || buildingName === 'ใต้บ้าน' || buildingName === 'อาคารใต้บ้าน') {
-      buildingDisplayName = 'อาคารใต้บ้าน';
-      buildingBadgeColor = 'background:#FFF3E0; color:#E65100;';
+      buildingDisplayName = 'อาคาร ใต้บ้าน';
+      buildingBadgeBg = 'rgba(245,158,11,0.15)';
+      buildingBadgeColor = '#F59E0B';
+      cardAccentColor = '#F59E0B';
     }
 
+    const roomSize = r.size || (buildingName === 'UnderGround' ? 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)' : 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)');
+    const bathroomType = r.bathroom || (buildingName === 'UnderGround' ? 'ห้องน้ำรวม' : 'ห้องน้ำในตัว');
+    const roomCondition = r.condition || (buildingName === 'UnderGround' ? 'ราคาสบายกระเป๋า พร้อมอยู่' : (buildingName === 'KingPhetch' ? 'เงียบสงบ เป็นส่วนตัว' : 'โปร่งสบาย ระเบียงส่วนตัว'));
+
     html += `
-      <div class="room-box-card ${statusClass}" data-room-id="${r.id}">
-        <div class="room-top">
-          <div>
-            <span class="room-badge-floor" style="${buildingBadgeColor} font-weight:600; padding:2px 8px; border-radius:6px; font-size:0.75rem;">
-              ${buildingDisplayName}
+      <div class="smoky-room-card ${statusClass}" data-room-id="${r.id}">
+        
+        <div>
+          <!-- Top Row: Building Name & Status Badge -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <div>
+              <span style="background: ${buildingBadgeBg}; color: ${buildingBadgeColor}; font-size: 0.70rem; font-weight: 700; padding: 3px 9px; border-radius: 6px; letter-spacing: 0.03em;">
+                ${buildingDisplayName}
+              </span>
+              <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 8px;">
+                <h3 style="font-size: 1.45rem; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.02em;">
+                  ห้อง ${r.room_number}
+                </h3>
+                <span style="font-size: 0.74rem; color: rgba(255,255,255,0.45); font-weight: 500;">${r.type || 'ห้องพัดลม'}</span>
+              </div>
+            </div>
+
+            <!-- Status Badge -->
+            <span style="background: ${statusBadgeBg}; color: ${statusColor}; border: 1px solid ${statusBadgeBorder}; font-size: 0.70rem; font-weight: 700; padding: 3px 10px; border-radius: 9999px; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: ${statusColor}; box-shadow: 0 0 6px ${statusColor};"></span>
+              ${statusLabel}
             </span>
-            <div class="room-no" style="margin-top:4px;">ห้อง ${r.room_number}</div>
-          </div>
-          <span class="room-status-badge ${statusClass}">
-            <span class="status-dot" style="background:${dotColor}"></span>
-            ${statusLabel}
-          </span>
-        </div>
-
-        <div class="room-details-body">
-          <div class="room-type">${r.type || 'ห้องพัดลม'}</div>
-          <div style="font-size:0.8rem; color:var(--muted); margin: 4px 0 6px 0; line-height: 1.4;">
-            <div>📐 ${roomSize}</div>
-            <div>🚿 ${bathroomType}</div>
-          </div>
-          <div class="room-price">${fmtCurrency(r.price)} / เดือน</div>
-          
-          <div style="font-size:0.75rem; color:var(--muted); background:#f9fafb; padding:6px 8px; border-radius:6px; margin-top:6px; line-height:1.4;">
-            <strong>ของในห้อง:</strong> ${roomAmenities}
           </div>
 
-          <div class="room-tenant-info" style="margin-top:8px;">
-            ${r.status === 'occupied' 
-              ? `${ic('user')} <span>${r.tenant_name || 'ไม่ระบุชื่อ'}</span>` 
-              : `<span class="empty-hint">${r.status === 'maintenance' ? '🔧 อยู่ระหว่างปรับปรุง' : '✨ พร้อมทำสัญญาเข้าอยู่'}</span>`
-            }
+          <!-- Specs List -->
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 10px 12px; margin: 12px 0; font-size: 0.76rem; color: rgba(255,255,255,0.7); display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="color: rgba(255,255,255,0.45);">📐 ขนาดพื้นที่:</span>
+              <span style="font-weight: 600; color: #ffffff;">${roomSize}</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="color: rgba(255,255,255,0.45);">🚿 ห้องน้ำ:</span>
+              <span style="font-weight: 600; color: #ffffff;">${bathroomType}</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="color: rgba(255,255,255,0.45);">🌿 บรรยากาศ:</span>
+              <span style="color: rgba(255,255,255,0.85);">${roomCondition}</span>
+            </div>
+          </div>
+
+          <!-- Price Row -->
+          <div style="display: flex; align-items: baseline; justify-content: space-between; margin: 12px 0 14px;">
+            <span style="font-size: 0.78rem; color: rgba(255,255,255,0.45);">อัตราค่าเช่า:</span>
+            <div style="display: flex; align-items: baseline; gap: 4px;">
+              <span class="smoky-kpi-num" style="font-size: 1.35rem; color: #ffffff;">${Number(r.price).toLocaleString()} ฿</span>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.45);">/ เดือน</span>
+            </div>
+          </div>
+
+          <!-- Tenant info / Vacant info box -->
+          <div style="background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 12px; font-size: 0.78rem; margin-bottom: 16px;">
+            ${r.status === 'occupied' ? `
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 26px; height: 26px; border-radius: 50%; background: rgba(59,130,246,0.22); color: #3B82F6; display: flex; align-items: center; justify-content: center; font-size: 0.70rem;">
+                    ${ic('user')}
+                  </div>
+                  <div>
+                    <span style="font-weight: 600; color: #ffffff; display: block;">${r.tenant_name || 'ผู้พักอาศัย'}</span>
+                    <span style="font-size: 0.70rem; color: rgba(255,255,255,0.45);">${r.tenant_phone || 'สัญญา 12 เดือน'}</span>
+                  </div>
+                </div>
+              </div>
+            ` : (r.status === 'maintenance' ? `
+              <div style="display: flex; align-items: center; gap: 8px; color: #F59E0B;">
+                ${ic('wrench')}
+                <span style="font-size: 0.76rem;">อยู่ระหว่างตรวจสอบและซ่อมบำรุง</span>
+              </div>
+            ` : `
+              <div style="display: flex; align-items: center; gap: 8px; color: #34D399;">
+                ${ic('sparkles')}
+                <span style="font-size: 0.76rem;">ห้องว่าง พร้อมทำสัญญาเข้าอยู่ (12 เดือน)</span>
+              </div>
+            `)}
           </div>
         </div>
 
-        <div class="room-card-footer">
-          <button class="btn btn-outline btn-sm btn-manage-room" data-room-id="${r.id}" style="width: 100%;">
-            จัดการห้องพัก
-          </button>
-        </div>
+        <!-- Action Button -->
+        <button class="smoky-round-glass-btn btn-manage-room" data-room-id="${r.id}" style="width: 100%; height: 38px; border-radius: 10px; font-size: 0.82rem; font-weight: 600; justify-content: center; gap: 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);">
+          <span>จัดการห้องพัก</span>
+          <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+
       </div>
     `;
   });
@@ -1614,9 +1824,9 @@ function bindRoomsEvents() {
 
   const buildingTabs = document.getElementById('building-tabs');
   if (buildingTabs) {
-    buildingTabs.querySelectorAll('.filter-tab-btn').forEach(btn => {
+    buildingTabs.querySelectorAll('.smoky-seg-btn').forEach(btn => {
       btn.onclick = () => {
-        buildingTabs.querySelectorAll('.filter-tab-btn').forEach(b => b.classList.remove('active'));
+        buildingTabs.querySelectorAll('.smoky-seg-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentBuildingFilter = btn.getAttribute('data-building');
         loadRoomsData();
@@ -1641,80 +1851,82 @@ function bindRoomsEvents() {
 // Modal จัดการห้องพัก
 function openManageRoomModal(room, allRooms) {
   const body = `
-    <form id="form-manage-room">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+    <form id="form-manage-room" style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>หมายเลขห้อง</label>
-          <input type="text" id="m-room-number" value="${room.room_number}" required>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">หมายเลขห้อง</label>
+          <input type="text" id="m-room-number" value="${room.room_number}" class="form-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label>อาคาร</label>
-          <select id="m-building" class="form-select">
-            <option value="Tanakrit" ${room.building === 'Tanakrit' ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (กว้าง 3.5 เมตร ยาว 8 เมตร รวม 28 ตร.ม.)</option>
-            <option value="KingPhetch" ${room.building === 'KingPhetch' ? 'selected' : ''}>อาคาร กิ่งเพชร (กว้าง 3.5 เมตร ยาว 8 เมตร รวม 28 ตร.ม.)</option>
-            <option value="UnderGround" ${room.building === 'UnderGround' ? 'selected' : ''}>อาคารใต้บ้าน (กว้าง 3 เมตร ยาว 4 เมตร รวม 12 ตร.ม.)</option>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">อาคาร</label>
+          <select id="m-building" class="form-select" style="width: 100%;">
+            <option value="Tanakrit" ${room.building === 'Tanakrit' ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (2,800 ฿ / เดือน)</option>
+            <option value="KingPhetch" ${room.building === 'KingPhetch' ? 'selected' : ''}>อาคาร กิ่งเพชร (2,600 ฿ / เดือน)</option>
+            <option value="UnderGround" ${room.building === 'UnderGround' ? 'selected' : ''}>อาคาร ใต้บ้าน (1,500 ฿ / เดือน)</option>
           </select>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ประเภทห้องพัก</label>
-          <input type="text" id="m-type" value="${room.type || 'ห้องพัดลม'}" required>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้องพัก</label>
+          <input type="text" id="m-type" value="${room.type || 'ห้องพัดลม'}" class="form-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label>ราคาค่าเช่าต่อเดือน (บาท)</label>
-          <input type="number" id="m-price" value="${room.price}" required>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
+          <input type="number" id="m-price" value="${room.price}" class="form-input" style="width: 100%;" required>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ขนาดห้องพัก</label>
-          <input type="text" id="m-size" value="${room.size || (room.building === 'UnderGround' ? 'กว้าง 3 M × ยาว 4 M' : 'กว้าง 3.5 M × ยาว 8 M')}">
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ขนาดห้องพัก</label>
+          <input type="text" id="m-size" value="${room.size || (room.building === 'UnderGround' ? 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)' : 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)')}" class="form-input" style="width: 100%;">
         </div>
         <div class="field">
-          <label>ประเภทห้องน้ำ</label>
-          <select id="m-bathroom" class="form-select">
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
+          <select id="m-bathroom" class="form-select" style="width: 100%;">
             <option value="ห้องน้ำในตัว" ${room.bathroom !== 'ห้องน้ำรวม' ? 'selected' : ''}>ห้องน้ำในตัว</option>
             <option value="ห้องน้ำรวม" ${room.bathroom === 'ห้องน้ำรวม' ? 'selected' : ''}>ห้องน้ำรวม</option>
           </select>
         </div>
       </div>
 
-      <div class="field" style="margin-bottom: 14px;">
-        <label>สถานะห้องพัก</label>
-        <select id="m-status" class="form-select">
-          <option value="vacant" ${room.status === 'vacant' ? 'selected' : ''}>ว่าง (พร้อมเข้าอยู่)</option>
-          <option value="occupied" ${room.status === 'occupied' ? 'selected' : ''}>มีผู้เช่าแล้ว</option>
+      <div class="field">
+        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">สถานะห้องพัก</label>
+        <select id="m-status" class="form-select" style="width: 100%;">
+          <option value="vacant" ${room.status === 'vacant' ? 'selected' : ''}>ห้องว่างพร้อมอยู่ (พร้อมทำสัญญา)</option>
+          <option value="occupied" ${room.status === 'occupied' ? 'selected' : ''}>มีผู้พักอาศัยแล้ว</option>
           <option value="maintenance" ${room.status === 'maintenance' ? 'selected' : ''}>ปิดปรับปรุง / ซ่อมบำรุง</option>
         </select>
       </div>
 
-      <div class="field" style="margin-bottom: 14px;">
-        <label>ชื่อผู้เช่าปัจจุบัน</label>
-        <input type="text" id="m-tenant-name" value="${room.tenant_name || ''}" placeholder="ระบุชื่อผู้พักอาศัย (ถ้ามี)">
+      <div class="field">
+        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ชื่อผู้พักอาศัยปัจจุบัน</label>
+        <input type="text" id="m-tenant-name" value="${room.tenant_name || ''}" placeholder="ระบุชื่อผู้พักอาศัย (ถ้ามี)" class="form-input" style="width: 100%;">
       </div>
 
-      <div class="field" style="margin-bottom: 14px;">
-        <label>เบอร์โทรศัพท์ผู้เช่า</label>
-        <input type="text" id="m-tenant-phone" value="${room.tenant_phone || ''}" placeholder="08x-xxx-xxxx">
+      <div class="field">
+        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">เบอร์โทรศัพท์ผู้เช่า</label>
+        <input type="text" id="m-tenant-phone" value="${room.tenant_phone || ''}" placeholder="08x-xxx-xxxx" class="form-input" style="width: 100%;">
       </div>
     </form>
   `;
 
   const footer = `
-    <button type="button" class="btn btn-outline" id="btn-delete-room" style="color:var(--danger); border-color:var(--danger);">
-      ${ic('trash')} ลบห้องพัก
-    </button>
-    <div style="display: flex; gap: 10px;">
-      <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
-      <button type="button" class="btn btn-primary" id="btn-save-manage-room">บันทึกข้อมูล</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <button type="button" class="btn btn-outline" id="btn-delete-room" style="color: #F87171; border-color: rgba(248,113,113,0.3); font-size: 0.80rem;">
+        ${ic('trash')} ลบห้องพัก
+      </button>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-primary" id="btn-save-manage-room">บันทึกข้อมูล</button>
+      </div>
     </div>
   `;
 
   showModal({
-    title: `จัดการห้องพัก ${room.room_number} (อาคาร ${room.building || 'Tanakrit'})`,
+    title: `จัดการห้องพัก ${room.room_number} (${room.building === 'KingPhetch' ? 'อาคาร กิ่งเพชร' : (room.building === 'UnderGround' ? 'อาคาร ใต้บ้าน' : 'อาคาร ธนกฤษฎ์')})`,
     body,
     footer,
     maxWidth: '540px'
@@ -1750,11 +1962,11 @@ function openManageRoomModal(room, allRooms) {
 
     // อัปเดตใน LocalStorage Cache
     try {
-      const cached = JSON.parse(localStorage.getItem('tanakrit_rooms_cache') || '[]');
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
       const idx = cached.findIndex(x => x.id === room.id);
       if (idx !== -1) {
         cached[idx] = { ...cached[idx], ...updatedData };
-        localStorage.setItem('tanakrit_rooms_cache', JSON.stringify(cached));
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
       }
     } catch (_) {}
 
@@ -1770,9 +1982,9 @@ function openManageRoomModal(room, allRooms) {
       } catch (_) {}
 
       try {
-        let cached = JSON.parse(localStorage.getItem('tanakrit_rooms_cache') || '[]');
+        let cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
         cached = cached.filter(x => x.id !== room.id);
-        localStorage.setItem('tanakrit_rooms_cache', JSON.stringify(cached));
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
       } catch (_) {}
 
       toast(`ลบห้อง ${room.room_number} สำเร็จ`, 'info');
@@ -1785,50 +1997,50 @@ function openManageRoomModal(room, allRooms) {
 // Modal เพิ่มห้องใหม่
 function openAddRoomModal() {
   const body = `
-    <form id="form-add-room">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+    <form id="form-add-room" style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>หมายเลขห้อง (เช่น 110, B04)</label>
-          <input type="text" id="add-room-number" placeholder="เช่น 110" required>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">หมายเลขห้อง (เช่น 110, 206, B04)</label>
+          <input type="text" id="add-room-number" placeholder="เช่น 110" class="form-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label>อาคาร</label>
-          <select id="add-building" class="form-select">
-            <option value="Tanakrit">อาคาร ธนกฤษฎ์ (กว้าง 3.5 เมตร ยาว 8 เมตร รวม 28 ตร.ม.)</option>
-            <option value="KingPhetch">อาคาร กิ่งเพชร (กว้าง 3.5 เมตร ยาว 8 เมตร รวม 28 ตร.ม.)</option>
-            <option value="UnderGround">อาคารใต้บ้าน (กว้าง 3 เมตร ยาว 4 เมตร รวม 12 ตร.ม.)</option>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">อาคาร</label>
+          <select id="add-building" class="form-select" style="width: 100%;">
+            <option value="Tanakrit">อาคาร ธนกฤษฎ์ (2,800 ฿ / เดือน)</option>
+            <option value="KingPhetch">อาคาร กิ่งเพชร (2,600 ฿ / เดือน)</option>
+            <option value="UnderGround">อาคาร ใต้บ้าน (1,500 ฿ / เดือน)</option>
           </select>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ประเภทห้อง</label>
-          <input type="text" id="add-type" value="ห้องพัดลม" required>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้อง</label>
+          <input type="text" id="add-type" value="ห้องพัดลม" class="form-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label>ราคาค่าเช่าต่อเดือน (บาท)</label>
-          <input type="number" id="add-price" value="1500" required>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
+          <input type="number" id="add-price" value="2800" class="form-input" style="width: 100%;" required>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ขนาดห้อง</label>
-          <input type="text" id="add-size" value="กว้าง 3.5 M × ยาว 8 M">
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ขนาดห้อง</label>
+          <input type="text" id="add-size" value="กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)" class="form-input" style="width: 100%;">
         </div>
         <div class="field">
-          <label>ประเภทห้องน้ำ</label>
-          <select id="add-bathroom" class="form-select">
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
+          <select id="add-bathroom" class="form-select" style="width: 100%;">
             <option value="ห้องน้ำในตัว">ห้องน้ำในตัว</option>
             <option value="ห้องน้ำรวม">ห้องน้ำรวม</option>
           </select>
         </div>
       </div>
 
-      <div class="field" style="margin-bottom: 14px;">
-        <label>สถานะเริ่มต้น</label>
-        <select id="add-status" class="form-select">
+      <div class="field">
+        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">สถานะเริ่มต้น</label>
+        <select id="add-status" class="form-select" style="width: 100%;">
           <option value="vacant">ห้องว่าง (พร้อมเปิดให้เช่า)</option>
           <option value="occupied">มีผู้เช่าแล้ว</option>
           <option value="maintenance">ปิดปรับปรุง</option>
@@ -1838,8 +2050,10 @@ function openAddRoomModal() {
   `;
 
   const footer = `
-    <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
-    <button type="button" class="btn btn-primary" id="btn-submit-add-room">เพิ่มห้องพัก</button>
+    <div style="display: flex; justify-content: flex-end; gap: 10px; width: 100%;">
+      <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
+      <button type="button" class="btn btn-primary" id="btn-submit-add-room">เพิ่มห้องพัก</button>
+    </div>
   `;
 
   showModal({
@@ -1854,12 +2068,16 @@ function openAddRoomModal() {
     bldSelect.onchange = () => {
       const val = bldSelect.value;
       if (val === 'UnderGround') {
-        document.getElementById('add-price').value = 800;
-        document.getElementById('add-size').value = 'กว้าง 3 M × ยาว 4 M';
-        document.getElementById('add-bathroom').value = 'ห้องน้ำรวม';
-      } else {
         document.getElementById('add-price').value = 1500;
-        document.getElementById('add-size').value = 'กว้าง 3.5 M × ยาว 8 M';
+        document.getElementById('add-size').value = 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)';
+        document.getElementById('add-bathroom').value = 'ห้องน้ำรวม';
+      } else if (val === 'KingPhetch') {
+        document.getElementById('add-price').value = 2600;
+        document.getElementById('add-size').value = 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)';
+        document.getElementById('add-bathroom').value = 'ห้องน้ำในตัว';
+      } else {
+        document.getElementById('add-price').value = 2800;
+        document.getElementById('add-size').value = 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)';
         document.getElementById('add-bathroom').value = 'ห้องน้ำในตัว';
       }
     };
@@ -1891,7 +2109,8 @@ function openAddRoomModal() {
       status: st,
       tenant_name: '',
       tenant_phone: '',
-      amenities: bld === 'UnderGround' ? 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำรวม' : 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง'
+      condition: bld === 'UnderGround' ? 'ราคาสบายกระเป๋า พร้อมอยู่' : (bld === 'KingPhetch' ? 'เงียบสงบ เป็นส่วนตัว' : 'โปร่งสบาย ระเบียงส่วนตัว'),
+      amenities: bld === 'UnderGround' ? 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' : 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้อง'
     };
 
     try {
@@ -1899,12 +2118,12 @@ function openAddRoomModal() {
     } catch (_) {}
 
     try {
-      const cached = JSON.parse(localStorage.getItem('tanakrit_rooms_cache') || '[]');
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
       cached.push(newRoom);
-      localStorage.setItem('tanakrit_rooms_cache', JSON.stringify(cached));
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
     } catch (_) {}
 
-    toast(`เพิ่มห้องพัก ${num} (อาคาร ${bld}) เรียบร้อยแล้ว`, 'success');
+    toast(`เพิ่มห้องพัก ${num} (${bld === 'KingPhetch' ? 'อาคาร กิ่งเพชร' : (bld === 'UnderGround' ? 'อาคาร ใต้บ้าน' : 'อาคาร ธนกฤษฎ์')}) เรียบร้อยแล้ว`, 'success');
     closeModal();
     loadRoomsData();
   };
