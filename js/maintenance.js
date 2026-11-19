@@ -148,9 +148,9 @@ export async function renderMaintenanceView() {
           <!-- Status Filter Tabs (Segmented Control) -->
           <div class="smoky-segmented" id="maint-filter-tabs" style="overflow-x: auto; max-width: 100%;">
             <button class="smoky-seg-btn active" data-status="all">ทั้งหมด</button>
-            <button class="smoky-seg-btn" data-status="pending" style="color: #FBBF24;">รอรับเรื่อง</button>
-            <button class="smoky-seg-btn" data-status="in_progress" style="color: #60A5FA;">กำลังดำเนินการ</button>
-            <button class="smoky-seg-btn" data-status="completed" style="color: #34D399;">ซ่อมเสร็จสิ้น</button>
+            <button class="smoky-seg-btn" data-status="pending">รอรับเรื่อง</button>
+            <button class="smoky-seg-btn" data-status="in_progress">กำลังดำเนินการ</button>
+            <button class="smoky-seg-btn" data-status="completed">ซ่อมเสร็จสิ้น</button>
           </div>
 
           <!-- Refresh Action -->
@@ -169,13 +169,13 @@ export async function renderMaintenanceView() {
         <table class="smoky-table">
           <thead>
             <tr>
-              <th style="width: 110px;">รหัสแจ้งซ่อม</th>
-              <th style="min-width: 170px;">ห้องพัก / ผู้แจ้ง</th>
-              <th style="min-width: 140px;">หมวดหมู่งาน</th>
-              <th style="min-width: 260px;">รายละเอียดปัญหา & วันที่</th>
-              <th style="width: 110px;">ความเร่งด่วน</th>
+              <th style="width: 105px;">รหัสแจ้งซ่อม</th>
+              <th style="min-width: 165px;">ห้องพัก / ผู้แจ้ง</th>
+              <th style="min-width: 135px;">หมวดหมู่งาน</th>
+              <th style="min-width: 250px;">รายละเอียดปัญหา & วันที่</th>
+              <th style="width: 105px;">ความเร่งด่วน</th>
               <th style="min-width: 130px;">ช่างผู้รับผิดชอบ</th>
-              <th style="width: 130px;">สถานะ</th>
+              <th style="min-width: 155px; width: 160px;">สถานะ</th>
               <th style="text-align: right; padding-right: 22px; width: 110px;">การกระทำ</th>
             </tr>
           </thead>
@@ -253,19 +253,19 @@ async function loadMaintenanceData() {
     // Status pill
     let statusPill = '';
     if (t.status === 'in_progress') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(59, 130, 246, 0.16); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 600;">⚡ กำลังดำเนินการ</span>`;
+      statusPill = `<span class="smoky-status-pill pill-blue">⚡ กำลังดำเนินการ</span>`;
     } else if (t.status === 'completed') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(52, 211, 153, 0.16); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.3);">✓ ซ่อมเสร็จแล้ว</span>`;
+      statusPill = `<span class="smoky-status-pill pill-green">✓ ซ่อมเสร็จแล้ว</span>`;
     } else {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3);">⏳ รอรับเรื่อง</span>`;
+      statusPill = `<span class="smoky-status-pill pill-amber">⏳ รอรับเรื่อง</span>`;
     }
 
     // Urgency pill
-    let urgencyBadge = `<span class="smoky-status-pill" style="background: rgba(52, 211, 153, 0.14); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.25);">ปกติ</span>`;
+    let urgencyBadge = `<span class="smoky-status-pill pill-green">ปกติ</span>`;
     if (t.urgency === 'high') {
-      urgencyBadge = `<span class="smoky-status-pill" style="background: rgba(244, 63, 94, 0.18); color: #FB7185; border: 1px solid rgba(244, 63, 94, 0.35); font-weight: 700;">⚡ ด่วนมาก</span>`;
+      urgencyBadge = `<span class="smoky-status-pill pill-rose">⚡ ด่วนมาก</span>`;
     } else if (t.urgency === 'medium') {
-      urgencyBadge = `<span class="smoky-status-pill" style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3);">ปานกลาง</span>`;
+      urgencyBadge = `<span class="smoky-status-pill pill-amber">ปานกลาง</span>`;
     }
 
     html += `
@@ -276,7 +276,7 @@ async function loadMaintenanceData() {
         <td>
           <div style="display: flex; align-items: center; gap: 8px;">
             <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">ห้อง ${t.room_number}</div>
-            <span style="font-size: 0.70rem; color: #60A5FA; background: rgba(59,130,246,0.14); border: 1px solid rgba(59,130,246,0.25); border-radius: 9999px; padding: 1px 7px;">
+            <span class="smoky-bldg-badge">
               ${bldg}
             </span>
           </div>
@@ -285,7 +285,7 @@ async function loadMaintenanceData() {
           </div>
         </td>
         <td>
-          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); font-size: 0.78rem; color: #E2E8F0;">
+          <span class="smoky-cat-pill">
             ${t.category}
           </span>
         </td>

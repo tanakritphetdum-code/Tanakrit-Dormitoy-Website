@@ -144,8 +144,8 @@ export async function renderParcelsView() {
           <!-- Status Filter Tabs (Segmented Control) -->
           <div class="smoky-segmented" id="parcel-filter-tabs" style="overflow-x: auto; max-width: 100%;">
             <button class="smoky-seg-btn active" data-status="all">ทั้งหมด</button>
-            <button class="smoky-seg-btn" data-status="waiting" style="color: #FBBF24;">รอผู้พักมารับ</button>
-            <button class="smoky-seg-btn" data-status="collected" style="color: #34D399;">รับแล้วเรียบร้อย</button>
+            <button class="smoky-seg-btn" data-status="waiting">รอผู้พักมารับ</button>
+            <button class="smoky-seg-btn" data-status="collected">รับแล้วเรียบร้อย</button>
           </div>
 
           <!-- Refresh Action -->
@@ -168,7 +168,7 @@ export async function renderParcelsView() {
               <th style="min-width: 180px;">ห้องพัก / ผู้รับ</th>
               <th style="min-width: 180px;">ลักษณะพัสดุ</th>
               <th style="min-width: 150px;">วันที่มาถึง / รับมอบ</th>
-              <th style="width: 140px;">สถานะ</th>
+              <th style="min-width: 155px; width: 160px;">สถานะ</th>
               <th style="text-align: right; padding-right: 22px; width: 140px;">การดำเนินการ</th>
             </tr>
           </thead>
@@ -244,9 +244,9 @@ async function loadParcelsData() {
 
     let statusPill = '';
     if (isCollected) {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(52, 211, 153, 0.16); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.3);">✓ รับแล้ว</span>`;
+      statusPill = `<span class="smoky-status-pill pill-green">✓ รับแล้ว</span>`;
     } else {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3);">⏳ รอรับที่สำนักงาน</span>`;
+      statusPill = `<span class="smoky-status-pill pill-amber">⏳ รอรับที่สำนักงาน</span>`;
     }
 
     html += `
@@ -256,7 +256,7 @@ async function loadParcelsData() {
             ${p.tracking_number}
           </div>
           <div style="margin-top: 4px;">
-            <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: #93C5FD; font-weight: 500;">
+            <span class="smoky-cat-pill">
               ${p.courier}
             </span>
           </div>
@@ -264,7 +264,7 @@ async function loadParcelsData() {
         <td>
           <div style="display: flex; align-items: center; gap: 8px;">
             <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">ห้อง ${p.room_number}</div>
-            <span style="font-size: 0.70rem; color: #60A5FA; background: rgba(59,130,246,0.14); border: 1px solid rgba(59,130,246,0.25); border-radius: 9999px; padding: 1px 7px;">
+            <span class="smoky-bldg-badge">
               ${bldg}
             </span>
           </div>

@@ -3889,9 +3889,9 @@ async function renderBookingsView() {
           <!-- Status Filter Tabs (Segmented Control) -->
           <div class="smoky-segmented" id="booking-filter-tabs" style="overflow-x: auto; max-width: 100%;">
             <button class="smoky-seg-btn active" data-status="all">ทั้งหมด</button>
-            <button class="smoky-seg-btn" data-status="pending" style="color: #FBBF24;">รอติดต่อ</button>
-            <button class="smoky-seg-btn" data-status="contacted" style="color: #60A5FA;">ติดต่อแล้ว</button>
-            <button class="smoky-seg-btn" data-status="confirmed" style="color: #34D399;">ยืนยันแล้ว</button>
+            <button class="smoky-seg-btn" data-status="pending">รอติดต่อ</button>
+            <button class="smoky-seg-btn" data-status="contacted">ติดต่อแล้ว</button>
+            <button class="smoky-seg-btn" data-status="confirmed">ยืนยันแล้ว</button>
           </div>
 
           <!-- Refresh Action -->
@@ -3915,7 +3915,7 @@ async function renderBookingsView() {
               <th style="min-width: 190px;">อาคาร / ประเภทห้องที่สนใจ</th>
               <th style="min-width: 130px;">วันที่ต้องการเข้าพัก</th>
               <th style="min-width: 240px;">หมายเหตุ / ความต้องการ</th>
-              <th style="width: 130px;">สถานะ</th>
+              <th style="min-width: 150px; width: 155px;">สถานะ</th>
               <th style="text-align: right; padding-right: 22px; width: 170px;">การกระทำ</th>
             </tr>
           </thead>
@@ -3984,13 +3984,13 @@ async function loadBookingsData() {
   filtered.forEach(b => {
     let statusPill = '';
     if (b.status === 'pending') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3);">⏳ รอติดต่อกลับ</span>`;
+      statusPill = `<span class="smoky-status-pill pill-amber">⏳ รอติดต่อกลับ</span>`;
     } else if (b.status === 'contacted') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(59, 130, 246, 0.16); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 600;">📞 ติดต่อแล้ว</span>`;
+      statusPill = `<span class="smoky-status-pill pill-blue">📞 ติดต่อแล้ว</span>`;
     } else if (b.status === 'confirmed') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(52, 211, 153, 0.16); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.3); font-weight: 600;">🎉 ยืนยันเข้าพัก</span>`;
+      statusPill = `<span class="smoky-status-pill pill-green">🎉 ยืนยันเข้าพัก</span>`;
     } else {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(244, 63, 94, 0.16); color: #FB7185; border: 1px solid rgba(244, 63, 94, 0.3);">ยกเลิก</span>`;
+      statusPill = `<span class="smoky-status-pill pill-rose">ยกเลิก</span>`;
     }
 
     html += `
@@ -4009,7 +4009,7 @@ async function loadBookingsData() {
           </div>
         </td>
         <td>
-          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); font-size: 0.78rem; color: #E2E8F0;">
+          <span class="smoky-cat-pill">
             ${b.room_type}
           </span>
           ${b.preferred_floor ? `<div style="font-size: 0.72rem; color: rgba(255,255,255,0.42); margin-top: 4px;">ความต้องการ: ${b.preferred_floor}</div>` : ''}
@@ -4027,7 +4027,7 @@ async function loadBookingsData() {
         <td>${statusPill}</td>
         <td style="text-align: right; padding-right: 18px;">
           <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
-            <select class="status-select-bk" data-id="${b.id}" style="background: rgba(18, 22, 33, 0.90); border: 1px solid rgba(255, 255, 255, 0.16); color: #fff; border-radius: 9999px; padding: 4px 10px; font-size: 0.78rem; outline: none; cursor: pointer;">
+            <select class="status-select-bk smoky-glass-select" data-id="${b.id}" style="border-radius: 9999px; padding: 4px 10px; font-size: 0.78rem; outline: none; cursor: pointer;">
               <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>รอติดต่อกลับ</option>
               <option value="contacted" ${b.status === 'contacted' ? 'selected' : ''}>ติดต่อแล้ว</option>
               <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>ยืนยันเข้าพัก</option>
@@ -4561,9 +4561,9 @@ async function renderMaintenanceView() {
           <!-- Status Filter Tabs (Segmented Control) -->
           <div class="smoky-segmented" id="maint-filter-tabs" style="overflow-x: auto; max-width: 100%;">
             <button class="smoky-seg-btn active" data-status="all">ทั้งหมด</button>
-            <button class="smoky-seg-btn" data-status="pending" style="color: #FBBF24;">รอรับเรื่อง</button>
-            <button class="smoky-seg-btn" data-status="in_progress" style="color: #60A5FA;">กำลังดำเนินการ</button>
-            <button class="smoky-seg-btn" data-status="completed" style="color: #34D399;">ซ่อมเสร็จสิ้น</button>
+            <button class="smoky-seg-btn" data-status="pending">รอรับเรื่อง</button>
+            <button class="smoky-seg-btn" data-status="in_progress">กำลังดำเนินการ</button>
+            <button class="smoky-seg-btn" data-status="completed">ซ่อมเสร็จสิ้น</button>
           </div>
 
           <!-- Refresh Action -->
@@ -4582,13 +4582,13 @@ async function renderMaintenanceView() {
         <table class="smoky-table">
           <thead>
             <tr>
-              <th style="width: 110px;">รหัสแจ้งซ่อม</th>
-              <th style="min-width: 170px;">ห้องพัก / ผู้แจ้ง</th>
-              <th style="min-width: 140px;">หมวดหมู่งาน</th>
-              <th style="min-width: 260px;">รายละเอียดปัญหา & วันที่</th>
-              <th style="width: 110px;">ความเร่งด่วน</th>
+              <th style="width: 105px;">รหัสแจ้งซ่อม</th>
+              <th style="min-width: 165px;">ห้องพัก / ผู้แจ้ง</th>
+              <th style="min-width: 135px;">หมวดหมู่งาน</th>
+              <th style="min-width: 250px;">รายละเอียดปัญหา & วันที่</th>
+              <th style="width: 105px;">ความเร่งด่วน</th>
               <th style="min-width: 130px;">ช่างผู้รับผิดชอบ</th>
-              <th style="width: 130px;">สถานะ</th>
+              <th style="min-width: 155px; width: 160px;">สถานะ</th>
               <th style="text-align: right; padding-right: 22px; width: 110px;">การกระทำ</th>
             </tr>
           </thead>
@@ -4666,19 +4666,19 @@ async function loadMaintenanceData() {
     // Status pill
     let statusPill = '';
     if (t.status === 'in_progress') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(59, 130, 246, 0.16); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 600;">⚡ กำลังดำเนินการ</span>`;
+      statusPill = `<span class="smoky-status-pill pill-blue">⚡ กำลังดำเนินการ</span>`;
     } else if (t.status === 'completed') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(52, 211, 153, 0.16); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.3);">✓ ซ่อมเสร็จแล้ว</span>`;
+      statusPill = `<span class="smoky-status-pill pill-green">✓ ซ่อมเสร็จแล้ว</span>`;
     } else {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3);">⏳ รอรับเรื่อง</span>`;
+      statusPill = `<span class="smoky-status-pill pill-amber">⏳ รอรับเรื่อง</span>`;
     }
 
     // Urgency pill
-    let urgencyBadge = `<span class="smoky-status-pill" style="background: rgba(52, 211, 153, 0.14); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.25);">ปกติ</span>`;
+    let urgencyBadge = `<span class="smoky-status-pill pill-green">ปกติ</span>`;
     if (t.urgency === 'high') {
-      urgencyBadge = `<span class="smoky-status-pill" style="background: rgba(244, 63, 94, 0.18); color: #FB7185; border: 1px solid rgba(244, 63, 94, 0.35); font-weight: 700;">⚡ ด่วนมาก</span>`;
+      urgencyBadge = `<span class="smoky-status-pill pill-rose">⚡ ด่วนมาก</span>`;
     } else if (t.urgency === 'medium') {
-      urgencyBadge = `<span class="smoky-status-pill" style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3);">ปานกลาง</span>`;
+      urgencyBadge = `<span class="smoky-status-pill pill-amber">ปานกลาง</span>`;
     }
 
     html += `
@@ -4689,7 +4689,7 @@ async function loadMaintenanceData() {
         <td>
           <div style="display: flex; align-items: center; gap: 8px;">
             <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">ห้อง ${t.room_number}</div>
-            <span style="font-size: 0.70rem; color: #60A5FA; background: rgba(59,130,246,0.14); border: 1px solid rgba(59,130,246,0.25); border-radius: 9999px; padding: 1px 7px;">
+            <span class="smoky-bldg-badge">
               ${bldg}
             </span>
           </div>
@@ -4698,7 +4698,7 @@ async function loadMaintenanceData() {
           </div>
         </td>
         <td>
-          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); font-size: 0.78rem; color: #E2E8F0;">
+          <span class="smoky-cat-pill">
             ${t.category}
           </span>
         </td>
@@ -5191,8 +5191,8 @@ async function renderParcelsView() {
           <!-- Status Filter Tabs (Segmented Control) -->
           <div class="smoky-segmented" id="parcel-filter-tabs" style="overflow-x: auto; max-width: 100%;">
             <button class="smoky-seg-btn active" data-status="all">ทั้งหมด</button>
-            <button class="smoky-seg-btn" data-status="waiting" style="color: #FBBF24;">รอผู้พักมารับ</button>
-            <button class="smoky-seg-btn" data-status="collected" style="color: #34D399;">รับแล้วเรียบร้อย</button>
+            <button class="smoky-seg-btn" data-status="waiting">รอผู้พักมารับ</button>
+            <button class="smoky-seg-btn" data-status="collected">รับแล้วเรียบร้อย</button>
           </div>
 
           <!-- Refresh Action -->
@@ -5215,7 +5215,7 @@ async function renderParcelsView() {
               <th style="min-width: 180px;">ห้องพัก / ผู้รับ</th>
               <th style="min-width: 180px;">ลักษณะพัสดุ</th>
               <th style="min-width: 150px;">วันที่มาถึง / รับมอบ</th>
-              <th style="width: 140px;">สถานะ</th>
+              <th style="min-width: 155px; width: 160px;">สถานะ</th>
               <th style="text-align: right; padding-right: 22px; width: 140px;">การดำเนินการ</th>
             </tr>
           </thead>
@@ -5291,9 +5291,9 @@ async function loadParcelsData() {
 
     let statusPill = '';
     if (isCollected) {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(52, 211, 153, 0.16); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.3);">✓ รับแล้ว</span>`;
+      statusPill = `<span class="smoky-status-pill pill-green">✓ รับแล้ว</span>`;
     } else {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3);">⏳ รอรับที่สำนักงาน</span>`;
+      statusPill = `<span class="smoky-status-pill pill-amber">⏳ รอรับที่สำนักงาน</span>`;
     }
 
     html += `
@@ -5303,7 +5303,7 @@ async function loadParcelsData() {
             ${p.tracking_number}
           </div>
           <div style="margin-top: 4px;">
-            <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 9999px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: #93C5FD; font-weight: 500;">
+            <span class="smoky-cat-pill">
               ${p.courier}
             </span>
           </div>
@@ -5311,7 +5311,7 @@ async function loadParcelsData() {
         <td>
           <div style="display: flex; align-items: center; gap: 8px;">
             <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">ห้อง ${p.room_number}</div>
-            <span style="font-size: 0.70rem; color: #60A5FA; background: rgba(59,130,246,0.14); border: 1px solid rgba(59,130,246,0.25); border-radius: 9999px; padding: 1px 7px;">
+            <span class="smoky-bldg-badge">
               ${bldg}
             </span>
           </div>
@@ -5726,22 +5726,13 @@ async function loadAnnouncementsData() {
 
   let html = '';
   filtered.forEach(a => {
-    let catBadgeColor = '#93C5FD';
-    let catBgColor = 'rgba(59, 130, 246, 0.14)';
-    let catBorderColor = 'rgba(59, 130, 246, 0.28)';
-
+    let catPillClass = 'pill-blue';
     if (a.category === 'ซ่อมบำรุง') {
-      catBadgeColor = '#FBBF24';
-      catBgColor = 'rgba(245, 158, 11, 0.14)';
-      catBorderColor = 'rgba(245, 158, 11, 0.28)';
+      catPillClass = 'pill-amber';
     } else if (a.category === 'การเงิน') {
-      catBadgeColor = '#34D399';
-      catBgColor = 'rgba(52, 211, 153, 0.14)';
-      catBorderColor = 'rgba(52, 211, 153, 0.28)';
+      catPillClass = 'pill-green';
     } else if (a.category === 'กฎระเบียบ') {
-      catBadgeColor = '#FB7185';
-      catBgColor = 'rgba(244, 63, 94, 0.14)';
-      catBorderColor = 'rgba(244, 63, 94, 0.28)';
+      catPillClass = 'pill-rose';
     }
 
     html += `
@@ -5749,11 +5740,11 @@ async function loadAnnouncementsData() {
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             ${a.pinned ? `
-              <span style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; padding: 2px 10px; border-radius: 9999px; font-size: 0.74rem; font-weight: 600; border: 1px solid rgba(245, 158, 11, 0.3);">
+              <span class="smoky-status-pill pill-amber" style="padding: 2px 10px; font-size: 0.74rem;">
                 📌 ปักหมุด
               </span>
             ` : ''}
-            <span style="background: ${catBgColor}; color: ${catBadgeColor}; border: 1px solid ${catBorderColor}; padding: 2px 10px; border-radius: 9999px; font-size: 0.74rem; font-weight: 600;">
+            <span class="smoky-status-pill ${catPillClass}" style="padding: 2px 10px; font-size: 0.74rem;">
               ${a.category}
             </span>
             <span style="font-size: 0.78rem; color: rgba(255, 255, 255, 0.42);">

@@ -207,22 +207,13 @@ async function loadAnnouncementsData() {
 
   let html = '';
   filtered.forEach(a => {
-    let catBadgeColor = '#93C5FD';
-    let catBgColor = 'rgba(59, 130, 246, 0.14)';
-    let catBorderColor = 'rgba(59, 130, 246, 0.28)';
-
+    let catPillClass = 'pill-blue';
     if (a.category === 'ซ่อมบำรุง') {
-      catBadgeColor = '#FBBF24';
-      catBgColor = 'rgba(245, 158, 11, 0.14)';
-      catBorderColor = 'rgba(245, 158, 11, 0.28)';
+      catPillClass = 'pill-amber';
     } else if (a.category === 'การเงิน') {
-      catBadgeColor = '#34D399';
-      catBgColor = 'rgba(52, 211, 153, 0.14)';
-      catBorderColor = 'rgba(52, 211, 153, 0.28)';
+      catPillClass = 'pill-green';
     } else if (a.category === 'กฎระเบียบ') {
-      catBadgeColor = '#FB7185';
-      catBgColor = 'rgba(244, 63, 94, 0.14)';
-      catBorderColor = 'rgba(244, 63, 94, 0.28)';
+      catPillClass = 'pill-rose';
     }
 
     html += `
@@ -230,11 +221,11 @@ async function loadAnnouncementsData() {
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             ${a.pinned ? `
-              <span style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; padding: 2px 10px; border-radius: 9999px; font-size: 0.74rem; font-weight: 600; border: 1px solid rgba(245, 158, 11, 0.3);">
+              <span class="smoky-status-pill pill-amber" style="padding: 2px 10px; font-size: 0.74rem;">
                 📌 ปักหมุด
               </span>
             ` : ''}
-            <span style="background: ${catBgColor}; color: ${catBadgeColor}; border: 1px solid ${catBorderColor}; padding: 2px 10px; border-radius: 9999px; font-size: 0.74rem; font-weight: 600;">
+            <span class="smoky-status-pill ${catPillClass}" style="padding: 2px 10px; font-size: 0.74rem;">
               ${a.category}
             </span>
             <span style="font-size: 0.78rem; color: rgba(255, 255, 255, 0.42);">

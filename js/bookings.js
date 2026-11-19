@@ -260,9 +260,9 @@ export async function renderBookingsView() {
           <!-- Status Filter Tabs (Segmented Control) -->
           <div class="smoky-segmented" id="booking-filter-tabs" style="overflow-x: auto; max-width: 100%;">
             <button class="smoky-seg-btn active" data-status="all">ทั้งหมด</button>
-            <button class="smoky-seg-btn" data-status="pending" style="color: #FBBF24;">รอติดต่อ</button>
-            <button class="smoky-seg-btn" data-status="contacted" style="color: #60A5FA;">ติดต่อแล้ว</button>
-            <button class="smoky-seg-btn" data-status="confirmed" style="color: #34D399;">ยืนยันแล้ว</button>
+            <button class="smoky-seg-btn" data-status="pending">รอติดต่อ</button>
+            <button class="smoky-seg-btn" data-status="contacted">ติดต่อแล้ว</button>
+            <button class="smoky-seg-btn" data-status="confirmed">ยืนยันแล้ว</button>
           </div>
 
           <!-- Refresh Action -->
@@ -286,7 +286,7 @@ export async function renderBookingsView() {
               <th style="min-width: 190px;">อาคาร / ประเภทห้องที่สนใจ</th>
               <th style="min-width: 130px;">วันที่ต้องการเข้าพัก</th>
               <th style="min-width: 240px;">หมายเหตุ / ความต้องการ</th>
-              <th style="width: 130px;">สถานะ</th>
+              <th style="min-width: 150px; width: 155px;">สถานะ</th>
               <th style="text-align: right; padding-right: 22px; width: 170px;">การกระทำ</th>
             </tr>
           </thead>
@@ -355,13 +355,13 @@ async function loadBookingsData() {
   filtered.forEach(b => {
     let statusPill = '';
     if (b.status === 'pending') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(245, 158, 11, 0.16); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3);">⏳ รอติดต่อกลับ</span>`;
+      statusPill = `<span class="smoky-status-pill pill-amber">⏳ รอติดต่อกลับ</span>`;
     } else if (b.status === 'contacted') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(59, 130, 246, 0.16); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 600;">📞 ติดต่อแล้ว</span>`;
+      statusPill = `<span class="smoky-status-pill pill-blue">📞 ติดต่อแล้ว</span>`;
     } else if (b.status === 'confirmed') {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(52, 211, 153, 0.16); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.3); font-weight: 600;">🎉 ยืนยันเข้าพัก</span>`;
+      statusPill = `<span class="smoky-status-pill pill-green">🎉 ยืนยันเข้าพัก</span>`;
     } else {
-      statusPill = `<span class="smoky-status-pill" style="background: rgba(244, 63, 94, 0.16); color: #FB7185; border: 1px solid rgba(244, 63, 94, 0.3);">ยกเลิก</span>`;
+      statusPill = `<span class="smoky-status-pill pill-rose">ยกเลิก</span>`;
     }
 
     html += `
@@ -380,7 +380,7 @@ async function loadBookingsData() {
           </div>
         </td>
         <td>
-          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); font-size: 0.78rem; color: #E2E8F0;">
+          <span class="smoky-cat-pill">
             ${b.room_type}
           </span>
           ${b.preferred_floor ? `<div style="font-size: 0.72rem; color: rgba(255,255,255,0.42); margin-top: 4px;">ความต้องการ: ${b.preferred_floor}</div>` : ''}
@@ -398,7 +398,7 @@ async function loadBookingsData() {
         <td>${statusPill}</td>
         <td style="text-align: right; padding-right: 18px;">
           <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
-            <select class="status-select-bk" data-id="${b.id}" style="background: rgba(18, 22, 33, 0.90); border: 1px solid rgba(255, 255, 255, 0.16); color: #fff; border-radius: 9999px; padding: 4px 10px; font-size: 0.78rem; outline: none; cursor: pointer;">
+            <select class="status-select-bk smoky-glass-select" data-id="${b.id}" style="border-radius: 9999px; padding: 4px 10px; font-size: 0.78rem; outline: none; cursor: pointer;">
               <option value="pending" ${b.status === 'pending' ? 'selected' : ''}>รอติดต่อกลับ</option>
               <option value="contacted" ${b.status === 'contacted' ? 'selected' : ''}>ติดต่อแล้ว</option>
               <option value="confirmed" ${b.status === 'confirmed' ? 'selected' : ''}>ยืนยันเข้าพัก</option>
