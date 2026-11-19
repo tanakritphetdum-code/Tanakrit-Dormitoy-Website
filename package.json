@@ -1,0 +1,12 @@
+{
+  "name": "tanakrit-dormitory-website",
+  "version": "1.0.3",
+  "description": "Tanakrit Dormitory Website & Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "bundle": "powershell -ExecutionPolicy Bypass -File build_bundle.ps1"
+  },
+  "author": "Tanakrit Phetdum",
+  "license": "ISC"
+}
