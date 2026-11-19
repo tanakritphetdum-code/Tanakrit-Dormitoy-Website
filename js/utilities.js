@@ -1,9 +1,13 @@
 // js/utilities.js
+// ระบบบันทึกมิเตอร์น้ำ-ไฟ และออกใบแจ้งหนี้ (Billing & Utilities)
+// ออกแบบด้วย Smoky Frosted Glass Design System
 import { supabase } from './supabase.js';
 import { ic, fmtCurrency, fmtDate, showModal, closeModal, toast, compressImage, showImageModal } from './api.js';
 import { currentUser } from './auth.js';
+import { DEFAULT_ROOMS } from './rooms.js';
 
 let utilityStatusFilter = 'all';
+let utilitySearchQuery = '';
 
 export async function renderUtilitiesView() {
   setTimeout(() => {
@@ -12,55 +16,89 @@ export async function renderUtilitiesView() {
   }, 0);
 
   return `
-    <div class="card">
-      <div class="card-header-actions">
-        <div>
-          <h3>${ic('bill')} ระบบบันทึกมิเตอร์น้ำ-ไฟ และออกใบแจ้งหนี้ (Billing & Utilities)</h3>
-          <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
-            คำนวณค่าน้ำ ค่าไฟ ค่าเช่าห้อง ตรวจสอบสลิปโอนเงิน และสร้าง QR Code สแกนจ่าย
-          </p>
+    <div style="display: flex; flex-direction: column; gap: 22px;">
+      
+      <!-- 1. Header Card (Smoky Glass) -->
+      <div class="smoky-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.32); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
+            ${ic('bill')}
+          </div>
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: #ffffff; margin: 0; letter-spacing: -0.02em;">
+              ระบบบันทึกมิเตอร์น้ำ-ไฟ และออกใบแจ้งหนี้ (Billing & Utilities)
+            </h2>
+            <span style="font-size: 0.82rem; color: rgba(255,255,255,0.48); margin-top: 3px; display: block;">
+              ค่าน้ำประปา (18 ฿/หน่วย) · ค่าไฟฟ้า (8 ฿/หน่วย) · ค่าบริการส่วนกลาง 100 ฿ · Wi-Fi 100 ฿ · ขยะ 20 ฿ · QR สแกนจ่าย
+            </span>
+          </div>
         </div>
-        <button class="btn btn-primary" id="btn-add-meter">
-          ${ic('plus')} จดมิเตอร์รอบใหม่
-        </button>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button class="smoky-round-glass-btn" id="btn-add-meter" style="width: auto; border-radius: 9999px; padding: 0 18px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 0 20px rgba(59,130,246,0.4); font-size: 0.82rem; font-weight: 600; gap: 6px;">
+            ${ic('plus')}
+            <span>จดมิเตอร์รอบใหม่</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Quick Summary Stats -->
-      <div class="room-stats-summary" id="utility-summary-stats">
+      <!-- 2. KPI Summary Tiles (Smoky Glass) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px;" id="utility-summary-stats">
         <!-- populated via JS -->
       </div>
 
-      <!-- Filters & Actions -->
-      <div class="toolbar-filter-grid" style="margin-top: 16px;">
-        <div class="filter-tabs" id="utility-status-tabs">
-          <button class="filter-tab-btn active" data-status="all">ทั้งหมด</button>
-          <button class="filter-tab-btn" data-status="pending">รอชำระเงิน</button>
-          <button class="filter-tab-btn" data-status="verifying" style="color:#E65100;">รอตรวจสลิป ⏳</button>
-          <button class="filter-tab-btn" data-status="paid">ชำระแล้ว</button>
-        </div>
-        <div style="margin-left: auto;">
-          <button class="btn btn-outline" id="btn-refresh-utilities">${ic('check')} รีเฟรชข้อมูล</button>
+      <!-- 3. Filters & Search Toolbar (Smoky Glass) -->
+      <div class="smoky-card" style="padding: 16px 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+          
+          <!-- Search Box -->
+          <div style="position: relative; min-width: 240px; flex: 1; max-width: 320px;">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); display: flex; align-items: center;">
+              ${ic('search')}
+            </span>
+            <input type="text" id="utility-search-input" class="smoky-glass-input" placeholder="ค้นหาเลขห้อง หรือชื่อผู้เช่า..." style="width: 100%; padding-left: 38px;">
+          </div>
+
+          <!-- Status Filter Tabs (Segmented Control) -->
+          <div class="smoky-segmented" id="utility-status-tabs" style="overflow-x: auto; max-width: 100%;">
+            <button class="smoky-seg-btn active" data-status="all">ทั้งหมด</button>
+            <button class="smoky-seg-btn" data-status="pending">รอชำระเงิน</button>
+            <button class="smoky-seg-btn" data-status="verifying" style="color: #F59E0B;">รอตรวจสลิป ⏳</button>
+            <button class="smoky-seg-btn" data-status="paid" style="color: #34D399;">ชำระแล้ว</button>
+          </div>
+
+          <!-- Refresh Action -->
+          <div>
+            <button class="smoky-round-glass-btn" id="btn-refresh-utilities" style="width: auto; height: 36px; padding: 0 16px; border-radius: 9999px; font-size: 0.80rem; gap: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);">
+              ${ic('check')}
+              <span>รีเฟรชข้อมูล</span>
+            </button>
+          </div>
+
         </div>
       </div>
 
-      <div class="table-responsive" style="margin-top: 16px;">
-        <table class="modern-table">
+      <!-- 4. Table Wrapper (Smoky Frosted Glass) -->
+      <div class="smoky-table-wrap">
+        <table class="smoky-table">
           <thead>
             <tr>
-              <th>เลขที่บิล / ห้อง</th>
+              <th>เลขที่บิล / ห้องพัก</th>
               <th>รอบประจำเดือน</th>
               <th>ค่าน้ำประปา (18฿/หน่วย)</th>
               <th>ค่าไฟฟ้า (8฿/หน่วย)</th>
+              <th>ค่าส่วนกลาง & สัญญา</th>
               <th>ยอดรวมทั้งสิ้น</th>
               <th>สถานะการชำระ</th>
-              <th>จัดการบิล</th>
+              <th style="text-align: right; padding-right: 22px;">จัดการบิล</th>
             </tr>
           </thead>
           <tbody id="utilities-tbody">
-            <tr><td colspan="7" style="text-align:center; padding: 30px; color:var(--muted);">กำลังโหลดข้อมูลค่าน้ำ-ค่าไฟ...</td></tr>
+            <tr><td colspan="8" style="text-align:center; padding: 40px; color: rgba(255,255,255,0.4);">กำลังโหลดข้อมูลค่าน้ำ-ค่าไฟ...</td></tr>
           </tbody>
         </table>
       </div>
+
     </div>
   `;
 }
@@ -76,7 +114,7 @@ async function loadUtilitiesData() {
     .order('billing_month', { ascending: false });
 
   if (error || !readings) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger); padding: 24px;">ไม่สามารถโหลดข้อมูลค่าน้ำ-ค่าไฟได้</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#F87171; padding: 30px;">ไม่สามารถโหลดข้อมูลค่าน้ำ-ค่าไฟได้</td></tr>`;
     return;
   }
 
@@ -90,32 +128,70 @@ async function loadUtilitiesData() {
 
   if (summaryBox) {
     summaryBox.innerHTML = `
-      <div class="rstat-item total">
-        <span class="num">${fmtCurrency(totalRevenue)}</span>
-        <span class="lbl">ยอดเรียกเก็บรวม (${totalBills} บิล)</span>
+      <div class="smoky-tile" style="padding: 16px 18px; border-radius: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="smoky-meta-label">ยอดเรียกเก็บรวม</span>
+          <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85);">
+            ${ic('bill')}
+          </div>
+        </div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 8px;">
+          <span class="smoky-kpi-num" style="font-size: 1.65rem; color: #ffffff;">${fmtCurrency(totalRevenue)}</span>
+          <span style="font-size: 0.76rem; color: rgba(255,255,255,0.45);">${totalBills} บิล</span>
+        </div>
       </div>
-      <div class="rstat-item vacant">
-        <span class="num" style="color:var(--danger);">${fmtCurrency(pendingAmount)}</span>
-        <span class="lbl">รอชำระ (${pendingBills.length} บิล)</span>
+
+      <div class="smoky-tile" style="padding: 16px 18px; border-radius: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="smoky-meta-label">รอชำระเงิน</span>
+          <span class="smoky-delta-neg" style="font-size: 0.70rem;">${pendingBills.length} บิล</span>
+        </div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 8px;">
+          <span class="smoky-kpi-num" style="font-size: 1.65rem; color: #F87171;">${fmtCurrency(pendingAmount)}</span>
+          <span style="font-size: 0.76rem; color: rgba(255,255,255,0.45);">ค้างชำระ</span>
+        </div>
       </div>
-      <div class="rstat-item" style="background:#FFF8E1; border:1px solid #FFE082;">
-        <span class="num" style="color:#E65100;">${verifyingBills.length}</span>
-        <span class="lbl" style="color:#B78103; font-weight:600;">รอตรวจสลิป ⏳</span>
+
+      <div class="smoky-tile" style="padding: 16px 18px; border-radius: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="smoky-meta-label">รอตรวจสลิปโอน</span>
+          <span style="background: rgba(245,158,11,0.18); color: #F59E0B; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px;">ตรวจสอบ</span>
+        </div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 8px;">
+          <span class="smoky-kpi-num" style="font-size: 1.65rem; color: #F59E0B;">${verifyingBills.length}</span>
+          <span style="font-size: 0.76rem; color: rgba(255,255,255,0.45);">สลิปแนบใหม่</span>
+        </div>
       </div>
-      <div class="rstat-item occupied">
-        <span class="num">${paidBills.length}</span>
-        <span class="lbl">ชำระแล้วเรียบร้อย</span>
+
+      <div class="smoky-tile" style="padding: 16px 18px; border-radius: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="smoky-meta-label">ชำระแล้วเรียบร้อย</span>
+          <span class="smoky-delta-pos" style="font-size: 0.70rem;">เสร็จสิ้น</span>
+        </div>
+        <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 8px;">
+          <span class="smoky-kpi-num" style="font-size: 1.65rem; color: #34D399;">${paidBills.length}</span>
+          <span style="font-size: 0.76rem; color: rgba(255,255,255,0.45);">บิลรับชำระแล้ว</span>
+        </div>
       </div>
     `;
   }
 
   let filtered = readings;
   if (utilityStatusFilter !== 'all') {
-    filtered = readings.filter(r => r.status === utilityStatusFilter);
+    filtered = filtered.filter(r => r.status === utilityStatusFilter);
+  }
+
+  if (utilitySearchQuery) {
+    const q = utilitySearchQuery.toLowerCase();
+    filtered = filtered.filter(r => 
+      (r.room_number || '').toLowerCase().includes(q) ||
+      (r.tenant_name || '').toLowerCase().includes(q) ||
+      (r.id || '').toLowerCase().includes(q)
+    );
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 30px; color:var(--muted);">ไม่มีรายการบิลในหมวดหมู่นี้</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px; color:rgba(255,255,255,0.4);">ไม่มีรายการบิลตามเงื่อนไขที่เลือก</td></tr>`;
     return;
   }
 
@@ -123,54 +199,91 @@ async function loadUtilitiesData() {
   filtered.forEach(r => {
     const isPaid = r.status === 'paid';
     const isVerifying = r.status === 'verifying';
-    let badgeClass = 'pending';
-    let badgeText = 'รอชำระ';
+    
+    let statusBadgeBg = 'rgba(248,113,113,0.16)';
+    let statusBadgeColor = '#F87171';
+    let statusBadgeBorder = 'rgba(248,113,113,0.30)';
+    let statusBadgeText = 'รอชำระ';
 
     if (isPaid) {
-      badgeClass = 'approved';
-      badgeText = '✓ ชำระแล้ว';
+      statusBadgeBg = 'rgba(52,211,153,0.16)';
+      statusBadgeColor = '#34D399';
+      statusBadgeBorder = 'rgba(52,211,153,0.30)';
+      statusBadgeText = '✓ ชำระแล้ว';
     } else if (isVerifying) {
-      badgeClass = 'verifying';
-      badgeText = '⏳ รอตรวจสลิป';
+      statusBadgeBg = 'rgba(245,158,11,0.16)';
+      statusBadgeColor = '#F59E0B';
+      statusBadgeBorder = 'rgba(245,158,11,0.30)';
+      statusBadgeText = '⏳ รอตรวจสลิป';
+    }
+
+    const roomNum = r.room_number || '';
+    let bldName = 'อาคาร ธนกฤษฎ์';
+    let bldColor = '#34D399';
+    if (roomNum.startsWith('B')) {
+      bldName = 'อาคาร ใต้บ้าน';
+      bldColor = '#F59E0B';
+    } else if (Number(roomNum) >= 200) {
+      bldName = 'อาคาร กิ่งเพชร';
+      bldColor = '#60A5FA';
     }
 
     html += `
       <tr>
         <td>
-          <div style="font-weight: 600; color:var(--teal-950);">ห้อง ${r.room_number}</div>
-          <small style="color:var(--muted);">${r.tenant_name || '-'} (${r.id})</small>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 34px; height: 34px; border-radius: 9px; background: rgba(59,130,246,0.18); color: #3B82F6; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; border: 1px solid rgba(59,130,246,0.25);">
+              ${r.room_number}
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-weight: 700; color: #ffffff; font-size: 0.90rem;">ห้อง ${r.room_number}</span>
+                <span style="font-size: 0.65rem; color: ${bldColor}; font-weight: 600;">(${bldName})</span>
+              </div>
+              <small style="color: rgba(255,255,255,0.45); font-size: 0.72rem;">${r.tenant_name || '-'} · ${r.id}</small>
+            </div>
+          </div>
         </td>
         <td>
-          <div style="font-weight: 500;">${r.month_label || r.billing_month}</div>
-          <small style="color:var(--muted);">ครบกำหนด: ${fmtDate(r.due_date)}</small>
+          <div style="font-weight: 600; color: #ffffff;">${r.month_label || r.billing_month}</div>
+          <small style="color: rgba(255,255,255,0.45); font-size: 0.72rem;">ครบกำหนด: ${fmtDate(r.due_date)}</small>
         </td>
         <td>
-          <div>${r.water_unit || 0} หน่วย (${r.prev_water}➔${r.curr_water})</div>
-          <small style="color:var(--muted);">${fmtCurrency(r.water_total || (r.water_unit * 18))}</small>
+          <div style="font-weight: 600; color: rgba(255,255,255,0.9);">${r.water_unit || 0} หน่วย <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4);">(${r.prev_water}➔${r.curr_water})</span></div>
+          <small style="color: #60A5FA; font-weight: 600;">${fmtCurrency(r.water_total || (r.water_unit * 18))}</small>
         </td>
         <td>
-          <div>${r.electric_unit || 0} หน่วย (${r.prev_electric}➔${r.curr_electric})</div>
-          <small style="color:var(--muted);">${fmtCurrency(r.electric_total || (r.electric_unit * 8))}</small>
+          <div style="font-weight: 600; color: rgba(255,255,255,0.9);">${r.electric_unit || 0} หน่วย <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4);">(${r.prev_electric}➔${r.curr_electric})</span></div>
+          <small style="color: #F59E0B; font-weight: 600;">${fmtCurrency(r.electric_total || (r.electric_unit * 8))}</small>
         </td>
         <td>
-          <strong style="color:var(--teal-900); font-size: 1.05rem;">${fmtCurrency(r.total_price)}</strong>
+          <div style="font-size: 0.82rem; color: rgba(255,255,255,0.85); font-weight: 600;">220 ฿</div>
+          <small style="color: rgba(255,255,255,0.4); font-size: 0.68rem;">ส่วนกลาง 100 + wifi 100 + ขยะ 20</small>
         </td>
-        <td><span class="badge ${badgeClass}">${badgeText}</span></td>
         <td>
-          <div style="display: flex; gap: 6px; align-items:center;">
+          <strong style="color: #ffffff; font-size: 1.05rem; letter-spacing: -0.01em;">${fmtCurrency(r.total_price)}</strong>
+        </td>
+        <td>
+          <span style="background: ${statusBadgeBg}; color: ${statusBadgeColor}; border: 1px solid ${statusBadgeBorder}; font-size: 0.70rem; font-weight: 700; padding: 4px 10px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: ${statusBadgeColor};"></span>
+            ${statusBadgeText}
+          </span>
+        </td>
+        <td style="text-align: right; padding-right: 22px;">
+          <div style="display: inline-flex; gap: 8px; align-items: center; justify-content: flex-end;">
             ${isVerifying ? `
-              <button class="btn btn-primary btn-sm btn-view-invoice" data-id="${r.id}" style="background:#E65100; border-color:#E65100;" title="ตรวจสอบสลิปโอนเงิน">
-                ${ic('eye')} ตรวจสลิป
+              <button class="smoky-round-glass-btn btn-view-invoice" data-id="${r.id}" style="width: auto; height: 32px; padding: 0 12px; border-radius: 8px; background: rgba(245,158,11,0.25); border: 1px solid rgba(245,158,11,0.45); color: #F59E0B; font-size: 0.75rem; font-weight: 600; gap: 5px;" title="ตรวจสอบสลิปโอนเงิน">
+                ${ic('eye')} <span>ตรวจสลิป</span>
               </button>
             ` : `
-              <button class="btn btn-outline btn-sm btn-view-invoice" data-id="${r.id}" title="เปิดดูใบแจ้งหนี้ / สแกนจ่าย">
-                ${ic('bill')} ใบแจ้งหนี้
+              <button class="smoky-round-glass-btn btn-view-invoice" data-id="${r.id}" style="width: auto; height: 32px; padding: 0 12px; border-radius: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); color: #ffffff; font-size: 0.75rem; font-weight: 600; gap: 5px;" title="เปิดดูใบแจ้งหนี้ / สแกนจ่าย">
+                ${ic('bill')} <span>ใบแจ้งหนี้</span>
               </button>
             `}
             ${r.slip_url ? `
-              <img src="${r.slip_url}" class="img-thumb-preview" alt="สลิป" onclick="event.stopPropagation(); window.showImageModal('${r.slip_url}', 'สลิปโอนเงิน ห้อง ${r.room_number}')" title="คลิกดูสลิปขนาดเต็ม">
+              <img src="${r.slip_url}" class="img-thumb-preview" alt="สลิป" onclick="event.stopPropagation(); window.showImageModal('${r.slip_url}', 'สลิปโอนเงิน ห้อง ${r.room_number}')" title="คลิกดูสลิปขนาดเต็ม" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); cursor: pointer;">
             ` : ''}
-            <button class="btn ${isPaid ? 'btn-outline' : 'btn-primary'} btn-sm btn-toggle-pay" data-id="${r.id}" title="${isPaid ? 'เปลี่ยนเป็นยังไม่ชำระ' : 'ยืนยันรับชำระเงิน'}">
+            <button class="smoky-round-glass-btn btn-toggle-pay" data-id="${r.id}" style="width: 32px; height: 32px; border-radius: 8px; background: ${isPaid ? 'rgba(255,255,255,0.06)' : 'rgba(52,211,153,0.22)'}; border: 1px solid ${isPaid ? 'rgba(255,255,255,0.12)' : 'rgba(52,211,153,0.4)'}; color: ${isPaid ? 'rgba(255,255,255,0.5)' : '#34D399'};" title="${isPaid ? 'เปลี่ยนเป็นยังไม่ชำระ' : 'ยืนยันรับชำระเงิน'}">
               ${isPaid ? ic('x') : ic('check')}
             </button>
           </div>
@@ -207,14 +320,22 @@ async function loadUtilitiesData() {
 function bindUtilitiesEvents() {
   const tabs = document.getElementById('utility-status-tabs');
   if (tabs) {
-    tabs.querySelectorAll('.filter-tab-btn').forEach(btn => {
+    tabs.querySelectorAll('.smoky-seg-btn').forEach(btn => {
       btn.onclick = () => {
-        tabs.querySelectorAll('.filter-tab-btn').forEach(b => b.classList.remove('active'));
+        tabs.querySelectorAll('.smoky-seg-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         utilityStatusFilter = btn.getAttribute('data-status');
         loadUtilitiesData();
       };
     });
+  }
+
+  const searchInput = document.getElementById('utility-search-input');
+  if (searchInput) {
+    searchInput.oninput = (e) => {
+      utilitySearchQuery = e.target.value.trim().toLowerCase();
+      loadUtilitiesData();
+    };
   }
 
   const btnAdd = document.getElementById('btn-add-meter');
@@ -232,7 +353,7 @@ export function openInvoiceModal(bill) {
   const isPaid = bill.status === 'paid';
   const isVerifying = bill.status === 'verifying';
   const isAdminOrStaff = currentUser && (currentUser.role === 'admin' || currentUser.role === 'staff');
-  const qrMockUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PROMPTPAY-0899998877-AMOUNT-${bill.total_price}`;
+  const qrMockUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PROMPTPAY-0869461654-AMOUNT-${bill.total_price}`;
 
   let statusBadgeHtml = '<div class="invoice-badge unpaid">รอชำระเงิน</div>';
   if (isPaid) {
@@ -249,8 +370,8 @@ export function openInvoiceModal(bill) {
             <div style="font-family:'Kanit'; font-size: 1.4rem; font-weight: 700; color: var(--teal-950);">
               Tanakrit Dormitory
             </div>
-            <div style="font-size: 0.85rem; color: var(--muted);">หอพักชายธนกฤษฎ์ นครศรีธรรมราช</div>
-            <div style="font-size: 0.8rem; color: var(--muted);">69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320 โทร. 075-355-289</div>
+            <div style="font-size: 0.85rem; color: var(--muted);">หอพักชายธนกฤษฎ์ นครศรีธรรมราช (3 อาคาร 17 ห้อง)</div>
+            <div style="font-size: 0.8rem; color: var(--muted);">ใกล้มหาวิทยาลัยวลัยลักษณ์ ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช โทร. 086-946-1654</div>
           </div>
           <div style="text-align: right;">
             ${statusBadgeHtml}
@@ -283,7 +404,7 @@ export function openInvoiceModal(bill) {
         </thead>
         <tbody>
           <tr>
-            <td><strong>ค่าเช่าห้องพักประจำเดือน</strong></td>
+            <td><strong>ค่าเช่าห้องพักประจำเดือน (สัญญา 12 เดือน)</strong></td>
             <td style="text-align: center;">-</td>
             <td style="text-align: center;">1 เดือน</td>
             <td style="text-align: right;">${fmtCurrency(bill.room_price)}</td>
@@ -311,7 +432,7 @@ export function openInvoiceModal(bill) {
             <td style="text-align: right;">100 ฿</td>
           </tr>
           <tr>
-            <td>Wi-Fi</td>
+            <td>ค่าบริการ Wi-Fi ความเร็วสูง</td>
             <td style="text-align: center;">-</td>
             <td style="text-align: center;">1 เดือน</td>
             <td style="text-align: right;">100 ฿</td>
@@ -375,8 +496,8 @@ export function openInvoiceModal(bill) {
               📱 สแกนจ่ายผ่าน Thai QR PromptPay
             </div>
             <p style="font-size: 0.85rem; color: var(--muted); margin: 0 0 8px 0; line-height: 1.5;">
-              รองรับทุกแอปพลิเคชันธนาคาร (พร้อมเพย์: 089-999-8877 นายเกียรติศักดิ์ บริหาร)<br>
-              เมื่อโอนชำระเรียบร้อย สามารถแนบสลิปด้านล่างเพื่อให้เจ้าหน้าที่อนุมัติทันที
+              รองรับทุกแอปพลิเคชันธนาคาร (พร้อมเพย์: 086-946-1654 นายเกียรติศักดิ์ บริหาร)<br>
+              เมื่อโอนชำระเรียบรวย สามารถแนบสลิปด้านล่างเพื่อให้เจ้าหน้าที่อนุมัติทันที
             </p>
           </div>
           <div style="text-align: center;">
@@ -498,34 +619,26 @@ export function openInvoiceModal(bill) {
 
       try {
         const dataUrl = await compressImage(selectedSlipFile, 1200, 0.85);
-        const notes = document.getElementById('slip-notes-input') ? document.getElementById('slip-notes-input').value.trim() : '';
+        const notes = document.getElementById('slip-notes-input').value.trim();
 
-        const { error } = await supabase.from('meter_readings').eq('id', bill.id).update({
+        await supabase.from('meter_readings').eq('id', bill.id).update({
           status: 'verifying',
           slip_url: dataUrl,
           slip_uploaded_at: new Date().toISOString(),
           payment_notes: notes
         });
 
-        if (error) {
-          toast('เกิดข้อผิดพลาดในการบันทึกสลิป', 'error');
-          btnSubmitSlip.disabled = false;
-          btnSubmitSlip.textContent = '🚀 ส่งหลักฐานการชำระเงินให้เจ้าหน้าที่';
-          return;
-        }
-
-        toast('ส่งหลักฐานสลิปโอนเงินเรียบร้อยแล้ว อยู่ระหว่างเจ้าหน้าที่ตรวจสอบ', 'success');
+        toast('ส่งหลักฐานสลิปโอนเงินเรียบร้อยแล้ว รอเจ้าหน้าที่ตรวจสอบ', 'success');
         closeModal();
-        if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+        loadUtilitiesData();
       } catch (err) {
-        console.error('Slip upload error:', err);
-        toast('ไม่สามารถประมวลผลรูปภาพสลิปได้', 'error');
+        toast('เกิดข้อผิดพลาดในการอัปโหลด: ' + err.message, 'error');
         btnSubmitSlip.disabled = false;
+        btnSubmitSlip.textContent = '🚀 ส่งหลักฐานการชำระเงินให้เจ้าหน้าที่';
       }
     };
   }
 
-  // Bind Events อนุมัติ / ปฏิเสธ สำหรับ Admin & Staff
   const btnApproveSlip = document.getElementById('btn-approve-slip');
   if (btnApproveSlip) {
     btnApproveSlip.onclick = async () => {
@@ -557,83 +670,97 @@ export function openInvoiceModal(bill) {
   }
 }
 
-// Modal จดมิเตอร์ใหม่
+// Modal จดมิเตอร์ใหม่ (Smoky Glass)
 async function openAddMeterModal() {
-  const { data: rooms } = await supabase.from('rooms').select('*').order('room_number', { ascending: true });
-  const roomOptions = (rooms || []).map(r => `
+  const rooms = DEFAULT_ROOMS;
+
+  const roomOptions = rooms.map(r => `
     <option value="${r.room_number}" data-price="${r.price}" data-tenant="${r.tenant_name || ''}">
-      ห้อง ${r.room_number} (${r.type}) - ${r.tenant_name || 'ว่าง'}
+      ห้อง ${r.room_number} (${r.building === 'KingPhetch' ? 'กิ่งเพชร' : (r.building === 'UnderGround' ? 'ใต้บ้าน' : 'ธนกฤษฎ์')}) - ${fmtCurrency(r.price)} ${r.tenant_name ? '(' + r.tenant_name + ')' : '(ห้องว่าง)'}
     </option>
   `).join('');
 
   const body = `
-    <form id="form-meter-reading">
-      <div class="field" style="margin-bottom: 14px;">
-        <label>เลือกห้องพัก *</label>
-        <select id="mr-room" class="form-select">
+    <form id="form-meter-reading" style="display: flex; flex-direction: column; gap: 14px;">
+      <div class="field">
+        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">เลือกห้องพัก (3 อาคาร 17 ห้อง) *</label>
+        <select id="mr-room" class="form-select" style="width: 100%;">
           ${roomOptions}
         </select>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>รอบเดือนประจำบิล</label>
-          <input type="month" id="mr-month" value="2026-10" required>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">รอบเดือนประจำบิล</label>
+          <input type="month" id="mr-month" value="2026-11" class="form-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label>ค่าเช่าห้องพัก (บาท)</label>
-          <input type="number" id="mr-room-price" value="3500" required>
+          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ค่าเช่าห้องพัก (บาท/เดือน)</label>
+          <input type="number" id="mr-room-price" value="2800" class="form-input" style="width: 100%;" required>
         </div>
       </div>
 
       <!-- Water Section -->
-      <div style="background: var(--mint-50); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin-bottom: 14px;">
-        <div style="font-weight: 600; color: var(--teal-950); margin-bottom: 8px;">💧 มิเตอร์น้ำประปา (18 บาท/หน่วย)</div>
+      <div style="background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.22); border-radius: 14px; padding: 14px;">
+        <div style="font-weight: 700; color: #60A5FA; margin-bottom: 10px; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+          💧 มิเตอร์น้ำประปา (18 บาท/หน่วย)
+        </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
           <div class="field">
-            <label style="font-size:0.8rem;">เลขครั้งก่อน</label>
-            <input type="number" id="mr-water-prev" value="100">
+            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งก่อน</label>
+            <input type="number" id="mr-water-prev" value="100" class="form-input" style="width: 100%;">
           </div>
           <div class="field">
-            <label style="font-size:0.8rem;">เลขครั้งนี้ *</label>
-            <input type="number" id="mr-water-curr" value="105" required>
+            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งนี้ *</label>
+            <input type="number" id="mr-water-curr" value="105" class="form-input" style="width: 100%;" required>
           </div>
           <div class="field">
-            <label style="font-size:0.8rem;">รวมเงิน (น้ำ)</label>
-            <input type="text" id="mr-water-total" disabled value="90 ฿">
+            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">รวมเงินค่าน้ำ</label>
+            <input type="text" id="mr-water-total" disabled value="90 ฿" class="form-input" style="width: 100%; background: rgba(255,255,255,0.04); color: #60A5FA; font-weight: 700;">
           </div>
         </div>
       </div>
 
       <!-- Electric Section -->
-      <div style="background: #fdf8e7; border: 1px solid #f2c14e; border-radius: 10px; padding: 14px; margin-bottom: 14px;">
-        <div style="font-weight: 600; color: #8F6B1A; margin-bottom: 8px;">⚡ มิเตอร์ไฟฟ้า (8 บาท/หน่วย)</div>
+      <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.22); border-radius: 14px; padding: 14px;">
+        <div style="font-weight: 700; color: #F59E0B; margin-bottom: 10px; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+          ⚡ มิเตอร์ไฟฟ้า (8 บาท/หน่วย)
+        </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
           <div class="field">
-            <label style="font-size:0.8rem;">เลขครั้งก่อน</label>
-            <input type="number" id="mr-elec-prev" value="500">
+            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งก่อน</label>
+            <input type="number" id="mr-elec-prev" value="500" class="form-input" style="width: 100%;">
           </div>
           <div class="field">
-            <label style="font-size:0.8rem;">เลขครั้งนี้ *</label>
-            <input type="number" id="mr-elec-curr" value="545" required>
+            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งนี้ *</label>
+            <input type="number" id="mr-elec-curr" value="545" class="form-input" style="width: 100%;" required>
           </div>
           <div class="field">
-            <label style="font-size:0.8rem;">รวมเงิน (ไฟ)</label>
-            <input type="text" id="mr-elec-total" disabled value="360 ฿">
+            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">รวมเงินค่าไฟ</label>
+            <input type="text" id="mr-elec-total" disabled value="360 ฿" class="form-input" style="width: 100%; background: rgba(255,255,255,0.04); color: #F59E0B; font-weight: 700;">
           </div>
         </div>
       </div>
 
-      <div style="background: var(--sky-100); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-weight: 600; color: var(--teal-950);">ยอดรวมทั้งสิ้น (รวมค่าห้อง + ส่วนกลาง 100฿ + Wi-Fi 100฿ + ขยะ 20฿):</span>
-        <strong style="font-size: 1.3rem; color: var(--teal-900);" id="mr-grand-total">4,170 ฿</strong>
+      <!-- Fixed Charges Box -->
+      <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 14px; font-size: 0.78rem; color: rgba(255,255,255,0.7); display: flex; justify-content: space-between;">
+        <span>ค่าบริการคงที่รายเดือน (ส่วนกลาง 100฿ + Wi-Fi 100฿ + ขยะ 20฿):</span>
+        <strong style="color: #ffffff;">220 ฿</strong>
+      </div>
+
+      <!-- Grand Total -->
+      <div style="background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 600; color: #ffffff; font-size: 0.90rem;">ยอดรวมทั้งสิ้น (ค่าห้อง + น้ำ + ไฟ + บริการ):</span>
+        <strong style="font-size: 1.35rem; color: #ffffff;" id="mr-grand-total">3,470 ฿</strong>
       </div>
     </form>
   `;
 
   const footer = `
-    <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
-    <button type="button" class="btn btn-primary" id="btn-submit-meter">บันทึกและสร้างบิล</button>
+    <div style="display: flex; justify-content: flex-end; gap: 10px; width: 100%;">
+      <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
+      <button type="button" class="btn btn-primary" id="btn-submit-meter">บันทึกและสร้างบิล</button>
+    </div>
   `;
 
   showModal({
@@ -659,8 +786,8 @@ async function openAddMeterModal() {
     const fixedFees = 100 + 100 + 20; // ค่าบริการส่วนกลาง 100 + Wi-Fi 100 + กำจัดขยะ 20
     const grand = roomPrice + wCost + eCost + fixedFees;
 
-    document.getElementById('mr-water-total').value = wCost + ' ฿';
-    document.getElementById('mr-elec-total').value = eCost + ' ฿';
+    document.getElementById('mr-water-total').value = wCost.toLocaleString() + ' ฿';
+    document.getElementById('mr-elec-total').value = eCost.toLocaleString() + ' ฿';
     document.getElementById('mr-grand-total').textContent = grand.toLocaleString() + ' ฿';
     return { roomPrice, wPrev, wCurr, wUnits, wCost, ePrev, eCurr, eUnits, eCost, grand };
   };
@@ -679,6 +806,9 @@ async function openAddMeterModal() {
       calc();
     }
   };
+
+  // Run initial calculation
+  calc();
 
   document.getElementById('btn-submit-meter').onclick = async () => {
     const vals = calc();
