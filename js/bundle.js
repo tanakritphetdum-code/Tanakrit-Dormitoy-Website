@@ -1366,9 +1366,9 @@ async function renderRoomsView() {
 
         <div class="filter-tabs" id="building-tabs">
           <button class="filter-tab-btn active" data-building="all">ทุกอาคาร (17 ห้อง)</button>
-          <button class="filter-tab-btn" data-building="Tanakrit">🏢 Tanakrit (9 ห้อง)</button>
-          <button class="filter-tab-btn" data-building="KingPhetch">🏡 KingPhetch (5 ห้อง)</button>
-          <button class="filter-tab-btn" data-building="UnderGround">🛋️ UnderGround (3 ห้อง)</button>
+          <button class="filter-tab-btn" data-building="Tanakrit">🏢 อาคาร ธนกฤษฎ์ (9 ห้อง)</button>
+          <button class="filter-tab-btn" data-building="KingPhetch">🏡 อาคาร กิ่งเพชร (5 ห้อง)</button>
+          <button class="filter-tab-btn" data-building="UnderGround">🛋️ อาคารใต้บ้าน (3 ห้อง)</button>
         </div>
 
         <div class="filter-select-wrap">
@@ -1507,10 +1507,13 @@ async function loadRoomsData() {
     const bathroomType = r.bathroom || (buildingName === 'UnderGround' ? 'ห้องน้ำรวม' : 'ห้องน้ำในตัว');
     const roomAmenities = r.amenities || (buildingName === 'UnderGround' ? 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำรวม' : 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง');
 
+    let buildingDisplayName = 'อาคาร ธนกฤษฎ์';
     let buildingBadgeColor = 'background:#E8F5E9; color:#1B5E20;';
-    if (buildingName === 'KingPhetch') {
+    if (buildingName === 'KingPhetch' || buildingName === 'กิ่งเพชร' || buildingName === 'อาคาร กิ่งเพชร') {
+      buildingDisplayName = 'อาคาร กิ่งเพชร';
       buildingBadgeColor = 'background:#E3F2FD; color:#0D47A1;';
-    } else if (buildingName === 'UnderGround') {
+    } else if (buildingName === 'UnderGround' || buildingName === 'ใต้บ้าน' || buildingName === 'อาคารใต้บ้าน') {
+      buildingDisplayName = 'อาคารใต้บ้าน';
       buildingBadgeColor = 'background:#FFF3E0; color:#E65100;';
     }
 
@@ -1519,7 +1522,7 @@ async function loadRoomsData() {
         <div class="room-top">
           <div>
             <span class="room-badge-floor" style="${buildingBadgeColor} font-weight:600; padding:2px 8px; border-radius:6px; font-size:0.75rem;">
-              อาคาร ${buildingName}
+              ${buildingDisplayName}
             </span>
             <div class="room-no" style="margin-top:4px;">ห้อง ${r.room_number}</div>
           </div>
@@ -1618,9 +1621,9 @@ function openManageRoomModal(room, allRooms) {
         <div class="field">
           <label>อาคาร</label>
           <select id="m-building" class="form-select">
-            <option value="Tanakrit" ${room.building === 'Tanakrit' ? 'selected' : ''}>อาคาร Tanakrit (กว้าง 3.5 M × ยาว 8 M)</option>
-            <option value="KingPhetch" ${room.building === 'KingPhetch' ? 'selected' : ''}>อาคาร KingPhetch (กว้าง 3.5 M × ยาว 8 M)</option>
-            <option value="UnderGround" ${room.building === 'UnderGround' ? 'selected' : ''}>อาคาร UnderGround (กว้าง 3 M × ยาว 4 M)</option>
+            <option value="Tanakrit" ${room.building === 'Tanakrit' ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (กว้าง 3.5 เมตร ยาว 8 เมตร รวม 28 ตร.ม.)</option>
+            <option value="KingPhetch" ${room.building === 'KingPhetch' ? 'selected' : ''}>อาคาร กิ่งเพชร (กว้าง 3.5 เมตร ยาว 8 เมตร รวม 28 ตร.ม.)</option>
+            <option value="UnderGround" ${room.building === 'UnderGround' ? 'selected' : ''}>อาคารใต้บ้าน (กว้าง 3 เมตร ยาว 4 เมตร รวม 12 ตร.ม.)</option>
           </select>
         </div>
       </div>
@@ -1762,9 +1765,9 @@ function openAddRoomModal() {
         <div class="field">
           <label>อาคาร</label>
           <select id="add-building" class="form-select">
-            <option value="Tanakrit">อาคาร Tanakrit (กว้าง 3.5 M × ยาว 8 M)</option>
-            <option value="KingPhetch">อาคาร KingPhetch (กว้าง 3.5 M × ยาว 8 M)</option>
-            <option value="UnderGround">อาคาร UnderGround (กว้าง 3 M × ยาว 4 M)</option>
+            <option value="Tanakrit">อาคาร ธนกฤษฎ์ (กว้าง 3.5 เมตร ยาว 8 เมตร รวม 28 ตร.ม.)</option>
+            <option value="KingPhetch">อาคาร กิ่งเพชร (กว้าง 3.5 เมตร ยาว 8 เมตร รวม 28 ตร.ม.)</option>
+            <option value="UnderGround">อาคารใต้บ้าน (กว้าง 3 เมตร ยาว 4 เมตร รวม 12 ตร.ม.)</option>
           </select>
         </div>
       </div>
@@ -2280,9 +2283,9 @@ function openBookingModal(preselectedType = '') {
         <div class="field">
           <label>อาคารและห้องพักที่สนใจ *</label>
           <select id="bk-type" required>
-            <option value="อาคาร Tanakrit" ${preselectedType.includes('Tanakrit') ? 'selected' : ''}>อาคาร Tanakrit (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
-            <option value="อาคาร KingPhetch" ${preselectedType.includes('KingPhetch') ? 'selected' : ''}>อาคาร KingPhetch (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
-            <option value="อาคาร UnderGround" ${preselectedType.includes('UnderGround') ? 'selected' : ''}>อาคาร UnderGround (ห้องพัดลม 3×4 ม. ห้องน้ำรวม) 800 ฿</option>
+            <option value="อาคาร ธนกฤษฎ์" ${preselectedType.includes('Tanakrit') || preselectedType.includes('ธนกฤษฎ์') ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
+            <option value="อาคาร กิ่งเพชร" ${preselectedType.includes('KingPhetch') || preselectedType.includes('กิ่งเพชร') ? 'selected' : ''}>อาคาร กิ่งเพชร (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
+            <option value="อาคารใต้บ้าน" ${preselectedType.includes('UnderGround') || preselectedType.includes('ใต้บ้าน') ? 'selected' : ''}>อาคารใต้บ้าน (ห้องพัดลม 3×4 ม. ห้องน้ำรวม) 800 ฿</option>
           </select>
         </div>
       </div>
@@ -2292,9 +2295,9 @@ function openBookingModal(preselectedType = '') {
           <label>ความต้องการอาคาร</label>
           <select id="bk-floor">
             <option value="">เลือกอาคารใดก็ได้ (ตามห้องว่าง)</option>
-            <option value="Tanakrit">เฉพาะอาคาร Tanakrit (9 ห้อง)</option>
-            <option value="KingPhetch">เฉพาะอาคาร KingPhetch (5 ห้อง)</option>
-            <option value="UnderGround">เฉพาะอาคาร UnderGround (3 ห้อง)</option>
+            <option value="Tanakrit">เฉพาะอาคาร ธนกฤษฎ์ (9 ห้อง)</option>
+            <option value="KingPhetch">เฉพาะอาคาร กิ่งเพชร (5 ห้อง)</option>
+            <option value="UnderGround">เฉพาะอาคารใต้บ้าน (3 ห้อง)</option>
           </select>
         </div>
         <div class="field">

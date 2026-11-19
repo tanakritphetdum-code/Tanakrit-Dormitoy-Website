@@ -35,9 +35,9 @@ export function openBookingModal(preselectedType = '') {
         <div class="field">
           <label>อาคารและห้องพักที่สนใจ *</label>
           <select id="bk-type" required>
-            <option value="อาคาร Tanakrit" ${preselectedType.includes('Tanakrit') ? 'selected' : ''}>อาคาร Tanakrit (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
-            <option value="อาคาร KingPhetch" ${preselectedType.includes('KingPhetch') ? 'selected' : ''}>อาคาร KingPhetch (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
-            <option value="อาคาร UnderGround" ${preselectedType.includes('UnderGround') ? 'selected' : ''}>อาคาร UnderGround (ห้องพัดลม 3×4 ม. ห้องน้ำรวม) 800 ฿</option>
+            <option value="อาคาร ธนกฤษฎ์" ${preselectedType.includes('Tanakrit') || preselectedType.includes('ธนกฤษฎ์') ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
+            <option value="อาคาร กิ่งเพชร" ${preselectedType.includes('KingPhetch') || preselectedType.includes('กิ่งเพชร') ? 'selected' : ''}>อาคาร กิ่งเพชร (ห้องพัดลม 3.5×8 ม. ห้องน้ำในตัว) 1,500 ฿</option>
+            <option value="อาคารใต้บ้าน" ${preselectedType.includes('UnderGround') || preselectedType.includes('ใต้บ้าน') ? 'selected' : ''}>อาคารใต้บ้าน (ห้องพัดลม 3×4 ม. ห้องน้ำรวม) 800 ฿</option>
           </select>
         </div>
       </div>
@@ -47,9 +47,9 @@ export function openBookingModal(preselectedType = '') {
           <label>ความต้องการอาคาร</label>
           <select id="bk-floor">
             <option value="">เลือกอาคารใดก็ได้ (ตามห้องว่าง)</option>
-            <option value="Tanakrit">เฉพาะอาคาร Tanakrit (9 ห้อง)</option>
-            <option value="KingPhetch">เฉพาะอาคาร KingPhetch (5 ห้อง)</option>
-            <option value="UnderGround">เฉพาะอาคาร UnderGround (3 ห้อง)</option>
+            <option value="Tanakrit">เฉพาะอาคาร ธนกฤษฎ์ (9 ห้อง)</option>
+            <option value="KingPhetch">เฉพาะอาคาร กิ่งเพชร (5 ห้อง)</option>
+            <option value="UnderGround">เฉพาะอาคารใต้บ้าน (3 ห้อง)</option>
           </select>
         </div>
         <div class="field">
