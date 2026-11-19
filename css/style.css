@@ -3387,6 +3387,45 @@ body:not(.theme-light) #app-modal-backdrop label {
   color: rgba(255, 255, 255, 0.85) !important;
 }
 
+/* Modal Inner Components - Dark Mode */
+.smoky-modal-card-header {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.smoky-modal-card-title {
+  color: #FFFFFF;
+}
+.smoky-modal-sub {
+  color: rgba(255, 255, 255, 0.55);
+}
+.smoky-modal-block {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.smoky-modal-label {
+  color: rgba(255, 255, 255, 0.50);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+.smoky-modal-val {
+  color: #FFFFFF;
+  font-size: 0.82rem;
+}
+.smoky-modal-meta {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.80rem;
+}
+.smoky-modal-notes {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.70);
+}
+.btn-modal-phone {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60A5FA;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
 /* Light Mode Modals (App Backdrop) */
 .theme-light #app-modal-backdrop .modal-dialog {
   background: #FFFFFF !important;
@@ -3400,6 +3439,7 @@ body:not(.theme-light) #app-modal-backdrop label {
 }
 .theme-light #app-modal-backdrop .modal-title {
   color: #0F172A !important;
+  font-weight: 700 !important;
 }
 .theme-light #app-modal-backdrop .modal-close {
   color: #64748B !important;
@@ -3422,23 +3462,139 @@ body:not(.theme-light) #app-modal-backdrop label {
   border: 1px solid #CBD5E1 !important;
   color: #0F172A !important;
 }
-.theme-light #app-modal-backdrop label {
+.theme-light #app-modal-backdrop label,
+.theme-light #app-modal-backdrop .smoky-form-label {
+  color: #1E293B !important;
+  font-weight: 600 !important;
+}
+
+/* Modal Inner Components - Light Mode */
+.theme-light #app-modal-backdrop .smoky-modal-card-header {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+.theme-light #app-modal-backdrop .smoky-modal-card-title {
+  color: #0F172A !important;
+}
+.theme-light #app-modal-backdrop .smoky-modal-sub {
+  color: #475569 !important;
+}
+.theme-light #app-modal-backdrop .smoky-modal-sub strong {
+  color: #0F172A !important;
+}
+.theme-light #app-modal-backdrop .smoky-modal-block {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+}
+.theme-light #app-modal-backdrop .smoky-modal-label {
+  color: #475569 !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+}
+.theme-light #app-modal-backdrop .smoky-modal-val {
+  color: #0F172A !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+}
+.theme-light #app-modal-backdrop .smoky-modal-meta {
+  color: #64748B !important;
+}
+.theme-light #app-modal-backdrop .smoky-modal-notes {
+  background: #F1F5F9 !important;
+  border: 1px dashed #CBD5E1 !important;
   color: #334155 !important;
 }
+.theme-light #app-modal-backdrop .btn-modal-phone {
+  background: #EFF6FF !important;
+  color: #1D4ED8 !important;
+  border: 1px solid #BFDBFE !important;
+}
+.theme-light #app-modal-backdrop .btn-modal-phone:hover {
+  background: #DBEAFE !important;
+  color: #1E40AF !important;
+}
+
+/* Fallback & Wildcard Rules for Modals in Light Mode */
 .theme-light #app-modal-backdrop [style*="color: #ffffff"],
 .theme-light #app-modal-backdrop [style*="color:#ffffff"],
+.theme-light #app-modal-backdrop [style*="color: #fff"],
+.theme-light #app-modal-backdrop [style*="color:#fff"],
 .theme-light #app-modal-backdrop [style*="color: white"],
 .theme-light #app-modal-backdrop [style*="color:white"] {
   color: #0F172A !important;
 }
-.theme-light #app-modal-backdrop [style*="color: rgba(255, 255, 255,"],
-.theme-light #app-modal-backdrop [style*="color:rgba(255,255,255,"] {
-  color: #64748B !important;
+
+.theme-light #app-modal-backdrop [style*="color: rgba(255"],
+.theme-light #app-modal-backdrop [style*="color:rgba(255"] {
+  color: #475569 !important;
 }
-.theme-light #app-modal-backdrop [style*="background: rgba(255, 255, 255,"],
-.theme-light #app-modal-backdrop [style*="background:rgba(255,255,255,"] {
+
+.theme-light #app-modal-backdrop span[style*="rgba(255"],
+.theme-light #app-modal-backdrop p[style*="rgba(255"],
+.theme-light #app-modal-backdrop div[style*="rgba(255"] {
+  color: #475569 !important;
+}
+
+.theme-light #app-modal-backdrop strong,
+.theme-light #app-modal-backdrop b {
+  color: #0F172A !important;
+}
+
+.theme-light #app-modal-backdrop div[style*="background: rgba(255"],
+.theme-light #app-modal-backdrop div[style*="background:rgba(255"] {
   background: #F8FAFC !important;
   border-color: #E2E8F0 !important;
+}
+
+.theme-light #app-modal-backdrop div[style*="border: 1px dashed"],
+.theme-light #app-modal-backdrop div[style*="border:1px dashed"] {
+  background: #F8FAFC !important;
+  border-color: #CBD5E1 !important;
+  color: #334155 !important;
+}
+
+/* Accent Color Contrast inside Modals in Light Mode */
+.theme-light #app-modal-backdrop [style*="color: #60A5FA"],
+.theme-light #app-modal-backdrop [style*="color:#60A5FA"],
+.theme-light #app-modal-backdrop [style*="color: #93C5FD"],
+.theme-light #app-modal-backdrop [style*="color:#93C5FD"] {
+  color: #1D4ED8 !important;
+}
+.theme-light #app-modal-backdrop [style*="color: #34D399"],
+.theme-light #app-modal-backdrop [style*="color:#34D399"] {
+  color: #047857 !important;
+}
+.theme-light #app-modal-backdrop [style*="color: #FBBF24"],
+.theme-light #app-modal-backdrop [style*="color:#FBBF24"],
+.theme-light #app-modal-backdrop [style*="color: #F59E0B"],
+.theme-light #app-modal-backdrop [style*="color:#F59E0B"] {
+  color: #B45309 !important;
+}
+.theme-light #app-modal-backdrop [style*="color: #EC4899"],
+.theme-light #app-modal-backdrop [style*="color:#EC4899"],
+.theme-light #app-modal-backdrop [style*="color: #F472B6"],
+.theme-light #app-modal-backdrop [style*="color:#F472B6"] {
+  color: #BE185D !important;
+}
+
+/* Buttons in Modal Light Mode */
+.theme-light #app-modal-backdrop .smoky-round-glass-btn:not(.btn-modal-phone) {
+  background: #F1F5F9 !important;
+  color: #334155 !important;
+  border: 1px solid #CBD5E1 !important;
+}
+.theme-light #app-modal-backdrop .smoky-round-glass-btn:not(.btn-modal-phone):hover {
+  background: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+.theme-light #app-modal-backdrop button[style*="background: #3B82F6"],
+.theme-light #app-modal-backdrop button[style*="background:#3B82F6"],
+.theme-light #app-modal-backdrop button[style*="background: #10B981"],
+.theme-light #app-modal-backdrop button[style*="background:#10B981"],
+.theme-light #app-modal-backdrop .smoky-pill-btn[style*="background: #3B82F6"],
+.theme-light #app-modal-backdrop .smoky-pill-btn[style*="background:#3B82F6"] {
+  color: #FFFFFF !important;
 }
 
 

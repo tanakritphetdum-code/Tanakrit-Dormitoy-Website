@@ -762,17 +762,17 @@ export function viewTenantDetails(id) {
     <div style="display: flex; flex-direction: column; gap: 20px;">
       
       <!-- Profile Header Card -->
-      <div style="display: flex; align-items: center; gap: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px;">
+      <div class="smoky-modal-card-header" style="display: flex; align-items: center; gap: 16px; border-radius: 14px; padding: 16px;">
         <div style="width: 58px; height: 58px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(59,130,246,0.5); flex-shrink: 0;">
           <img src="${avatarUrl}" alt="${tenant.name}" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
         <div style="flex: 1;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <h3 style="font-size: 1.15rem; font-weight: 700; color: #ffffff; margin: 0;">${tenant.name}</h3>
+            <h3 class="smoky-modal-card-title" style="font-size: 1.15rem; font-weight: 700; margin: 0;">${tenant.name}</h3>
             <span class="smoky-delta-pos" style="font-size: 0.70rem;">● กำลังพักอาศัย</span>
           </div>
-          <div style="font-size: 0.80rem; color: rgba(255,255,255,0.5); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap;">
-            <span>รหัสผู้เช่า: <strong style="color: #60A5FA;">${tenant.tenant_id}</strong></span>
+          <div class="smoky-modal-sub" style="font-size: 0.80rem; margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <span>รหัสผู้เช่า: <strong style="color: #2563EB;">${tenant.tenant_id}</strong></span>
             <span>บัตร ปชช.: <strong>${tenant.id_card || '-'}</strong></span>
           </div>
         </div>
@@ -782,89 +782,89 @@ export function viewTenantDetails(id) {
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         
         <!-- Block 1: ข้อมูลห้องพัก & สัญญา -->
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
-          <div style="font-size: 0.74rem; font-weight: 600; text-transform: uppercase; color: #60A5FA; margin-bottom: 8px;">
+        <div class="smoky-modal-block" style="border-radius: 12px; padding: 14px;">
+          <div style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; color: #2563EB; margin-bottom: 8px;">
             🏢 ข้อมูลห้องพัก & ค่าเช่า
           </div>
-          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem;">
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">ห้องพัก:</span>
-              <strong style="color: #ffffff;">ห้อง ${tenant.room}</strong>
+          <div style="display: flex; flex-direction: column; gap: 7px; font-size: 0.84rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">ห้องพัก:</span>
+              <strong class="smoky-modal-val">ห้อง ${tenant.room}</strong>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">อาคาร:</span>
-              <span style="color: ${bInfo.color}; font-weight: 600;">${bInfo.nameTh}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">อาคาร:</span>
+              <span style="color: ${bInfo.color}; font-weight: 700;">${bInfo.nameTh}</span>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">ค่าเช่ารายเดือน:</span>
-              <strong style="color: #34D399;">${fmtCurrency(tenant.rent || bInfo.rent)}</strong>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">ค่าเช่ารายเดือน:</span>
+              <strong style="color: #059669;">${fmtCurrency(tenant.rent || bInfo.rent)}</strong>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">เงินประกันความเสียหาย:</span>
-              <span style="color: #ffffff;">${fmtCurrency(tenant.deposit || 2000)}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">เงินประกันความเสียหาย:</span>
+              <span class="smoky-modal-val">${fmtCurrency(tenant.deposit || 2000)}</span>
             </div>
           </div>
         </div>
 
         <!-- Block 2: ข้อมูลสัญญาและวันที่เข้าพัก -->
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
-          <div style="font-size: 0.74rem; font-weight: 600; text-transform: uppercase; color: #10B981; margin-bottom: 8px;">
+        <div class="smoky-modal-block" style="border-radius: 12px; padding: 14px;">
+          <div style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; color: #059669; margin-bottom: 8px;">
             📅 ข้อมูลสัญญาเช่า
           </div>
-          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem;">
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">วันที่เริ่มเข้าพัก:</span>
-              <strong style="color: #ffffff;">${fmtDate(tenant.check_in)}</strong>
+          <div style="display: flex; flex-direction: column; gap: 7px; font-size: 0.84rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">วันที่เริ่มเข้าพัก:</span>
+              <strong class="smoky-modal-val">${fmtDate(tenant.check_in)}</strong>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">ระยะเวลาสัญญา:</span>
-              <span style="color: #ffffff;">${tenant.lease_term || 'สัญญา 1 ปี'}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">ระยะเวลาสัญญา:</span>
+              <span class="smoky-modal-val">${tenant.lease_term || 'สัญญา 1 ปี'}</span>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">สถานะสัญญา:</span>
-              <span class="smoky-delta-pos" style="font-size: 0.70rem;">ปกติ</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">สถานะสัญญา:</span>
+              <span class="smoky-delta-pos" style="font-size: 0.72rem; padding: 2px 8px;">ปกติ</span>
             </div>
           </div>
         </div>
 
         <!-- Block 3: ข้อมูลติดต่อ & ช่องทาง -->
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
-          <div style="font-size: 0.74rem; font-weight: 600; text-transform: uppercase; color: #FBBF24; margin-bottom: 8px;">
+        <div class="smoky-modal-block" style="border-radius: 12px; padding: 14px;">
+          <div style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; color: #D97706; margin-bottom: 8px;">
             📞 ช่องทางติดต่อ
           </div>
-          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem;">
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">เบอร์โทรศัพท์:</span>
-              <a href="tel:${tenant.phone}" style="color: #60A5FA; text-decoration: none; font-weight: 600;">${tenant.phone || '-'}</a>
+          <div style="display: flex; flex-direction: column; gap: 7px; font-size: 0.84rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">เบอร์โทรศัพท์:</span>
+              <a href="tel:${tenant.phone}" style="color: #2563EB; text-decoration: none; font-weight: 700;">${tenant.phone || '-'}</a>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">LINE ID:</span>
-              <span style="color: #ffffff;">${tenant.line_id || '-'}</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">LINE ID:</span>
+              <span class="smoky-modal-val">${tenant.line_id || '-'}</span>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">อีเมล:</span>
-              <a href="mailto:${tenant.email}" style="color: rgba(255,255,255,0.7); text-decoration: none;">${tenant.email || '-'}</a>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">อีเมล:</span>
+              <a href="mailto:${tenant.email}" class="smoky-modal-val" style="text-decoration: underline;">${tenant.email || '-'}</a>
             </div>
           </div>
         </div>
 
         <!-- Block 4: ข้อมูลฉุกเฉิน & บัญชีเข้าระบบ -->
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px;">
-          <div style="font-size: 0.74rem; font-weight: 600; text-transform: uppercase; color: #EC4899; margin-bottom: 8px;">
+        <div class="smoky-modal-block" style="border-radius: 12px; padding: 14px;">
+          <div style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase; color: #DB2777; margin-bottom: 8px;">
             🔐 ข้อมูลฉุกเฉิน & บัญชีล็อกอิน
           </div>
-          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem;">
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">ติดต่อฉุกเฉิน:</span>
-              <span style="color: #ffffff;">${tenant.emergency_contact || '-'}</span>
+          <div style="display: flex; flex-direction: column; gap: 7px; font-size: 0.84rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">ติดต่อฉุกเฉิน:</span>
+              <span class="smoky-modal-val">${tenant.emergency_contact || '-'}</span>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">Username เข้าเว็บ:</span>
-              <strong style="color: #F472B6; font-family: monospace;">${tenant.tenant_id || tenant.phone || tenant.room}</strong>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">Username เข้าเว็บ:</span>
+              <strong style="color: #DB2777; font-family: monospace;">${tenant.tenant_id || tenant.phone || tenant.room}</strong>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: rgba(255,255,255,0.45);">รหัสผ่านเริ่มต้น:</span>
-              <span style="color: rgba(255,255,255,0.6); font-family: monospace;">(เลขห้องพัก: ${tenant.room})</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-modal-label">รหัสผ่านเริ่มต้น:</span>
+              <span class="smoky-modal-meta" style="font-family: monospace;">(เลขห้องพัก: ${tenant.room})</span>
             </div>
           </div>
         </div>
@@ -873,8 +873,8 @@ export function viewTenantDetails(id) {
 
       <!-- หมายเหตุเพิ่มเติม -->
       ${tenant.notes ? `
-        <div style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 14px; font-size: 0.80rem; color: rgba(255,255,255,0.6);">
-          📝 <strong>หมายเหตุจากผู้จัดการ:</strong> ${tenant.notes}
+        <div class="smoky-modal-notes" style="border-radius: 10px; padding: 10px 14px; font-size: 0.80rem;">
+          📝 <strong class="smoky-modal-val">หมายเหตุจากผู้จัดการ:</strong> <span>${tenant.notes}</span>
         </div>
       ` : ''}
 
@@ -883,7 +883,7 @@ export function viewTenantDetails(id) {
 
   const footer = `
     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-      <a href="tel:${tenant.phone}" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 16px; height: 38px; gap: 6px; font-size: 0.80rem; background: rgba(59,130,246,0.15); color: #60A5FA; border: 1px solid rgba(59,130,246,0.3); text-decoration: none;">
+      <a href="tel:${tenant.phone}" class="smoky-round-glass-btn btn-modal-phone" style="width: auto; border-radius: 9999px; padding: 0 16px; height: 38px; gap: 6px; font-size: 0.80rem; text-decoration: none;">
         ${ic('phone')} โทรติดต่อผู้พัก
       </a>
       <div style="display: flex; gap: 8px;">
@@ -920,18 +920,18 @@ export function openEditTenantModal(tenant) {
       
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">ชื่อ - นามสกุล *</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ชื่อ - นามสกุล *</label>
           <input type="text" id="ed-tenant-name" class="smoky-glass-input" value="${tenant.name}" required style="width: 100%;">
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">รหัสนักศึกษา / รหัสผู้เช่า *</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">รหัสนักศึกษา / รหัสผู้เช่า *</label>
           <input type="text" id="ed-tenant-tid" class="smoky-glass-input" value="${tenant.tenant_id || ''}" required style="width: 100%;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">ห้องพัก (ทั้ง 17 ห้อง) *</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ห้องพัก (ทั้ง 17 ห้อง) *</label>
           <select id="ed-tenant-room" class="smoky-glass-input" style="width: 100%; height: 38px;">
             <optgroup label="🏢 อาคาร ธนกฤษฎ์ (2,800 ฿/เดือน)" style="background: #141a29; color: white;">
               ${['101', '102', '103', '104', '105', '106', '107', '108', '109'].map(r => `
@@ -951,29 +951,29 @@ export function openEditTenantModal(tenant) {
           </select>
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">เบอร์โทรศัพท์ติดต่อ *</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">เบอร์โทรศัพท์ติดต่อ *</label>
           <input type="tel" id="ed-tenant-phone" class="smoky-glass-input" value="${tenant.phone || ''}" required style="width: 100%;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">อีเมล</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">อีเมล</label>
           <input type="email" id="ed-tenant-email" class="smoky-glass-input" value="${tenant.email || ''}" style="width: 100%;">
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">LINE ID</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">LINE ID</label>
           <input type="text" id="ed-tenant-line" class="smoky-glass-input" value="${tenant.line_id || ''}" style="width: 100%;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">วันที่เริ่มเข้าพัก</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">วันที่เริ่มเข้าพัก</label>
           <input type="date" id="ed-tenant-checkin" class="smoky-glass-input" value="${tenant.check_in || ''}" style="width: 100%;">
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">ระยะเวลาสัญญา</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ระยะเวลาสัญญา</label>
           <select id="ed-tenant-lease" class="smoky-glass-input" style="width: 100%; height: 38px;">
             <option value="สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)" style="background:#141a29; color:white;">สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)</option>
             <option value="สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)" style="background:#141a29; color:white;">สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)</option>
@@ -984,17 +984,17 @@ export function openEditTenantModal(tenant) {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">เงินประกัน (บาท)</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">เงินประกัน (บาท)</label>
           <input type="number" id="ed-tenant-deposit" class="smoky-glass-input" value="${tenant.deposit || 2000}" style="width: 100%;">
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">เบอร์ติดต่อฉุกเฉิน</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">เบอร์ติดต่อฉุกเฉิน</label>
           <input type="text" id="ed-tenant-emergency" class="smoky-glass-input" value="${tenant.emergency_contact || ''}" placeholder="ผู้ปกครอง 08x-xxx-xxxx" style="width: 100%;">
         </div>
       </div>
 
       <div>
-        <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">หมายเหตุเพิ่มเติม</label>
+        <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">หมายเหตุเพิ่มเติม</label>
         <textarea id="ed-tenant-notes" class="smoky-glass-input" rows="2" style="width: 100%; resize: none;">${tenant.notes || ''}</textarea>
       </div>
 
@@ -1099,18 +1099,18 @@ export function openAddTenantModal() {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">ชื่อ - นามสกุล *</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ชื่อ - นามสกุล *</label>
           <input type="text" id="add-tenant-name" class="smoky-glass-input" placeholder="เช่น นายวรเมธ แก้วมณี" required style="width: 100%;">
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">รหัสนักศึกษา / รหัสผู้เช่า</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">รหัสนักศึกษา / รหัสผู้เช่า</label>
           <input type="text" id="add-tenant-tid" class="smoky-glass-input" placeholder="เช่น 6512399" style="width: 100%;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">เลือกห้องพัก (ทั้ง 17 ห้อง) *</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">เลือกห้องพัก (ทั้ง 17 ห้อง) *</label>
           <select id="add-tenant-room" class="smoky-glass-input" style="width: 100%; height: 38px;">
             <optgroup label="🏢 อาคาร ธนกฤษฎ์ (2,800 ฿/เดือน)" style="background: #141a29; color: white;">
               <option value="107">ห้อง 107 (กำลังตรวจเช็ก)</option>
@@ -1138,29 +1138,29 @@ export function openAddTenantModal() {
           </select>
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">เบอร์โทรศัพท์ติดต่อ *</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">เบอร์โทรศัพท์ติดต่อ *</label>
           <input type="tel" id="add-tenant-phone" class="smoky-glass-input" placeholder="08x-xxx-xxxx" required style="width: 100%;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">อีเมล</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">อีเมล</label>
           <input type="email" id="add-tenant-email" class="smoky-glass-input" placeholder="student@tanakrit.com" style="width: 100%;">
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">LINE ID</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">LINE ID</label>
           <input type="text" id="add-tenant-line" class="smoky-glass-input" placeholder="เช่น line_id" style="width: 100%;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">วันที่เริ่มเข้าพัก</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">วันที่เริ่มเข้าพัก</label>
           <input type="date" id="add-tenant-checkin" class="smoky-glass-input" value="${new Date().toISOString().split('T')[0]}" style="width: 100%;">
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">ระยะเวลาสัญญา</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ระยะเวลาสัญญา</label>
           <select id="add-tenant-lease" class="smoky-glass-input" style="width: 100%; height: 38px;">
             <option value="สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)" style="background:#141a29; color:white;">สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)</option>
             <option value="สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)" style="background:#141a29; color:white;">สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)</option>
@@ -1171,11 +1171,11 @@ export function openAddTenantModal() {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">เงินประกันความเสียหาย (บาท)</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">เงินประกันความเสียหาย (บาท)</label>
           <input type="number" id="add-tenant-deposit" class="smoky-glass-input" value="2000" style="width: 100%;">
         </div>
         <div>
-          <label style="display: block; font-size: 0.80rem; color: rgba(255,255,255,0.6); margin-bottom: 5px;">ผู้ติดต่อฉุกเฉิน</label>
+          <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ผู้ติดต่อฉุกเฉิน</label>
           <input type="text" id="add-tenant-emergency" class="smoky-glass-input" placeholder="ผู้ปกครอง 08x-xxx-xxxx" style="width: 100%;">
         </div>
       </div>
