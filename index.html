@@ -7,7 +7,7 @@
     <title>Tanakrit Dormitory — หอพักชายธนกฤษฎ์ นครศรีธรรมราช</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Lexend:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
 </head>
 
@@ -712,59 +712,102 @@
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 6px;">
                         เข้าสู่ระบบ
                     </button>
+                    <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); text-align: center;">
+                        <span style="font-size: 0.78rem; color: var(--muted); display: block; margin-bottom: 8px;">ทดสอบระบบแบบด่วน (One-Click Demo Login)</span>
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" class="btn btn-outline btn-sm" style="flex: 1; font-size: 0.75rem;" onclick="window.quickLoginAs('admin')">Admin</button>
+                            <button type="button" class="btn btn-outline btn-sm" style="flex: 1; font-size: 0.75rem;" onclick="window.quickLoginAs('staff')">Staff</button>
+                            <button type="button" class="btn btn-outline btn-sm" style="flex: 1; font-size: 0.75rem;" onclick="window.quickLoginAs('student')">Student</button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 
 
-    <!-- ==================== หน้า App / Dashboard หลังเข้าสู่ระบบ ==================== -->
-    <div id="page-app" class="hidden">
-        <div class="app-layout">
-            <!-- Sidebar -->
-            <aside class="sidebar" id="sidebar">
-                <div class="sidebar-brand">
-                    <div class="logo-box">TK</div>
-                    <div>
-                        <div class="brand-title" style="color:white;">Tanakrit Dormitory</div>
-                        <div class="brand-sub" style="color:#B4D5CE;">หอพักชายธนกฤษฎ์</div>
-                    </div>
+    <!-- ==================== หน้า App / Dashboard หลังเข้าสู่ระบบ (Smoky Frosted Glass UI) ==================== -->
+    <div id="page-app" class="hidden smoky-dashboard-root">
+        <!-- Living room blurred background + vignette fallback -->
+        <div class="smoky-bg-underlay"></div>
+        <div class="smoky-vignette-overlay"></div>
+
+        <!-- Floating Glass App Shell -->
+        <div class="smoky-app-shell">
+            <div class="smoky-shell-highlight"></div>
+
+            <!-- Left Floating Vertical Capsule Sidebar (Icon-Only) -->
+            <aside class="smoky-sidebar" id="sidebar">
+                <div class="smoky-sidebar-top">
+                    <button class="smoky-brand-icon" id="smoky-brand-home" title="Tanakrit & Co. CRM" onclick="window.switchView('dashboard')">
+                        <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    </button>
+                    
+                    <nav class="smoky-capsule-nav" id="sidebar-nav">
+                        <!-- Populated with SVG icons, tooltips & active circle -->
+                    </nav>
                 </div>
 
-                <nav class="sidebar-nav" id="sidebar-nav">
-                    <!-- เมนูจะถูกเติมอัตโนมัติผ่าน js/app.js ตาม Role -->
-                </nav>
-
-                <div class="sidebar-footer">
-                    <button class="btn-logout" id="btn-logout">
-                        <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" />
-                            <line x1="21" y1="12" x2="9" y2="12" />
-                        </svg>
-                        ออกจากระบบ
-                    </button>
+                <div class="smoky-sidebar-bottom">
+                    <div class="smoky-nav-wrapper">
+                        <button class="smoky-nav-btn" id="smoky-btn-settings" title="Settings" onclick="window.switchView('settings')">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        </button>
+                        <div class="smoky-tooltip">Settings / ตั้งค่าระบบ</div>
+                    </div>
+                    <div class="smoky-nav-wrapper">
+                        <button class="smoky-nav-btn text-rose" id="btn-logout" title="Sign Out">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                        </button>
+                        <div class="smoky-tooltip">Sign Out / ออกจากระบบ</div>
+                    </div>
                 </div>
             </aside>
 
-            <!-- Main Content Area -->
-            <div class="main-wrapper">
-                <header class="app-header">
-                    <div style="display:flex; align-items:center; gap:16px;">
-                        <button class="menu-toggle" id="btn-sidebar-toggle">☰</button>
-                        <div class="app-header-title" id="app-view-title">แดชบอร์ดภาพรวม</div>
+            <!-- Main Content Container -->
+            <div class="smoky-main-wrapper">
+                <!-- Top Bar -->
+                <header class="smoky-topbar">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <button class="menu-toggle smoky-menu-toggle" id="btn-sidebar-toggle" style="color: white; border: none; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 8px; cursor: pointer;">☰</button>
+                        <!-- Text tabs: Overview / Sales / Marketing / Support -->
+                        <div class="smoky-tabs" id="smoky-top-tabs">
+                            <button class="smoky-tab active" data-tab="Overview">Overview<span class="tab-indicator"></span></button>
+                            <button class="smoky-tab" data-tab="Sales">Sales<span class="tab-indicator"></span></button>
+                            <button class="smoky-tab" data-tab="Marketing">Marketing<span class="tab-indicator"></span></button>
+                            <button class="smoky-tab" data-tab="Support">Support<span class="tab-indicator"></span></button>
+                        </div>
                     </div>
 
-                    <div class="user-badge-profile">
-                        <div class="u-avatar" id="header-user-initial">A</div>
-                        <div>
-                            <div class="u-name" id="header-user-name">ผู้ดูแลระบบ</div>
-                            <div class="u-role" id="header-user-role-label">Administrator</div>
+                    <!-- Right Controls -->
+                    <div class="smoky-topbar-right">
+                        <button class="smoky-round-dashed-btn" title="Create New" onclick="window.switchView('new-request')">
+                            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                        <button class="smoky-round-glass-btn" title="Grid Layout" onclick="window.switchView('deals')">
+                            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        </button>
+                        <div class="relative">
+                            <button class="smoky-round-glass-btn" title="Notifications" onclick="window.switchView('announcements')">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                                <span class="smoky-badge-count">3</span>
+                            </button>
+                        </div>
+                        <div class="smoky-user-profile" onclick="window.switchView('profile')">
+                            <div class="smoky-avatar-wrap">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="smoky-avatar-img" id="header-user-img">
+                                <span class="smoky-online-dot"></span>
+                            </div>
+                            <div class="smoky-user-meta">
+                                <span class="smoky-user-name" id="header-user-name">ผู้ดูแลระบบ</span>
+                                <span class="smoky-user-role" id="header-user-role-label">Administrator</span>
+                            </div>
                         </div>
                     </div>
                 </header>
 
-                <main class="app-content" id="app-content-body">
+                <!-- Page Content Body -->
+                <main class="smoky-content" id="app-content-body">
                     <!-- เนื้อหาแต่ละหน้าจอเรนเดอร์มาแสดงตรงนี้ -->
                 </main>
             </div>

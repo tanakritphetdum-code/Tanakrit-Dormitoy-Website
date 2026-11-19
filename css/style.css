@@ -1990,3 +1990,847 @@ img, svg { display: block; max-width: 100%; }
   0% { transform: rotate(-12deg) scale(0.98); }
   100% { transform: rotate(-10deg) scale(1.04); }
 }
+
+
+/* ==================== Smoky Frosted Glass CRM Dashboard Styles ==================== */
+.smoky-dashboard-root {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background: #0a0d14;
+  font-family: 'Outfit', 'Lexend', 'Kanit', sans-serif;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.smoky-dashboard-root * {
+  box-sizing: border-box;
+}
+
+/* Background layers */
+.smoky-bg-underlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: radial-gradient(circle at 50% 30%, rgba(35, 45, 68, 0.45) 0%, rgba(10, 13, 20, 0.96) 80%),
+    url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80');
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) grayscale(100%);
+  transform: scale(1.15);
+  pointer-events: none;
+  opacity: 0.38;
+}
+
+.smoky-vignette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 45%, rgba(20, 26, 38, 0.35) 0%, rgba(7, 9, 14, 0.95) 85%);
+  pointer-events: none;
+}
+
+/* App Shell */
+.smoky-app-shell {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1540px;
+  min-height: 860px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.22);
+  display: flex;
+  overflow: hidden;
+}
+
+.smoky-shell-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
+}
+
+/* Sidebar */
+.smoky-sidebar {
+  width: 80px;
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.02);
+  z-index: 20;
+  flex-shrink: 0;
+}
+
+.smoky-sidebar-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.smoky-brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.smoky-brand-icon:hover {
+  transform: scale(1.06);
+}
+
+.smoky-capsule-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 9999px;
+  padding: 6px;
+  backdrop-filter: blur(16px);
+}
+
+.smoky-nav-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.smoky-nav-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.smoky-nav-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+.smoky-nav-btn.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+}
+
+.smoky-nav-badge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3B82F6;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+}
+
+.smoky-tooltip {
+  position: absolute;
+  left: 54px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(10, 14, 22, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  padding: 5px 11px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #ffffff;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+.smoky-nav-wrapper:hover .smoky-tooltip {
+  opacity: 1;
+  visibility: visible;
+  left: 58px;
+}
+
+.smoky-sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.smoky-nav-btn.text-rose {
+  color: #FB7185;
+}
+.smoky-nav-btn.text-rose:hover {
+  background: rgba(244, 63, 94, 0.2);
+  color: #FDA4AF;
+}
+
+/* Main Container & Topbar */
+.smoky-main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.smoky-topbar {
+  height: 68px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  flex-shrink: 0;
+}
+
+.smoky-tabs {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.smoky-tab {
+  background: none;
+  border: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  padding: 8px 0;
+  position: relative;
+  transition: color 0.2s;
+  font-family: inherit;
+}
+.smoky-tab:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+.smoky-tab.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+.smoky-tab.active .tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 0 8px #ffffff;
+}
+
+.smoky-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.smoky-round-dashed-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.smoky-round-dashed-btn:hover {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.smoky-round-glass-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.smoky-round-glass-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.smoky-badge-count {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3B82F6;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+}
+
+.smoky-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.smoky-user-profile:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.smoky-avatar-wrap {
+  position: relative;
+  width: 36px;
+  height: 36px;
+}
+.smoky-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.smoky-online-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #34D399;
+  border: 2px solid #0a0d14;
+  box-shadow: 0 0 8px #34D399;
+}
+
+.smoky-user-meta {
+  display: flex;
+  flex-direction: column;
+}
+.smoky-user-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.2;
+}
+.smoky-user-role {
+  font-size: 0.70rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Content Area */
+.smoky-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+}
+
+/* Cards & Bento Grid */
+.smoky-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.smoky-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.smoky-card {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 20px;
+  padding: 24px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+.smoky-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Typography on Glass */
+.smoky-meta-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.smoky-card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 2px 0 0 0;
+}
+
+.smoky-kpi-num {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.smoky-kpi-sub {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+}
+
+/* Delta Pills */
+.smoky-delta-pos {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(52, 211, 153, 0.15);
+  color: #34D399;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.smoky-delta-neg {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(251, 113, 133, 0.15);
+  color: #FB7185;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* Spring Toggle Switch */
+.smoky-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: background 0.25s;
+  padding: 0;
+}
+.smoky-toggle.checked {
+  background: #3B82F6;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+}
+.smoky-toggle-knob {
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.smoky-toggle.checked .smoky-toggle-knob {
+  transform: translateX(20px);
+}
+
+/* Target Circular Ring */
+.smoky-ring-box {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 18px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.smoky-ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.smoky-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.smoky-ring-btn-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+.smoky-pill-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+.smoky-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.08);
+}
+
+/* Metric Chips */
+.smoky-metric-chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 18px;
+}
+.smoky-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.smoky-chip:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: #fff;
+}
+.smoky-chip.active {
+  background: #ffffff;
+  color: #0a0d14;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.45);
+  border-color: #ffffff;
+}
+.smoky-chip.active .chip-lbl {
+  color: rgba(10, 13, 20, 0.65);
+}
+.smoky-chip .chip-lbl {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.smoky-chip .chip-val {
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* Segmented Control */
+.smoky-segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+.smoky-seg-btn {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.smoky-seg-btn:hover {
+  color: #fff;
+}
+.smoky-seg-btn.active {
+  background: #ffffff;
+  color: #0a0d14;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Approvals Swipe Slider Pill */
+.smoky-swipe-container {
+  position: relative;
+  height: 40px;
+  width: 100%;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 14px;
+}
+.smoky-swipe-track-text {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+.smoky-swipe-thumb {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  width: 34px;
+  border-radius: 50%;
+  background: #3B82F6;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+  transition: background 0.3s, transform 0.2s;
+}
+.smoky-swipe-thumb.approved {
+  background: #10B981;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.8);
+  transform: translateX(180px);
+}
+
+/* 2x2 KPI Tiles Grid */
+.smoky-2x2-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.smoky-tile {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 18px;
+  padding: 16px;
+  backdrop-filter: blur(20px);
+  transition: all 0.25s;
+}
+.smoky-tile.active-spark {
+  border-color: rgba(59, 130, 246, 0.45);
+  background: rgba(59, 130, 246, 0.12);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.22);
+}
+
+/* Audio Waveform */
+.smoky-waveform-box {
+  position: relative;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 12px;
+  padding: 6px 12px;
+  margin: 14px 0 10px;
+}
+.smoky-wave-bar {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  transition: background 0.2s;
+}
+.smoky-wave-bar.played {
+  background: #3B82F6;
+}
+.smoky-waveform-needle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ffffff;
+  box-shadow: 0 0 8px #ffffff;
+  pointer-events: none;
+  transition: left 0.15s linear;
+}
+
+/* Tables & Filters */
+.smoky-table-wrap {
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+}
+.smoky-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.82rem;
+}
+.smoky-table th {
+  padding: 14px 18px;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+}
+.smoky-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.85);
+}
+.smoky-table tr:hover td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Search input on glass */
+.smoky-search-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  color: #fff;
+  padding: 6px 14px 6px 34px;
+  font-size: 0.78rem;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+.smoky-search-input:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+  .smoky-bento-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .smoky-dashboard-root {
+    padding: 0;
+  }
+  .smoky-app-shell {
+    border-radius: 0;
+    min-height: 100vh;
+    border: none;
+    flex-direction: column;
+    padding-bottom: 74px;
+  }
+  .smoky-sidebar {
+    position: fixed;
+    bottom: 10px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    height: 58px;
+    padding: 4px 12px;
+    flex-direction: row;
+    border-radius: 9999px;
+    background: rgba(14, 18, 28, 0.90);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: space-around;
+  }
+  .smoky-sidebar-top {
+    flex-direction: row;
+    gap: 8px;
+    width: auto;
+  }
+  .smoky-brand-icon {
+    display: none;
+  }
+  .smoky-capsule-nav {
+    flex-direction: row;
+    margin: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+  .smoky-sidebar-bottom {
+    flex-direction: row;
+  }
+  .smoky-tooltip {
+    display: none !important;
+  }
+  .smoky-topbar {
+    padding: 0 16px;
+  }
+  .smoky-content {
+    padding: 16px;
+  }
+  .smoky-tabs {
+    gap: 14px;
+  }
+  .smoky-tab {
+    font-size: 0.82rem;
+  }
+  .smoky-2x2-grid {
+    grid-template-columns: 1fr;
+  }
+}

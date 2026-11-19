@@ -1,388 +1,1260 @@
 // js/dashboard.js
+// Premium Smoky Frosted Glass CRM Dashboard for Tanakrit Dormitory & SaaS Management
 import { supabase } from './supabase.js';
 import { ic, fmtCurrency, fmtDate, showModal, closeModal, toast } from './api.js';
 import { currentUser } from './auth.js';
 import { openInvoiceModal } from './utilities.js';
 
-// แดชบอร์ดสำหรับ Staff / Admin
+// Interactive Dashboard State
+let dashboardState = {
+  targetPercent: 63,
+  targetActive: true,
+  activeMetricChip: 'revenue',
+  revenuePeriod: 'Today',
+  salesPeriod: 'Week',
+  isApproved: false,
+  tileStates: {
+    customers: true,
+    pipeline: true,
+    activeUsers: true,
+    openTickets: false
+  },
+  isPlayingAudio: false,
+  audioPlayhead: 35,
+  audioInterval: null
+};
+
+// Overview 3-Column Bento Grid Dashboard
 export function renderStaffDashboard() {
   setTimeout(() => {
-    loadStaffDashboardData();
+    initStaffDashboard();
   }, 0);
 
   return `
-    <!-- Top Stat Metric Cards -->
-    <div class="stat-cards" id="staff-stat-cards">
-      <div class="scard"><div class="num">...</div><div class="lbl">กำลังโหลดสถิติ...</div></div>
-    </div>
-
-    <!-- Quick Action Toolbar -->
-    <div class="card" style="margin-bottom: 24px;">
-      <h3 style="margin-bottom: 12px;">⚡ เมนูดำเนินการด่วน (Quick Actions)</h3>
-      <div class="quick-action-btns">
-        <button class="btn btn-outline" onclick="window.switchView('rooms')">${ic('door')} จัดการผังห้องพัก</button>
-        <button class="btn btn-outline" onclick="window.switchView('tenants')">${ic('users')} ทะเบียนผู้พักอาศัย</button>
-        <button class="btn btn-outline" onclick="window.switchView('utilities')">${ic('bill')} บันทึกมิเตอร์น้ำ-ไฟ</button>
-        <button class="btn btn-outline" onclick="window.switchView('maintenance')">${ic('wrench')} มอบหมายงานซ่อม</button>
-        <button class="btn btn-outline" onclick="window.switchView('parcels')">${ic('box')} บันทึกรับพัสดุ</button>
-        <button class="btn btn-outline" onclick="window.switchView('announcements')">${ic('bell')} สร้างประกาศ</button>
-      </div>
-    </div>
-
-    <!-- 2 Column Layout for Activities -->
-    <div class="dashboard-grid-2col">
-      <!-- Recent Maintenance Tickets -->
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <h3>${ic('wrench')} รายการแจ้งซ่อมที่รอจัดการ</h3>
-          <button class="btn btn-outline btn-sm" onclick="window.switchView('maintenance')">ดูทั้งหมด</button>
-        </div>
-        <div id="staff-recent-maintenance">กำลังโหลดข้อมูล...</div>
-      </div>
-
-      <!-- Recent Parcels -->
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <h3>${ic('box')} พัสดุมาใหม่ที่รอผู้พักมารับ</h3>
-          <button class="btn btn-outline btn-sm" onclick="window.switchView('parcels')">ดูทั้งหมด</button>
-        </div>
-        <div id="staff-recent-parcels">กำลังโหลดข้อมูล...</div>
-      </div>
-    </div>
-  `;
-}
-
-async function loadStaffDashboardData() {
-  const statBox = document.getElementById('staff-stat-cards');
-  const maintBox = document.getElementById('staff-recent-maintenance');
-  const parcelBox = document.getElementById('staff-recent-parcels');
-
-  const { data: rooms } = await supabase.from('rooms').select('*');
-  const { data: tickets } = await supabase.from('maintenance').select('*');
-  const { data: parcels } = await supabase.from('parcels').select('*');
-  const { data: bills } = await supabase.from('meter_readings').select('*');
-
-  if (statBox) {
-    const totalRooms = rooms ? rooms.length : 0;
-    const occupied = rooms ? rooms.filter(r => r.status === 'occupied').length : 0;
-    const vacant = rooms ? rooms.filter(r => r.status === 'vacant').length : 0;
-    const occRate = totalRooms > 0 ? Math.round((occupied / totalRooms) * 100) : 0;
-    const pendingTickets = tickets ? tickets.filter(t => t.status !== 'completed').length : 0;
-    const waitingParcels = parcels ? parcels.filter(p => p.status === 'waiting').length : 0;
-    const pendingBillsAmount = bills ? bills.filter(b => b.status === 'pending').reduce((a, c) => a + (c.total_price || 0), 0) : 0;
-
-    statBox.innerHTML = `
-      <div class="scard">
-        <div class="top"><span class="lbl">อัตราการเข้าพัก</span><div class="ic a">${ic('door')}</div></div>
-        <div class="num">${occRate}%</div>
-        <div class="lbl">${occupied} จาก ${totalRooms} ห้อง</div>
-      </div>
-      <div class="scard">
-        <div class="top"><span class="lbl">ห้องว่างพร้อมอยู่</span><div class="ic b">${ic('door')}</div></div>
-        <div class="num">${vacant}</div>
-        <div class="lbl">ห้องว่างในอาคาร</div>
-      </div>
-      <div class="scard">
-        <div class="top"><span class="lbl">งานแจ้งซ่อมบำรุง</span><div class="ic d">${ic('wrench')}</div></div>
-        <div class="num">${pendingTickets}</div>
-        <div class="lbl">รอดำเนินการ / กำลังซ่อม</div>
-      </div>
-      <div class="scard">
-        <div class="top"><span class="lbl">พัสดุรอส่งมอบ</span><div class="ic c">${ic('box')}</div></div>
-        <div class="num">${waitingParcels}</div>
-        <div class="lbl">ชิ้น ที่สำนักงาน</div>
-      </div>
-      <div class="scard">
-        <div class="top"><span class="lbl">ยอดค้างชำระค่าเช่า</span><div class="ic d">${ic('bill')}</div></div>
-        <div class="num" style="font-size: 1.45rem;">${fmtCurrency(pendingBillsAmount)}</div>
-        <div class="lbl">รอบประจำเดือน</div>
-      </div>
-    `;
-  }
-
-  if (maintBox) {
-    const ticketList = (tickets || []).filter(t => t.status !== 'completed').slice(0, 4);
-    if (ticketList.length === 0) {
-      maintBox.innerHTML = `<p style="color:var(--muted); font-size:0.9rem;">ไม่มีรายการแจ้งซ่อมค้างอยู่</p>`;
-    } else {
-      let html = '<div class="mini-activity-list">';
-      ticketList.forEach(t => {
-        html += `
-          <div class="mini-item">
+    <div class="smoky-bento-grid" id="staff-bento-grid">
+      
+      <!-- ==================== COLUMN 1 ==================== -->
+      <div class="smoky-col">
+        
+        <!-- 1. Team Card -->
+        <div class="smoky-card" id="card-team">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <strong>ห้อง ${t.room_number} — ${t.category}</strong>
-              <div style="font-size:0.8rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px;">
-                ${t.description}
+              <span class="smoky-meta-label">Active Crew</span>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px #34D399;"></span>
+                <span style="font-size: 0.92rem; font-weight: 600; color: #fff;">4 online now</span>
               </div>
             </div>
-            <span class="badge in-progress">${t.status === 'in_progress' ? 'กำลังซ่อม' : 'รอรับเรื่อง'}</span>
+            <button class="smoky-round-dashed-btn" title="Invite member" onclick="window.switchView('users')">
+              ${ic('plus')}
+            </button>
           </div>
-        `;
-      });
-      html += '</div>';
-      maintBox.innerHTML = html;
+
+          <!-- Overlapping Avatars + 3 -->
+          <div style="margin-top: 18px; display: flex; align-items: center;">
+            <div style="display: flex; margin-left: 6px;">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Alex" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -6px;" title="Alex Morgan (Head of Admin)">
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" alt="Sarah" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="Sarah Chen (Account Manager)">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="David" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="David Kim (Facility Tech)">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Elena" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="Elena Rostova (Tenant Support)">
+              <div style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-left: -8px;">
+                +3
+              </div>
+            </div>
+            <div style="margin-left: 14px; font-size: 0.76rem; color: rgba(255,255,255,0.5);">
+              หอพักชายธนกฤษฎ์ ทีมบริหาร
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Quarterly Target (TALL CARD) -->
+        <div class="smoky-card" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;" id="card-quarterly-target">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span class="smoky-meta-label">Performance Goal</span>
+              <h3 class="smoky-card-title">Quarterly Target</h3>
+            </div>
+            <button class="smoky-toggle checked" id="btn-toggle-target" onclick="window.toggleTargetGoal()">
+              <span class="smoky-toggle-knob"></span>
+            </button>
+          </div>
+
+          <!-- Circular Progress Ring with Draggable / Interactive Knob -->
+          <div class="smoky-ring-box">
+            <svg class="smoky-ring-svg" viewBox="0 0 100 100">
+              <!-- Dashed Background Track -->
+              <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7" stroke-dasharray="2 3"></circle>
+              <!-- Glowing Blue Progress Circle -->
+              <circle id="target-progress-ring" cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" stroke-dasharray="251.32" stroke-dashoffset="92.9" style="filter: drop-shadow(0 0 10px rgba(59,130,246,0.7)); transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></circle>
+            </svg>
+
+            <!-- Center KPI Label -->
+            <div class="smoky-ring-center">
+              <span class="smoky-kpi-num" id="target-percent-text">63%</span>
+              <span class="smoky-meta-label" style="margin-top: 2px;">Achieved</span>
+            </div>
+          </div>
+
+          <!-- - / + Buttons to Adjust Target -->
+          <div class="smoky-ring-btn-group">
+            <button class="smoky-pill-btn" onclick="window.adjustTargetPercent(-5)" title="ลด 5%">−</button>
+            <span style="font-size: 0.78rem; font-family: monospace; color: rgba(255,255,255,0.6);" id="target-sub-label">Goal: 63%</span>
+            <button class="smoky-pill-btn" onclick="window.adjustTargetPercent(5)" title="เพิ่ม 5%">+</button>
+          </div>
+
+          <!-- Bottom Row of Round Metric Chips: Revenue, Deals, Calls, Meetings -->
+          <div class="smoky-metric-chips" id="metric-chips-row">
+            <div class="smoky-chip active" data-metric="revenue" onclick="window.selectMetricChip('revenue')">
+              <span class="chip-lbl">Revenue</span>
+              <span class="chip-val">$840k</span>
+            </div>
+            <div class="smoky-chip" data-metric="deals" onclick="window.selectMetricChip('deals')">
+              <span class="chip-lbl">Deals</span>
+              <span class="chip-val">42 closed</span>
+            </div>
+            <div class="smoky-chip" data-metric="calls" onclick="window.selectMetricChip('calls')">
+              <span class="chip-lbl">Calls</span>
+              <span class="chip-val">318 log</span>
+            </div>
+            <div class="smoky-chip" data-metric="meetings" onclick="window.selectMetricChip('meetings')">
+              <span class="chip-lbl">Meetings</span>
+              <span class="chip-val">94 held</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== COLUMN 2 ==================== -->
+      <div class="smoky-col">
+        
+        <!-- 3. Revenue Card -->
+        <div class="smoky-card" id="card-revenue">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <span class="smoky-meta-label">Gross Collections</span>
+              <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
+                <span class="smoky-kpi-num" id="revenue-val-main">$23.1k</span>
+                <span style="font-size: 0.88rem; color: rgba(255,255,255,0.4);">/ $27k</span>
+              </div>
+              <div style="margin-top: 4px;">
+                <span class="smoky-delta-pos">${ic('trendingUp')} +12.4% vs yesterday</span>
+              </div>
+            </div>
+
+            <!-- Segmented Control Today/Week/Month -->
+            <div class="smoky-segmented" id="revenue-segmented">
+              <button class="smoky-seg-btn active" data-period="Today" onclick="window.selectRevenuePeriod('Today')">Today</button>
+              <button class="smoky-seg-btn" data-period="Week" onclick="window.selectRevenuePeriod('Week')">Week</button>
+              <button class="smoky-seg-btn" data-period="Month" onclick="window.selectRevenuePeriod('Month')">Month</button>
+            </div>
+          </div>
+
+          <!-- Smooth White Area Line Chart (SVG) -->
+          <div style="margin: 18px 0 12px; height: 110px; width: 100%;">
+            <svg viewBox="0 0 300 90" preserveAspectRatio="none" style="width: 100%; height: 100%; overflow: visible;">
+              <defs>
+                <linearGradient id="smokyRevGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.32" />
+                  <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
+                </linearGradient>
+              </defs>
+              <path id="revenue-area-path" d="M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10 L300,90 L0,90 Z" fill="url(#smokyRevGrad)" />
+              <path id="revenue-line-path" d="M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <!-- Row of Hourly Values -->
+          <div style="display: grid; grid-template-columns: repeat(6, 1fr); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; text-align: center;" id="revenue-hourly-row">
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">09:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$1.8k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">11:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$4.2k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">13:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$8.6k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">15:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$14.1k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">17:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">$19.3k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">19:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">$23.1k</div></div>
+          </div>
+        </div>
+
+        <!-- 4. New Leads Card & 5. Approvals Card -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          
+          <!-- 4. New Leads "1,186" with green delta pill & mini bar chart -->
+          <div class="smoky-card" id="card-new-leads">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smoky-meta-label">Inbound</span>
+              <span class="smoky-delta-pos">+18.2%</span>
+            </div>
+
+            <div style="margin-top: 10px;">
+              <div class="smoky-kpi-num" id="leads-num-count">1,186</div>
+              <span class="smoky-kpi-sub">New Leads / ผู้สนใจ</span>
+            </div>
+
+            <!-- Mini bar chart with last bar blue -->
+            <div style="display: flex; align-items: flex-end; gap: 5px; height: 46px; margin-top: 16px;">
+              <div style="flex: 1; height: 35%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 50%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 60%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 45%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 75%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 85%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 100%; background: #3B82F6; box-shadow: 0 0 10px #3B82F6; border-radius: 2px;"></div>
+            </div>
+          </div>
+
+          <!-- 5. Approvals Card: "4 pending", blue DISCOUNT badge, "$4,800" -->
+          <div class="smoky-card" id="card-approvals" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.5);">4 Pending</span>
+                <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.05em;">DISCOUNT</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px;">
+                <div class="smoky-kpi-num" style="font-size: 1.65rem;">$4,800</div>
+                <button style="background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 2px;" onclick="window.dismissApproval()" title="Dismiss">✕</button>
+              </div>
+              <span class="smoky-kpi-sub" style="font-size: 0.74rem;">Northwind Co. · 20% approval</span>
+            </div>
+
+            <!-- Swipe to Approve Slider Pill -->
+            <div class="smoky-swipe-container" id="swipe-approve-box" onclick="window.triggerSwipeApprove()">
+              <span class="smoky-swipe-track-text" id="swipe-track-label">Slide to Approve →</span>
+              <div class="smoky-swipe-thumb" id="swipe-thumb-btn">
+                ${ic('chevronRight')}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 7. Sales (k$) Bar Chart Mon-Sun -->
+        <div class="smoky-card" id="card-sales-weekly">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span class="smoky-meta-label">Revenue Stream</span>
+              <h3 class="smoky-card-title">Sales (k$)</h3>
+            </div>
+
+            <!-- Week/Month/Year Control -->
+            <div class="smoky-segmented" id="sales-segmented">
+              <button class="smoky-seg-btn active" data-period="Week" onclick="window.selectSalesPeriod('Week')">Week</button>
+              <button class="smoky-seg-btn" data-period="Month" onclick="window.selectSalesPeriod('Month')">Month</button>
+              <button class="smoky-seg-btn" data-period="Year" onclick="window.selectSalesPeriod('Year')">Year</button>
+            </div>
+          </div>
+
+          <!-- Mon-Sun Bars with Wednesday highlighted in Blue + Floating Tooltip -->
+          <div style="position: relative; margin-top: 26px; height: 140px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;">
+            
+            <!-- Mon -->
+            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
+              <div style="width: 100%; max-width: 30px; height: 50%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Mon</span>
+            </div>
+
+            <!-- Tue -->
+            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
+              <div style="width: 100%; max-width: 30px; height: 65%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Tue</span>
+            </div>
+
+            <!-- Wed (Active Blue with Floating Tooltip) -->
+            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
+              <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
+                $24.8k
+              </div>
+              <div style="width: 100%; max-width: 30px; height: 88%; background: #3B82F6; box-shadow: 0 0 15px rgba(59,130,246,0.6); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <span style="font-size: 0.72rem; font-weight: 700; color: #ffffff; margin-top: 6px;">Wed</span>
+            </div>
+
+            <!-- Thu -->
+            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
+              <div style="width: 100%; max-width: 30px; height: 68%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Thu</span>
+            </div>
+
+            <!-- Fri -->
+            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
+              <div style="width: 100%; max-width: 30px; height: 80%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Fri</span>
+            </div>
+
+            <!-- Sat -->
+            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
+              <div style="width: 100%; max-width: 30px; height: 42%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Sat</span>
+            </div>
+
+            <!-- Sun -->
+            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
+              <div style="width: 100%; max-width: 30px; height: 35%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">Sun</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== COLUMN 3 ==================== -->
+      <div class="smoky-col">
+        
+        <!-- 6. Right Column 2x2 KPI Tiles -->
+        <div class="smoky-2x2-grid">
+          
+          <!-- Tile 1: Customers 2,739 -->
+          <div class="smoky-tile" id="tile-customers">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
+                ${ic('users')}
+              </div>
+              <button class="smoky-toggle checked" onclick="window.toggleKpiTile('customers', this)">
+                <span class="smoky-toggle-knob"></span>
+              </button>
+            </div>
+            <div style="margin-top: 12px;">
+              <span class="smoky-meta-label">Customers</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-customers-count">2,739</div>
+              <span class="smoky-delta-pos" style="margin-top: 4px;">+8.4%</span>
+            </div>
+          </div>
+
+          <!-- Tile 2: Pipeline $1.19M with mini horizontal funnel bars -->
+          <div class="smoky-tile" id="tile-pipeline">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
+                ${ic('flame')}
+              </div>
+              <button class="smoky-toggle checked" onclick="window.toggleKpiTile('pipeline', this)">
+                <span class="smoky-toggle-knob"></span>
+              </button>
+            </div>
+            <div style="margin-top: 12px;">
+              <span class="smoky-meta-label">Pipeline</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;">$1.19M</div>
+              <!-- Mini horizontal funnel bars -->
+              <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
+                  <span style="width: 32px;">Lead</span>
+                  <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+                    <div style="width: 90%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
+                  <span style="width: 32px;">Qual</span>
+                  <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+                    <div style="width: 68%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
+                  <span style="width: 32px;">Prop</span>
+                  <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+                    <div style="width: 45%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
+                  <span style="width: 32px;">Won</span>
+                  <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+                    <div style="width: 25%; height: 100%; background: #34D399; border-radius: 9999px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tile 3: Active Users 300 with blue sparkline (toggled ON = card lights up) -->
+          <div class="smoky-tile active-spark" id="tile-active-users">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(59,130,246,0.25); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
+                ${ic('activity')}
+              </div>
+              <button class="smoky-toggle checked" onclick="window.toggleKpiTile('activeUsers', this)">
+                <span class="smoky-toggle-knob"></span>
+              </button>
+            </div>
+            <div style="margin-top: 12px;">
+              <span class="smoky-meta-label">Active Users</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;">300</div>
+              <!-- Blue Sparkline -->
+              <div style="height: 24px; width: 100%; margin-top: 6px;">
+                <svg viewBox="0 0 100 25" style="width: 100%; height: 100%; overflow: visible;">
+                  <path d="M0,20 Q20,5 40,16 T70,8 T100,2" fill="none" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tile 4: Open Tickets 17 (red delta) -->
+          <div class="smoky-tile" id="tile-open-tickets">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
+                ${ic('wrench')}
+              </div>
+              <button class="smoky-toggle" onclick="window.toggleKpiTile('openTickets', this)">
+                <span class="smoky-toggle-knob"></span>
+              </button>
+            </div>
+            <div style="margin-top: 12px;">
+              <span class="smoky-meta-label">Open Tickets</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-tickets-count">17</div>
+              <span class="smoky-delta-neg" style="margin-top: 4px;">−3 today</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 8. "Discovery Call · Northwind Co." Media Card -->
+        <div class="smoky-card" id="card-media-discovery">
+          <span class="smoky-meta-label">Discovery Call · Northwind Co.</span>
+          
+          <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80" alt="Marcus" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);">
+            <div>
+              <div style="font-size: 0.90rem; font-weight: 600; color: #fff;">Marcus Vance</div>
+              <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">VP of Operations</div>
+            </div>
+          </div>
+
+          <!-- Blue Audio Waveform with Playhead -->
+          <div class="smoky-waveform-box" id="waveform-box">
+            <!-- 24 bars -->
+            <div class="smoky-wave-bar played" style="height: 35%;"></div>
+            <div class="smoky-wave-bar played" style="height: 55%;"></div>
+            <div class="smoky-wave-bar played" style="height: 80%;"></div>
+            <div class="smoky-wave-bar played" style="height: 100%;"></div>
+            <div class="smoky-wave-bar played" style="height: 65%;"></div>
+            <div class="smoky-wave-bar played" style="height: 45%;"></div>
+            <div class="smoky-wave-bar played" style="height: 90%;"></div>
+            <div class="smoky-wave-bar played" style="height: 75%;"></div>
+            <div class="smoky-wave-bar" style="height: 50%;"></div>
+            <div class="smoky-wave-bar" style="height: 70%;"></div>
+            <div class="smoky-wave-bar" style="height: 85%;"></div>
+            <div class="smoky-wave-bar" style="height: 95%;"></div>
+            <div class="smoky-wave-bar" style="height: 40%;"></div>
+            <div class="smoky-wave-bar" style="height: 30%;"></div>
+            <div class="smoky-wave-bar" style="height: 60%;"></div>
+            <div class="smoky-wave-bar" style="height: 85%;"></div>
+            <div class="smoky-wave-bar" style="height: 70%;"></div>
+            <div class="smoky-wave-bar" style="height: 50%;"></div>
+            <div class="smoky-wave-bar" style="height: 90%;"></div>
+            <div class="smoky-wave-bar" style="height: 65%;"></div>
+            <div class="smoky-wave-bar" style="height: 40%;"></div>
+            <div class="smoky-wave-bar" style="height: 55%;"></div>
+            <div class="smoky-wave-bar" style="height: 80%;"></div>
+            <div class="smoky-wave-bar" style="height: 45%;"></div>
+
+            <!-- Animated Playhead Line -->
+            <div class="smoky-waveform-needle" id="waveform-needle" style="left: 35%;"></div>
+          </div>
+
+          <!-- Audio Controls: prev / play-pause / next -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+            <span style="font-size: 0.76rem; font-family: monospace; color: rgba(255,255,255,0.4);" id="audio-duration-txt">04:32</span>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button class="smoky-round-glass-btn" style="width: 32px; height: 32px;" onclick="window.seekAudio(0)" title="Previous">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+              </button>
+              <button class="smoky-round-glass-btn" id="btn-audio-play" style="width: 38px; height: 38px; background: #3B82F6; color: #fff; box-shadow: 0 0 15px rgba(59,130,246,0.6);" onclick="window.toggleAudioPlay()" title="Play / Pause">
+                ${ic('play')}
+              </button>
+              <button class="smoky-round-glass-btn" style="width: 32px; height: 32px;" onclick="window.seekAudio(100)" title="Next">
+                <svg class="icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+// Initialize Staff Dashboard & Bind Event Listeners
+async function initStaffDashboard() {
+  // 1. Fetch real dormitory data from supabase to augment CRM cards
+  try {
+    const { data: rooms } = await supabase.from('rooms').select('*');
+    const { data: tickets } = await supabase.from('maintenance').select('*');
+    const { data: bills } = await supabase.from('meter_readings').select('*');
+
+    if (rooms && rooms.length > 0) {
+      const occupied = rooms.filter(r => r.status === 'occupied').length;
+      const occPercent = Math.round((occupied / rooms.length) * 100);
+      
+      // Update target ring with real occupancy percent
+      dashboardState.targetPercent = occPercent || 63;
+      updateTargetRingUI();
+
+      const custEl = document.getElementById('kpi-customers-count');
+      if (custEl) custEl.textContent = `${occupied} / ${rooms.length} ห้อง`;
     }
+
+    if (tickets) {
+      const pendingT = tickets.filter(t => t.status !== 'completed').length;
+      const ticketEl = document.getElementById('kpi-tickets-count');
+      if (ticketEl) ticketEl.textContent = pendingT.toString();
+    }
+
+    if (bills) {
+      const totalPendingBills = bills.filter(b => b.status === 'pending').reduce((acc, curr) => acc + (curr.total_price || 0), 0);
+      if (totalPendingBills > 0) {
+        const revEl = document.getElementById('revenue-val-main');
+        if (revEl) revEl.textContent = fmtCurrency(totalPendingBills);
+      }
+    }
+  } catch (err) {
+    console.warn('Using default mock CRM data:', err);
   }
 
-  if (parcelBox) {
-    const waitingList = (parcels || []).filter(p => p.status === 'waiting').slice(0, 4);
-    if (waitingList.length === 0) {
-      parcelBox.innerHTML = `<p style="color:var(--muted); font-size:0.9rem;">ไม่มีพัสดุตกค้าง</p>`;
-    } else {
-      let html = '<div class="mini-activity-list">';
-      waitingList.forEach(p => {
-        html += `
-          <div class="mini-item">
-            <div>
-              <strong>ห้อง ${p.room_number} — ${p.recipient_name}</strong>
-              <div style="font-size:0.8rem; color:var(--muted);">${p.courier}: ${p.tracking_number}</div>
-            </div>
-            <span class="badge pending">รอผู้พักรับ</span>
-          </div>
-        `;
-      });
-      html += '</div>';
-      parcelBox.innerHTML = html;
-    }
+  // 2. Animate KPI numbers count-up from 0
+  animateNumberCountUp('target-percent-text', dashboardState.targetPercent, '%');
+  animateNumberCountUp('leads-num-count', 1186);
+}
+
+// Animated Counter Utility
+function animateNumberCountUp(elementId, targetNum, suffix = '') {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const duration = 800; // ms
+  const start = performance.now();
+  function update(time) {
+    const elapsed = time - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(easeOut * targetNum);
+    el.textContent = current.toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+// Global functions exposed to window for interactive controls
+window.toggleTargetGoal = function() {
+  dashboardState.targetActive = !dashboardState.targetActive;
+  const btn = document.getElementById('btn-toggle-target');
+  const ring = document.getElementById('target-progress-ring');
+  if (btn) btn.classList.toggle('checked', dashboardState.targetActive);
+  if (ring) {
+    ring.style.opacity = dashboardState.targetActive ? '1' : '0.25';
+  }
+};
+
+window.adjustTargetPercent = function(delta) {
+  dashboardState.targetPercent = Math.min(100, Math.max(0, dashboardState.targetPercent + delta));
+  updateTargetRingUI();
+};
+
+function updateTargetRingUI() {
+  const textEl = document.getElementById('target-percent-text');
+  const subEl = document.getElementById('target-sub-label');
+  const ring = document.getElementById('target-progress-ring');
+  
+  if (textEl) textEl.textContent = `${dashboardState.targetPercent}%`;
+  if (subEl) subEl.textContent = `Goal: ${dashboardState.targetPercent}%`;
+  
+  if (ring) {
+    const radius = 40;
+    const circumference = 2 * Math.PI * radius; // ~251.32
+    const offset = circumference * (1 - dashboardState.targetPercent / 100);
+    ring.style.strokeDashoffset = offset;
   }
 }
 
-// หน้าแรกสำหรับ Student (ผู้พักอาศัย)
+window.selectMetricChip = function(metricId) {
+  dashboardState.activeMetricChip = metricId;
+  const chips = document.querySelectorAll('#metric-chips-row .smoky-chip');
+  chips.forEach(c => {
+    if (c.getAttribute('data-metric') === metricId) {
+      c.classList.add('active');
+    } else {
+      c.classList.remove('active');
+    }
+  });
+};
+
+window.selectRevenuePeriod = function(period) {
+  dashboardState.revenuePeriod = period;
+  const btns = document.querySelectorAll('#revenue-segmented .smoky-seg-btn');
+  btns.forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-period') === period);
+  });
+
+  const revMain = document.getElementById('revenue-val-main');
+  const areaPath = document.getElementById('revenue-area-path');
+  const linePath = document.getElementById('revenue-line-path');
+
+  if (period === 'Today') {
+    if (revMain) revMain.textContent = '$23.1k';
+    if (areaPath) areaPath.setAttribute('d', 'M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10 L300,90 L0,90 Z');
+    if (linePath) linePath.setAttribute('d', 'M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10');
+  } else if (period === 'Week') {
+    if (revMain) revMain.textContent = '$148.5k';
+    if (areaPath) areaPath.setAttribute('d', 'M0,60 C40,70 100,35 150,45 C200,55 250,25 300,5 L300,90 L0,90 Z');
+    if (linePath) linePath.setAttribute('d', 'M0,60 C40,70 100,35 150,45 C200,55 250,25 300,5');
+  } else {
+    if (revMain) revMain.textContent = '$620.0k';
+    if (areaPath) areaPath.setAttribute('d', 'M0,80 C60,50 120,40 180,30 C220,25 260,15 300,2 L300,90 L0,90 Z');
+    if (linePath) linePath.setAttribute('d', 'M0,80 C60,50 120,40 180,30 C220,25 260,15 300,2');
+  }
+};
+
+window.selectSalesPeriod = function(period) {
+  dashboardState.salesPeriod = period;
+  const btns = document.querySelectorAll('#sales-segmented .smoky-seg-btn');
+  btns.forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-period') === period);
+  });
+};
+
+window.triggerSwipeApprove = function() {
+  dashboardState.isApproved = !dashboardState.isApproved;
+  const thumb = document.getElementById('swipe-thumb-btn');
+  const label = document.getElementById('swipe-track-label');
+  if (thumb) {
+    thumb.classList.toggle('approved', dashboardState.isApproved);
+    thumb.innerHTML = dashboardState.isApproved ? ic('check') : ic('chevronRight');
+  }
+  if (label) {
+    label.textContent = dashboardState.isApproved ? 'Approved ✓' : 'Slide to Approve →';
+    label.style.color = dashboardState.isApproved ? '#34D399' : 'rgba(255,255,255,0.5)';
+  }
+  if (dashboardState.isApproved) {
+    toast('อนุมัติส่วนลดพิเศษ $4,800 เรียบร้อยแล้ว', 'success');
+  }
+};
+
+window.dismissApproval = function() {
+  const card = document.getElementById('card-approvals');
+  if (card) {
+    card.style.opacity = '0';
+    card.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      card.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:rgba(255,255,255,0.4); font-size:0.82rem;">No pending approvals</div>`;
+      card.style.opacity = '1';
+    }, 250);
+  }
+};
+
+window.toggleKpiTile = function(tileKey, btnElement) {
+  dashboardState.tileStates[tileKey] = !dashboardState.tileStates[tileKey];
+  btnElement.classList.toggle('checked', dashboardState.tileStates[tileKey]);
+  
+  if (tileKey === 'activeUsers') {
+    const tile = document.getElementById('tile-active-users');
+    if (tile) tile.classList.toggle('active-spark', dashboardState.tileStates[tileKey]);
+  }
+};
+
+window.toggleAudioPlay = function() {
+  dashboardState.isPlayingAudio = !dashboardState.isPlayingAudio;
+  const btn = document.getElementById('btn-audio-play');
+  const needle = document.getElementById('waveform-needle');
+
+  if (btn) btn.innerHTML = dashboardState.isPlayingAudio ? ic('pause') : ic('play');
+
+  if (dashboardState.isPlayingAudio) {
+    dashboardState.audioInterval = setInterval(() => {
+      dashboardState.audioPlayhead = (dashboardState.audioPlayhead + 2) % 100;
+      if (needle) needle.style.left = dashboardState.audioPlayhead + '%';
+      
+      // Update wave bars played status
+      const bars = document.querySelectorAll('#waveform-box .smoky-wave-bar');
+      bars.forEach((bar, idx) => {
+        const pct = (idx / bars.length) * 100;
+        bar.classList.toggle('played', pct <= dashboardState.audioPlayhead);
+      });
+    }, 200);
+  } else {
+    clearInterval(dashboardState.audioInterval);
+  }
+};
+
+window.seekAudio = function(pos) {
+  dashboardState.audioPlayhead = pos;
+  const needle = document.getElementById('waveform-needle');
+  if (needle) needle.style.left = pos + '%';
+  const bars = document.querySelectorAll('#waveform-box .smoky-wave-bar');
+  bars.forEach((bar, idx) => {
+    const pct = (idx / bars.length) * 100;
+    bar.classList.toggle('played', pct <= pos);
+  });
+};
+
+// ==================== STUDENT DASHBOARD (Smoky Glass) ====================
 export function renderStudentDashboard() {
   setTimeout(() => {
-    loadStudentDashboardData();
+    initStudentDashboard();
   }, 0);
 
-  const room = currentUser && currentUser.room ? currentUser.room : '302';
-  const name = currentUser ? currentUser.name : 'นักศึกษา';
+  const room = currentUser && currentUser.room ? currentUser.room : '101';
+  const name = currentUser ? currentUser.name : 'นายสมชาย ธนกฤษฎ์';
 
   return `
-    <!-- Personal Room Banner -->
-    <div class="student-welcome-banner">
-      <div style="flex:1;">
-        <span class="badge" style="background:rgba(242,193,78,0.25); color:var(--sand); margin-bottom:8px;">
-          ✨ ผู้พักอาศัย Tanakrit Dormitory (หอพักชายธนกฤษฎ์)
-        </span>
-        <h2>ยินดีต้อนรับ, ${name}</h2>
-        <p>ห้องพักปัจจุบัน: <strong>ห้อง ${room} (${room.startsWith('B') ? 'อาคาร UnderGround' : (Number(room) >= 200 ? 'อาคาร KingPhetch' : 'อาคาร Tanakrit')})</strong> | ประเภท: ห้องพัดลม</p>
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      
+      <!-- Welcome Hero Banner -->
+      <div class="smoky-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; background: linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(59,130,246,0.12) 100%);">
+        <div>
+          <span class="smoky-delta-pos" style="margin-bottom: 8px;">
+            ✨ ผู้พักอาศัย Tanakrit Dormitory (หอพักชายธนกฤษฎ์)
+          </span>
+          <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff; margin: 4px 0;">ยินดีต้อนรับ, ${name}</h2>
+          <p style="color: rgba(255,255,255,0.6); font-size: 0.88rem; margin: 0;">
+            ห้องพักปัจจุบัน: <strong style="color: #fff;">ห้อง ${room} (${room.startsWith('B') ? 'อาคารใต้บ้าน' : (Number(room) >= 200 ? 'อาคาร กิ่งเพชร' : 'อาคาร ธนกฤษฎ์')})</strong> | ประเภท: ห้องพัดลม
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="smoky-round-glass-btn" style="border-radius: 9999px; width: auto; padding: 0 16px; height: 40px; font-weight: 600; font-size: 0.84rem; gap: 8px;" onclick="window.switchView('maintenance')">
+            ${ic('wrench')} แจ้งซ่อมอุปกรณ์
+          </button>
+          <button class="smoky-pill-btn" style="border-radius: 9999px; width: auto; padding: 0 18px; height: 40px; background: #3B82F6; box-shadow: 0 0 15px rgba(59,130,246,0.5); font-size: 0.84rem; gap: 8px;" onclick="window.switchView('utilities')">
+            ${ic('bill')} ดูบิลค่าน้ำ-ไฟ
+          </button>
+        </div>
       </div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-outline-white" onclick="window.switchView('maintenance')">
-          ${ic('wrench')} แจ้งซ่อมอุปกรณ์
-        </button>
-        <button class="btn btn-primary" onclick="window.switchView('utilities')">
-          ${ic('bill')} ดูบิลค่าน้ำ-ไฟ
-        </button>
+
+      <!-- 4 Glass KPI Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+        <div class="smoky-card">
+          <span class="smoky-meta-label">บิลเดือนล่าสุด</span>
+          <div class="smoky-kpi-num" style="margin-top: 4px;" id="std-bill-amount">1,720 ฿</div>
+          <span class="smoky-delta-pos" style="margin-top: 6px;">ชำระแล้ว</span>
+        </div>
+        <div class="smoky-card">
+          <span class="smoky-meta-label">พัสดุรอรับ</span>
+          <div class="smoky-kpi-num" style="margin-top: 4px;" id="std-parcel-count">0</div>
+          <span class="smoky-kpi-sub">ชิ้น ที่เคาน์เตอร์สำนักงาน</span>
+        </div>
+        <div class="smoky-card">
+          <span class="smoky-meta-label">งานแจ้งซ่อม</span>
+          <div class="smoky-kpi-num" style="margin-top: 4px;" id="std-ticket-count">0</div>
+          <span class="smoky-kpi-sub">รายการรอดำเนินการ</span>
+        </div>
+        <div class="smoky-card">
+          <span class="smoky-meta-label">สถานะสัญญา</span>
+          <div class="smoky-kpi-num" style="margin-top: 4px; font-size: 1.6rem; color: #34D399;">ปกติ</div>
+          <span class="smoky-kpi-sub">สัญญา 1 ปีการศึกษา (12 เดือน)</span>
+        </div>
       </div>
+
+      <!-- 2 Columns: Latest Bill & Activity -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" class="smoky-std-grid">
+        <div class="smoky-card" id="student-latest-bill-box">
+          <h3 class="smoky-card-title">${ic('bill')} ยอดชำระค่าน้ำ-ค่าไฟ</h3>
+          <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">กำลังตรวจสอบบิลล่าสุด...</p>
+        </div>
+        <div class="smoky-card">
+          <h3 class="smoky-card-title">${ic('box')} พัสดุของคุณที่รอรับ</h3>
+          <div id="student-parcels-box" style="margin-top: 14px; font-size: 0.85rem; color: rgba(255,255,255,0.5);">ไม่มีพัสดุตกค้าง</div>
+        </div>
+      </div>
+
     </div>
+  `;
+}
 
-    <!-- Student Cards Grid -->
-    <div class="stat-cards" style="margin-top:24px;" id="student-stat-cards">
-      <div class="scard"><div class="num">...</div><div class="lbl">กำลังโหลดข้อมูล...</div></div>
-    </div>
+async function initStudentDashboard() {
+  const room = currentUser && currentUser.room ? currentUser.room : '101';
+  try {
+    const { data: bills } = await supabase.from('meter_readings').eq('room_number', room);
+    const { data: parcels } = await supabase.from('parcels').eq('room_number', room);
 
-    <!-- Two Columns: Latest Bill & My Status -->
-    <div class="dashboard-grid-2col" style="margin-top:24px;">
-      <!-- Latest Bill Box -->
-      <div class="card" id="student-latest-bill-box">
-        <h3>${ic('bill')} ยอดชำระค่าน้ำ-ค่าไฟ ประจำเดือน</h3>
-        <p style="color:var(--muted); font-size:0.9rem;">กำลังตรวจสอบข้อมูลบิลล่าสุด...</p>
+    const billBox = document.getElementById('student-latest-bill-box');
+    if (billBox && bills && bills.length > 0) {
+      const b = bills[0];
+      const isPaid = b.status === 'paid';
+      billBox.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h3 class="smoky-card-title">${ic('bill')} บิลประจำเดือน ${b.billing_month || ''}</h3>
+          <span class="${isPaid ? 'smoky-delta-pos' : 'smoky-delta-neg'}">${isPaid ? 'ชำระแล้ว' : 'รอชำระ'}</span>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem;">
+            <div>ค่าเช่าห้อง: <strong>${fmtCurrency(b.room_price)}</strong></div>
+            <div>ค่าน้ำ (${b.water_unit || 0} หน่วย): <strong>${fmtCurrency(b.water_total)}</strong></div>
+            <div>ค่าไฟ (${b.electric_unit || 0} หน่วย): <strong>${fmtCurrency(b.electric_total)}</strong></div>
+            <div>ค่าส่วนกลาง: <strong>100 ฿</strong></div>
+          </div>
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.15); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600;">ยอดรวมสุทธิ:</span>
+            <span style="font-size: 1.4rem; font-weight: 700; color: #fff;">${fmtCurrency(b.total_price)}</span>
+          </div>
+        </div>
+        <button class="smoky-pill-btn" style="width: 100%; border-radius: 9999px; height: 42px; margin-top: 16px; background: #3B82F6;" onclick="window.openStudentInvoice()">
+          ${ic('qr')} ดูใบแจ้งหนี้ / แนบสลิป QR PromptPay
+        </button>
+      `;
+      window.openStudentInvoice = () => openInvoiceModal(b);
+    }
+  } catch (e) {
+    console.warn(e);
+  }
+}
+
+// ==================== PROFILE VIEW (Smoky Glass) ====================
+export function renderProfileView() {
+  const name = currentUser ? currentUser.name : 'ผู้ดูแลระบบ';
+  const room = currentUser && currentUser.room ? currentUser.room : 'สำนักงาน';
+  const role = currentUser ? (currentUser.roleTitle || currentUser.role) : 'Administrator';
+
+  return `
+    <div class="smoky-card" style="max-width: 600px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: #3B82F6; color: #fff; font-size: 2rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(59,130,246,0.6); margin-bottom: 12px;">
+          ${currentUser ? currentUser.initial : 'A'}
+        </div>
+        <h3 class="smoky-card-title" style="font-size: 1.3rem;">${name}</h3>
+        <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 4px;">${role} | ห้อง: ${room}</p>
       </div>
 
-      <!-- Pending Parcels & Repairs -->
-      <div class="card">
-        <h3>${ic('box')} พัสดุของคุณที่รอรับ</h3>
-        <div id="student-parcels-box" style="margin-top:14px;">กำลังโหลด...</div>
-
-        <h3 style="margin-top:24px; padding-top:16px; border-top:1px solid var(--line);">${ic('wrench')} สถานะงานแจ้งซ่อมของห้อง</h3>
-        <div id="student-tickets-box" style="margin-top:14px;">กำลังโหลด...</div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <label class="smoky-meta-label">ชื่อ-นามสกุล</label>
+            <input type="text" class="smoky-search-input" style="width: 100%; border-radius: 12px; padding: 10px 14px; margin-top: 6px;" value="${name}">
+          </div>
+          <div>
+            <label class="smoky-meta-label">สิทธิ์การใช้งาน</label>
+            <input type="text" class="smoky-search-input" style="width: 100%; border-radius: 12px; padding: 10px 14px; margin-top: 6px;" value="${role}" disabled>
+          </div>
+        </div>
+        <button class="smoky-pill-btn" style="width: 100%; border-radius: 9999px; height: 42px; background: #3B82F6; margin-top: 10px;" onclick="toast('บันทึกข้อมูลเรียบร้อย', 'success')">
+          ${ic('check')} บันทึกการเปลี่ยนแปลง
+        </button>
       </div>
     </div>
   `;
 }
 
-async function loadStudentDashboardData() {
-  const room = currentUser && currentUser.room ? currentUser.room : '302';
 
-  const { data: bills } = await supabase.from('meter_readings').eq('room_number', room);
-  const { data: parcels } = await supabase.from('parcels').eq('room_number', room);
-  const { data: tickets } = await supabase.from('maintenance').eq('room_number', room);
-
-  // Stats
-  const statBox = document.getElementById('student-stat-cards');
-  if (statBox) {
-    const latestBill = bills && bills.length > 0 ? bills[0] : null;
-    const isPaid = latestBill ? latestBill.status === 'paid' : true;
-    const waitingParcels = (parcels || []).filter(p => p.status === 'waiting').length;
-    const activeTickets = (tickets || []).filter(t => t.status !== 'completed').length;
-
-    statBox.innerHTML = `
-      <div class="scard">
-        <div class="top"><span class="lbl">บิลเดือนล่าสุด</span><div class="ic ${isPaid ? 'c' : 'd'}">${ic('bill')}</div></div>
-        <div class="num">${latestBill ? fmtCurrency(latestBill.total_price) : '0 ฿'}</div>
-        <div class="lbl">สถานะ: <strong style="color:${isPaid ? 'var(--emerald)' : 'var(--danger)'};">${isPaid ? 'ชำระแล้ว' : 'ยังไม่ชำระ'}</strong></div>
-      </div>
-      <div class="scard">
-        <div class="top"><span class="lbl">พัสดุรอรับ</span><div class="ic b">${ic('box')}</div></div>
-        <div class="num">${waitingParcels}</div>
-        <div class="lbl">ชิ้น ที่เคาน์เตอร์</div>
-      </div>
-      <div class="scard">
-        <div class="top"><span class="lbl">งานแจ้งซ่อม</span><div class="ic a">${ic('wrench')}</div></div>
-        <div class="num">${activeTickets}</div>
-        <div class="lbl">รายการกำลังดำเนินการ</div>
-      </div>
-      <div class="scard">
-        <div class="top"><span class="lbl">สถานะห้องพัก</span><div class="ic c">${ic('door')}</div></div>
-        <div class="num" style="font-size:1.6rem;">ปกติ</div>
-        <div class="lbl">ห้อง ${room} สัญญาปกติ</div>
-      </div>
-    `;
-  }
-
-  // Bill Box
-  const billBox = document.getElementById('student-latest-bill-box');
-  if (billBox && bills && bills.length > 0) {
-    const b = bills[0];
-    const isPaid = b.status === 'paid';
-    const isVerifying = b.status === 'verifying';
-    let badgeClass = isPaid ? 'approved' : (isVerifying ? 'verifying' : 'pending');
-    let badgeText = isPaid ? 'ชำระแล้ว' : (isVerifying ? '⏳ รอตรวจสลิป' : 'รอชำระเงิน');
-
-    billBox.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <h3>${ic('bill')} ยอดชำระค่าน้ำ-ค่าไฟ (${b.month_label || b.billing_month})</h3>
-        <span class="badge ${badgeClass}">${badgeText}</span>
-      </div>
-      <div style="background:var(--mint-50); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.9rem;">
-          <div>ค่าเช่าห้องพัก: <strong>${fmtCurrency(b.room_price)}</strong></div>
-          <div>ค่าน้ำประปา (${b.water_unit} หน่วย): <strong>${fmtCurrency(b.water_total)}</strong></div>
-          <div>ค่าไฟฟ้า (${b.electric_unit} หน่วย): <strong>${fmtCurrency(b.electric_total)}</strong></div>
-          <div>ค่าส่วนกลาง: <strong>${fmtCurrency(b.common_fee || 100)}</strong></div>
+// ==================== CRM SUB-PAGES: DEALS PIPELINE ====================
+export function renderDealsPipelineView() {
+  return `
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      
+      <!-- KPI Row -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Active Deals</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">28</div>
+          <span class="smoky-delta-pos" style="margin-top: 4px;">+4 this week</span>
         </div>
-        <div style="margin-top:14px; padding-top:12px; border-top:1.5px dashed var(--line); display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-weight:600; font-size:1.05rem;">ยอดรวมที่ต้องชำระ:</span>
-          <span style="font-weight:700; font-size:1.3rem; color:var(--teal-900);">${fmtCurrency(b.total_price)}</span>
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Weighted Forecast</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">$640k</div>
+          <span class="smoky-kpi-sub">Expected Q2 close</span>
+        </div>
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Win Probability</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">54%</div>
+          <span class="smoky-delta-pos" style="margin-top: 4px;">+6% vs avg</span>
+        </div>
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Cycle Velocity</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">18 days</div>
+          <span class="smoky-delta-pos" style="margin-top: 4px;">-3 days fast</span>
         </div>
       </div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-primary" id="btn-open-student-invoice" style="flex:1;">
-          ${isVerifying ? `${ic('eye')} ดูสลิป / ตรวจสอบสถานะ` : `${ic('qr')} ดูใบแจ้งหนี้ / แนบสลิปโอนเงิน`}
-        </button>
+
+      <!-- Kanban Columns: Lead / Qualified / Proposal / Negotiation / Won -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; align-items: flex-start;">
+        
+        <!-- Col: Lead -->
+        <div class="smoky-card" style="padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 12px;">
+            <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.7);">Lead</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 2px 7px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">2</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;">
+              <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">SaaS</span>
+              <h5 style="margin: 6px 0 2px; font-size: 0.85rem; color: #fff;">Enterprise Migration</h5>
+              <p style="margin: 0; font-size: 0.72rem; color: rgba(255,255,255,0.45);">Northwind Co.</p>
+              <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.82rem; font-weight: 700;">$48,000</span>
+                <span style="font-size: 0.72rem; color: #34D399;">30%</span>
+              </div>
+            </div>
+            <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;">
+              <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Data</span>
+              <h5 style="margin: 6px 0 2px; font-size: 0.85rem; color: #fff;">Analytics Integration</h5>
+              <p style="margin: 0; font-size: 0.72rem; color: rgba(255,255,255,0.45);">Solstice Group</p>
+              <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.82rem; font-weight: 700;">$18,500</span>
+                <span style="font-size: 0.72rem; color: #34D399;">40%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col: Qualified -->
+        <div class="smoky-card" style="padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 12px;">
+            <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.7);">Qualified</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 2px 7px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">1</span>
+          </div>
+          <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;">
+            <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Annual</span>
+            <h5 style="margin: 6px 0 2px; font-size: 0.85rem; color: #fff;">Global Rollout v2</h5>
+            <p style="margin: 0; font-size: 0.72rem; color: rgba(255,255,255,0.45);">Zenith Holdings</p>
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.82rem; font-weight: 700;">$92,000</span>
+              <span style="font-size: 0.72rem; color: #34D399;">60%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col: Proposal -->
+        <div class="smoky-card" style="padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 12px;">
+            <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.7);">Proposal</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 2px 7px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">1</span>
+          </div>
+          <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;">
+            <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Cloud</span>
+            <h5 style="margin: 6px 0 2px; font-size: 0.85rem; color: #fff;">Dedicated Cluster SLA</h5>
+            <p style="margin: 0; font-size: 0.72rem; color: rgba(255,255,255,0.45);">Hyperion Bio</p>
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.82rem; font-weight: 700;">$64,000</span>
+              <span style="font-size: 0.72rem; color: #34D399;">75%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col: Negotiation -->
+        <div class="smoky-card" style="padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 12px;">
+            <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: rgba(255,255,255,0.7);">Negotiation</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 2px 7px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">1</span>
+          </div>
+          <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;">
+            <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Enterprise</span>
+            <h5 style="margin: 6px 0 2px; font-size: 0.85rem; color: #fff;">Multi-Seat License</h5>
+            <p style="margin: 0; font-size: 0.72rem; color: rgba(255,255,255,0.45);">Apex Global</p>
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.82rem; font-weight: 700;">$120,000</span>
+              <span style="font-size: 0.72rem; color: #34D399;">90%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col: Won -->
+        <div class="smoky-card" style="padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px; margin-bottom: 12px;">
+            <span style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: #34D399;">Won</span>
+            <span style="background: rgba(52,211,153,0.2); color: #34D399; padding: 2px 7px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">1</span>
+          </div>
+          <div style="background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.25); border-radius: 12px; padding: 12px;">
+            <span style="background: rgba(52,211,153,0.2); color: #34D399; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Closed Won</span>
+            <h5 style="margin: 6px 0 2px; font-size: 0.85rem; color: #fff;">Q2 Expansion Pack</h5>
+            <p style="margin: 0; font-size: 0.72rem; color: rgba(255,255,255,0.45);">Starlight Retail</p>
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.82rem; font-weight: 700;">$55,000</span>
+              <span style="font-size: 0.72rem; color: #34D399;">100%</span>
+            </div>
+          </div>
+        </div>
+
       </div>
-    `;
 
-    document.getElementById('btn-open-student-invoice').onclick = () => {
-      openInvoiceModal(b);
-    };
-  }
-
-  // Parcels
-  const parcelsBox = document.getElementById('student-parcels-box');
-  if (parcelsBox) {
-    const myWaiting = (parcels || []).filter(p => p.status === 'waiting');
-    if (myWaiting.length === 0) {
-      parcelsBox.innerHTML = `<p style="color:var(--muted); font-size:0.85rem;">ไม่มีพัสดุตกค้าง คุณรับพัสดุครบเรียบร้อยแล้ว</p>`;
-    } else {
-      let html = '';
-      myWaiting.forEach(p => {
-        html += `
-          <div style="background:#fdf8e7; border:1px solid #f2c14e; border-radius:10px; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <strong>${p.courier}: ${p.tracking_number}</strong>
-              <div style="font-size:0.8rem; color:var(--muted);">${p.description} (มาถึง ${fmtDate(p.arrived_at)})</div>
-            </div>
-            <button class="btn btn-outline btn-sm btn-quick-collect" data-id="${p.id}">${ic('check')} รับแล้ว</button>
-          </div>
-        `;
-      });
-      parcelsBox.innerHTML = html;
-      parcelsBox.querySelectorAll('.btn-quick-collect').forEach(btn => {
-        btn.onclick = async () => {
-          const id = btn.getAttribute('data-id');
-          await supabase.from('parcels').eq('id', id).update({ status: 'collected', collected_at: new Date().toISOString().split('T')[0] });
-          toast('บันทึกการรับพัสดุเรียบร้อย', 'success');
-          loadStudentDashboardData();
-        };
-      });
-    }
-  }
-
-  // Tickets
-  const ticketsBox = document.getElementById('student-tickets-box');
-  if (ticketsBox) {
-    if (!tickets || tickets.length === 0) {
-      ticketsBox.innerHTML = `<p style="color:var(--muted); font-size:0.85rem;">ไม่มีประวัติการแจ้งซ่อม</p>`;
-    } else {
-      let html = '';
-      tickets.slice(0, 3).forEach(t => {
-        let badgeClass = t.status === 'completed' ? 'approved' : 'pending';
-        let statusText = t.status === 'completed' ? 'ซ่อมเสร็จแล้ว' : (t.status === 'in_progress' ? 'กำลังซ่อม' : 'รอรับเรื่อง');
-        html += `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); font-size:0.9rem;">
-            <div>
-              <strong>${t.category}</strong>
-              <div style="font-size:0.8rem; color:var(--muted);">${t.description}</div>
-            </div>
-            <span class="badge ${badgeClass}">${statusText}</span>
-          </div>
-        `;
-      });
-      ticketsBox.innerHTML = html;
-    }
-  }
-
-  const quickReq = document.getElementById('btn-new-req-quick');
-  if (quickReq) {
-    quickReq.onclick = () => window.switchView('new-request');
-  }
+    </div>
+  `;
 }
 
-// หน้าข้อมูลส่วนตัว (Profile สำหรับนักศึกษา)
-export function renderProfileView() {
-  const name = currentUser ? currentUser.name : 'นายสมชาย ธนกฤษฎ์';
-  const room = currentUser && currentUser.room ? currentUser.room : '302';
-  const phone = currentUser && currentUser.phone ? currentUser.phone : '089-123-4567';
-  const tid = currentUser && currentUser.tenantId ? currentUser.tenantId : '6512345';
-
+// ==================== CRM SUB-PAGES: CUSTOMERS ====================
+export function renderCustomersView() {
   return `
-    <div class="card" style="max-width: 650px; margin: 0 auto;">
-      <div style="text-align:center; margin-bottom:24px;">
-        <div style="width: 80px; height: 80px; background: var(--teal-950); color: var(--sand); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; font-family: 'Kanit'; font-weight: bold; border: 4px solid var(--mint-50); box-shadow: var(--shadow);">
-          ${currentUser ? currentUser.initial : 'ส'}
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      
+      <!-- 4 KPI Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Total Accounts</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">2,739</div>
+          <span class="smoky-delta-pos" style="margin-top: 4px;">+8.4%</span>
         </div>
-        <h3 style="margin: 12px 0 4px 0; color: var(--teal-950);">${name}</h3>
-        <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">รหัสประจำตัว: ${tid} | ห้องพัก: <strong>${room}</strong></p>
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Active Subscriptions</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">2,410</div>
+          <span class="smoky-delta-pos" style="margin-top: 4px;">92% active</span>
+        </div>
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Net Retention</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">118%</div>
+          <span class="smoky-delta-pos" style="margin-top: 4px;">+4%</span>
+        </div>
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Avg LTV</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">$34,200</div>
+          <span class="smoky-kpi-sub">Per business account</span>
+        </div>
       </div>
 
-      <form id="form-profile-save">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-          <div class="field">
-            <label>ชื่อ - นามสกุล</label>
-            <input type="text" id="prof-name" value="${name}">
+      <!-- Filter Chips, Search, Export, Add Customer -->
+      <div class="smoky-card" style="padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="customer-filter-chips">
+          <button class="smoky-seg-btn active" onclick="window.filterCustomerTable('All', this)">All (2,739)</button>
+          <button class="smoky-seg-btn" onclick="window.filterCustomerTable('Active', this)">Active (2,410)</button>
+          <button class="smoky-seg-btn" onclick="window.filterCustomerTable('Trial', this)">Trial (184)</button>
+          <button class="smoky-seg-btn" onclick="window.filterCustomerTable('Lead', this)">Lead (95)</button>
+          <button class="smoky-seg-btn" onclick="window.filterCustomerTable('Churned', this)">Churned (50)</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="position: relative;">
+            <input type="text" class="smoky-search-input" id="cust-search-input" placeholder="Search accounts..." oninput="window.searchCustomerTable(this.value)">
+            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); pointer-events: none;">🔍</span>
           </div>
-          <div class="field">
-            <label>ห้องพักปัจจุบัน</label>
-            <input type="text" value="${room}" disabled>
+          <button class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 14px; font-size: 0.78rem; gap: 6px; height: 34px;" onclick="toast('ส่งออกไฟล์ข้อมูล CSV สำเร็จ', 'success')">
+            ${ic('download')} Export
+          </button>
+          <button class="smoky-pill-btn" style="width: auto; border-radius: 9999px; padding: 0 16px; background: #ffffff; color: #0a0d14; font-size: 0.78rem; font-weight: 700; height: 34px;" onclick="window.switchView('tenants')">
+            + Add Customer
+          </button>
+        </div>
+      </div>
+
+      <!-- Customers Table -->
+      <div class="smoky-table-wrap">
+        <table class="smoky-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Company</th>
+              <th>Status</th>
+              <th>Owner</th>
+              <th>Lifetime Value</th>
+              <th>Last Contact</th>
+            </tr>
+          </thead>
+          <tbody id="customers-table-body">
+            <tr data-status="Active">
+              <td style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                <strong>Arthur Pendelton</strong>
+              </td>
+              <td>Acme Corp</td>
+              <td><span class="smoky-delta-pos">Active</span></td>
+              <td>Alex M.</td>
+              <td style="font-family: monospace; font-weight: 700;">$48,200</td>
+              <td style="color: rgba(255,255,255,0.5);">2 hrs ago</td>
+            </tr>
+            <tr data-status="Active">
+              <td style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                <strong>Miriam Sterling</strong>
+              </td>
+              <td>Nova Labs</td>
+              <td><span class="smoky-delta-pos">Active</span></td>
+              <td>Sarah C.</td>
+              <td style="font-family: monospace; font-weight: 700;">$32,150</td>
+              <td style="color: rgba(255,255,255,0.5);">Yesterday</td>
+            </tr>
+            <tr data-status="Trial">
+              <td style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                <strong>Liam Gallagher</strong>
+              </td>
+              <td>Vertex Systems</td>
+              <td><span style="background: rgba(245,158,11,0.15); color: #F59E0B; padding: 2px 8px; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">Trial</span></td>
+              <td>David K.</td>
+              <td style="font-family: monospace; font-weight: 700;">$8,400</td>
+              <td style="color: rgba(255,255,255,0.5);">3 days ago</td>
+            </tr>
+            <tr data-status="Lead">
+              <td style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                <strong>Chloe Dubois</strong>
+              </td>
+              <td>Lumiere AI</td>
+              <td><span style="background: rgba(59,130,246,0.15); color: #3B82F6; padding: 2px 8px; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">Lead</span></td>
+              <td>Elena R.</td>
+              <td style="font-family: monospace; font-weight: 700;">$12,000</td>
+              <td style="color: rgba(255,255,255,0.5);">May 12</td>
+            </tr>
+            <tr data-status="Churned">
+              <td style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                <strong>Jonathan Reeves</strong>
+              </td>
+              <td>Beacon Tech</td>
+              <td><span class="smoky-delta-neg">Churned</span></td>
+              <td>Alex M.</td>
+              <td style="font-family: monospace; font-weight: 700;">$19,500</td>
+              <td style="color: rgba(255,255,255,0.5);">Apr 28</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  `;
+}
+
+window.filterCustomerTable = function(status, btn) {
+  document.querySelectorAll('#customer-filter-chips .smoky-seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const rows = document.querySelectorAll('#customers-table-body tr');
+  rows.forEach(r => {
+    if (status === 'All' || r.getAttribute('data-status') === status) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+};
+
+window.searchCustomerTable = function(query) {
+  const q = query.toLowerCase();
+  const rows = document.querySelectorAll('#customers-table-body tr');
+  rows.forEach(r => {
+    const text = r.textContent.toLowerCase();
+    r.style.display = text.includes(q) ? '' : 'none';
+  });
+};
+
+// ==================== CRM SUB-PAGES: PRODUCTS & ROOMS ====================
+export function renderProductsView() {
+  return `
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+      
+      <!-- KPI Row -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Catalog Units</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">7 active</div>
+          <span class="smoky-delta-pos" style="margin-top: 4px;">100% online</span>
+        </div>
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Available Inventory</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">2 ห้องว่าง</div>
+          <span class="smoky-kpi-sub">พร้อมเข้าพักทันที</span>
+        </div>
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Capacity Rate</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">90%</div>
+          <span class="smoky-delta-pos" style="margin-top: 4px;">18/20 ห้องพัก</span>
+        </div>
+        <div class="smoky-card" style="padding: 16px;">
+          <span class="smoky-meta-label">Avg Monthly Rate</span>
+          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">1,475 ฿</div>
+          <span class="smoky-kpi-sub">ราคาเฉลี่ยต่อเดือน</span>
+        </div>
+      </div>
+
+      <!-- Product Grid Cards with vivid gradient app-style icons -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+        
+        <!-- Product 1: อาคาร ธนกฤษฎ์ -->
+        <div class="smoky-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #3B82F6, #1D4ED8); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 16px rgba(59,130,246,0.4);">
+              ${ic('door')}
+            </div>
+            <button class="smoky-toggle checked" onclick="this.classList.toggle('checked')">
+              <span class="smoky-toggle-knob"></span>
+            </button>
+          </div>
+          <div style="margin-top: 16px;">
+            <span class="smoky-meta-label">อาคารหลัก · 9 ห้อง</span>
+            <h4 class="smoky-card-title">อาคาร ธนกฤษฎ์</h4>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #3B82F6; margin-top: 4px;">1,500 ฿ / เดือน</div>
+          </div>
+          <div style="margin-top: 18px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-bottom: 4px;">
+              <span>อัตราการเข้าพัก</span>
+              <span>8 / 9 ห้อง</span>
+            </div>
+            <div style="height: 6px; width: 100%; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+              <div style="width: 88%; height: 100%; background: linear-gradient(90deg, #3B82F6, #60A5FA); border-radius: 9999px;"></div>
+            </div>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-          <div class="field">
-            <label>เบอร์โทรศัพท์ติดต่อ</label>
-            <input type="tel" id="prof-phone" value="${phone}">
+        <!-- Product 2: อาคาร กิ่งเพชร -->
+        <div class="smoky-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #06B6D4, #0284C7); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 16px rgba(6,182,212,0.4);">
+              ${ic('door')}
+            </div>
+            <button class="smoky-toggle checked" onclick="this.classList.toggle('checked')">
+              <span class="smoky-toggle-knob"></span>
+            </button>
           </div>
-          <div class="field">
-            <label>อีเมลติดต่อ</label>
-            <input type="email" id="prof-email" value="somchai@tanakrit.com">
+          <div style="margin-top: 16px;">
+            <span class="smoky-meta-label">อาคาร 2 · 5 ห้อง</span>
+            <h4 class="smoky-card-title">อาคาร กิ่งเพชร</h4>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #06B6D4; margin-top: 4px;">1,500 ฿ / เดือน</div>
+          </div>
+          <div style="margin-top: 18px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-bottom: 4px;">
+              <span>อัตราการเข้าพัก</span>
+              <span>5 / 5 ห้อง (เต็ม)</span>
+            </div>
+            <div style="height: 6px; width: 100%; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+              <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #06B6D4, #38BDF8); border-radius: 9999px;"></div>
+            </div>
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%;">
-          ${ic('check')} บันทึกการเปลี่ยนแปลงข้อมูลส่วนตัว
-        </button>
-      </form>
+        <!-- Product 3: อาคารใต้บ้าน -->
+        <div class="smoky-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #10B981, #059669); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 16px rgba(16,185,129,0.4);">
+              ${ic('door')}
+            </div>
+            <button class="smoky-toggle checked" onclick="this.classList.toggle('checked')">
+              <span class="smoky-toggle-knob"></span>
+            </button>
+          </div>
+          <div style="margin-top: 16px;">
+            <span class="smoky-meta-label">อาคาร 3 · 6 ห้อง</span>
+            <h4 class="smoky-card-title">อาคารใต้บ้าน</h4>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #10B981; margin-top: 4px;">1,400 ฿ / เดือน</div>
+          </div>
+          <div style="margin-top: 18px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-bottom: 4px;">
+              <span>อัตราการเข้าพัก</span>
+              <span>5 / 6 ห้อง</span>
+            </div>
+            <div style="height: 6px; width: 100%; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+              <div style="width: 83%; height: 100%; background: linear-gradient(90deg, #10B981, #34D399); border-radius: 9999px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 4: High-Speed Fiber Internet -->
+        <div class="smoky-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #8B5CF6, #6D28D9); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: 0 4px 16px rgba(139,92,246,0.4);">
+              ${ic('activity')}
+            </div>
+            <button class="smoky-toggle checked" onclick="this.classList.toggle('checked')">
+              <span class="smoky-toggle-knob"></span>
+            </button>
+          </div>
+          <div style="margin-top: 16px;">
+            <span class="smoky-meta-label">Add-on Service</span>
+            <h4 class="smoky-card-title">High-Speed Wi-Fi</h4>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #8B5CF6; margin-top: 4px;">100 ฿ / เดือน</div>
+          </div>
+          <div style="margin-top: 18px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-bottom: 4px;">
+              <span>Active Subscribers</span>
+              <span>18 / 18 ห้อง</span>
+            </div>
+            <div style="height: 6px; width: 100%; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+              <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #8B5CF6, #A78BFA); border-radius: 9999px;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   `;
 }
