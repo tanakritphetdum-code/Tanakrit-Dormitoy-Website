@@ -629,7 +629,16 @@ function openManageRoomModal(room, allRooms) {
     };
 
     try {
-      await supabase.from('rooms').eq('id', room.id).update(updatedData);
+      const dbPayload = {
+        room_number: num,
+        floor: bld === 'UnderGround' ? 0 : 1,
+        type: tp,
+        price: pr,
+        status: st,
+        tenant_name: st === 'occupied' ? tName : '',
+        tenant_phone: st === 'occupied' ? tPhone : ''
+      };
+      await supabase.from('rooms').eq('id', room.id).update(dbPayload);
     } catch (_) {}
 
     // อัปเดตใน LocalStorage Cache
@@ -786,7 +795,17 @@ function openAddRoomModal() {
     };
 
     try {
-      await supabase.from('rooms').insert([newRoom]);
+      const dbPayload = {
+        id: 'R' + num,
+        room_number: num,
+        floor: bld === 'UnderGround' ? 0 : 1,
+        type: tp,
+        price: pr,
+        status: st,
+        tenant_name: '',
+        tenant_phone: ''
+      };
+      await supabase.from('rooms').insert([dbPayload]);
     } catch (_) {}
 
     try {
