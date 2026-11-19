@@ -8047,6 +8047,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('overlay');
   if (overlay) overlay.addEventListener('click', () => toggleSidebar(false));
 
+  // ตรวจสอบ Theme เริ่มต้น
+  initTheme();
+
   // ตรวจสอบ Session ที่มีอยู่เดิม
   const existingUser = initAuth();
   if (existingUser) {
@@ -8255,6 +8258,53 @@ function bindProfileForm() {
     });
   }
 }
+
+// ==================== THEME MANAGEMENT (DARK / LIGHT MODE) ====================
+function initTheme() {
+  const savedTheme = localStorage.getItem('tanakrit_theme') || 'dark';
+  applyTheme(savedTheme, false);
+}
+function applyTheme(theme, notify = false) {
+  const root = document.documentElement;
+  const pageApp = document.getElementById('page-app');
+  const iconEl = document.getElementById('theme-toggle-icon');
+  const tooltipEl = document.getElementById('theme-toggle-tooltip');
+  const btn = document.getElementById('btn-theme-toggle');
+
+  if (theme === 'light') {
+    document.body.classList.add('theme-light');
+    if (pageApp) pageApp.classList.add('theme-light');
+    root.classList.add('theme-light');
+    if (iconEl) {
+      // แสดงไอคอนพระจันทร์ สำหรับคลิกกลับไปโหมดมืด
+      iconEl.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+    }
+    if (tooltipEl) tooltipEl.textContent = 'สลับโหมดมืด (Dark Mode)';
+    if (btn) btn.title = 'สลับโหมดมืด (Dark Mode)';
+    if (notify && typeof toast === 'function') toast('เปิดใช้งานโหมดสว่าง (Light Mode) เรียบร้อย', 'info');
+  } else {
+    document.body.classList.remove('theme-light');
+    if (pageApp) pageApp.classList.remove('theme-light');
+    root.classList.remove('theme-light');
+    if (iconEl) {
+      // แสดงไอคอนดวงอาทิตย์ สำหรับคลิกไปโหมดสว่าง
+      iconEl.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+    }
+    if (tooltipEl) tooltipEl.textContent = 'สลับโหมดสว่าง (Light Mode)';
+    if (btn) btn.title = 'สลับโหมดสว่าง (Light Mode)';
+    if (notify && typeof toast === 'function') toast('เปิดใช้งานโหมดมืด (Dark Mode) เรียบร้อย', 'info');
+  }
+  localStorage.setItem('tanakrit_theme', theme);
+}
+function toggleDarkMode() {
+  const current = localStorage.getItem('tanakrit_theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next, true);
+}
+
+window.initTheme = initTheme;
+window.applyTheme = applyTheme;
+window.toggleDarkMode = toggleDarkMode;
 
 
 })();
