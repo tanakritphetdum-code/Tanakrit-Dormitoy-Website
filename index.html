@@ -42,61 +42,100 @@
 
     <!-- ==================== หน้า Landing Page ==================== -->
     <div id="page-landing">
-        <header class="navbar">
-            <div class="nav-brand">
-                <div class="logo-box">TK</div>
-                <div>
-                    <div class="brand-title">Tanakrit Dormitory</div>
-                    <div class="brand-sub">หอพักชายธนกฤษฎ์ นครศรีธรรมราช</div>
+        
+        <!-- Prisma Hero Section (Cinematic Video, Noise Overlay & Floating Glass Navbar) -->
+        <section class="prisma-hero-wrapper">
+            <div class="prisma-hero-container">
+                <!-- Background Video -->
+                <video
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    class="prisma-bg-video"
+                    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4"
+                ></video>
+
+                <!-- Noise overlay -->
+                <div class="noise-overlay"></div>
+
+                <!-- Gradient overlay -->
+                <div class="gradient-overlay"></div>
+
+                <!-- Floating Navbar Pill -->
+                <nav class="prisma-navbar">
+                    <div class="prisma-nav-inner">
+                        <a href="#" class="prisma-brand">
+                            <span class="logo-box">TK</span>
+                            <span class="brand-text">Tanakrit</span>
+                            <span class="brand-sub-badge">นครศรีธรรมราช</span>
+                        </a>
+                        <div class="prisma-nav-links">
+                            <a href="#rooms" class="prisma-link">3 อาคารห้องพัก</a>
+                            <a href="#features" class="prisma-link">สิ่งอำนวยความสะดวก</a>
+                            <a href="#rates" class="prisma-link">อัตราค่าเช่า</a>
+                            <a href="#contact" class="prisma-link">ติดต่อเรา</a>
+                        </div>
+                        <button class="prisma-login-btn" id="btn-toggle-login" onclick="toggleLoginModal(true)">
+                            เข้าสู่ระบบจัดการ
+                        </button>
+                    </div>
+                </nav>
+
+                <!-- Hero Content -->
+                <div class="prisma-hero-content">
+                    <div class="prisma-hero-grid">
+                        <!-- Left: Giant Typography with WordsPullUp -->
+                        <div class="prisma-left">
+                            <div class="hero-live-badge">
+                                <span class="pulse-dot"></span>
+                                หอพักชายธนกฤษฎ์ นครศรีธรรมราช (3 อาคาร 17 ห้อง)
+                            </div>
+                            <h1 class="prisma-title">
+                                <span class="word-pull-up">Tanakrit</span><span class="prisma-asterisk">*</span>
+                            </h1>
+                            <div class="prisma-hero-sub">Dormitory & Living Space</div>
+                        </div>
+
+                        <!-- Right: Story, CTA & Fast Actions -->
+                        <div class="prisma-right">
+                            <p class="prisma-desc">
+                                หอพักชายธนกฤษฎ์ — บริการห้องพักรายเดือนคุณภาพสูง 3 อาคาร (Tanakrit, KingPhetch, UnderGround) บรรยากาศเงียบสงบ เป็นส่วนตัว ปลอดภัยตลอด 24 ชั่วโมง พร้อมระบบจัดการหอพักดิจิทัล คำนวณค่าน้ำ-ค่าไฟอัตโนมัติ และสแกนจ่ายผ่าน Thai QR PromptPay
+                            </p>
+
+                            <div class="prisma-action-row">
+                                <button class="prisma-cta-btn" onclick="window.openBookingModal && window.openBookingModal()">
+                                    <span>สนใจจองห้องพักออนไลน์</span>
+                                    <span class="prisma-arrow-circle">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="arrow-svg"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                                    </span>
+                                </button>
+                                <button class="prisma-secondary-btn" onclick="toggleLoginModal(true)">
+                                    เข้าสู่ระบบผู้พักและเจ้าหน้าที่
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <nav class="nav-menu">
-                <a href="#rooms">รูปแบบห้องพัก</a>
-                <a href="#features">สิ่งอำนวยความสะดวก</a>
-                <a href="#rates">อัตราค่าบริการ</a>
-                <a href="#contact">ติดต่อเรา</a>
-                <button class="btn btn-primary" id="btn-toggle-login" onclick="toggleLoginModal(true)">
-                    เข้าสู่ระบบจัดการ
-                </button>
-            </nav>
-        </header>
 
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    ✨ หอพักสไตล์โมเดิร์น ปลอดภัย บรรยากาศเงียบสงบ หอพักชายธนกฤษฎ์ นครศรีธรรมราช
+            <!-- Live Metrics Strip (17 Rooms, 3 Buildings, Rates, 100% Online) -->
+            <div class="hero-stats-strip prisma-stats-strip">
+                <div class="hstat-item">
+                    <div class="num">17 ห้อง</div>
+                    <div class="lbl">ห้องพักทั้งหมด (3 อาคาร)</div>
                 </div>
-                <h1>ระบบบริหารจัดการหอพัก <br><span>Tanakrit Dormitory</span></h1>
-                <p>
-                    บริการห้องพักรายเดือนคุณภาพสูง พร้อมระบบดิจิทัลครบวงจร: คำนวณค่าน้ำ-ค่าไฟอัตโนมัติ 
-                    ระบบแจ้งซ่อมอุปกรณ์ด่วน ออกบิลพร้อม QR Code สแกนจ่าย และจุดรับพัสดุไปรษณีย์ที่ปลอดภัยตลอด 24 ชั่วโมง
-                </p>
-                <div class="hero-actions">
-                    <button class="btn btn-sand" onclick="window.openBookingModal && window.openBookingModal()">📝 สนใจจองห้องพักออนไลน์</button>
-                    <button class="btn btn-outline-white" onclick="document.getElementById('btn-toggle-login').click()">
-                        เข้าสู่ระบบผู้พักและเจ้าหน้าที่
-                    </button>
+                <div class="hstat-item">
+                    <div class="num">3 อาคาร</div>
+                    <div class="lbl">Tanakrit / KingPhetch / UnderGround</div>
                 </div>
-
-                <!-- Live Metrics Strip -->
-                <div class="hero-stats-strip">
-                    <div class="hstat-item">
-                        <div class="num">17 ห้อง</div>
-                        <div class="lbl">ห้องพักทั้งหมด (3 อาคาร)</div>
-                    </div>
-                    <div class="hstat-item">
-                        <div class="num">3 อาคาร</div>
-                        <div class="lbl">Tanakrit / KingPhetch / UnderGround</div>
-                    </div>
-                    <div class="hstat-item">
-                        <div class="num">800 - 1,500 ฿</div>
-                        <div class="lbl">ราคาเริ่มต้น สบายกระเป๋า</div>
-                    </div>
-                    <div class="hstat-item">
-                        <div class="num">100%</div>
-                        <div class="lbl">ระบบบริการออนไลน์</div>
-                    </div>
+                <div class="hstat-item">
+                    <div class="num">800 - 1,500 ฿</div>
+                    <div class="lbl">ราคาเริ่มต้น สบายกระเป๋า</div>
+                </div>
+                <div class="hstat-item">
+                    <div class="num">100%</div>
+                    <div class="lbl">ระบบบริการออนไลน์</div>
                 </div>
             </div>
         </section>

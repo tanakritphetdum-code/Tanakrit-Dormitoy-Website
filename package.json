@@ -8,5 +8,9 @@
     "bundle": "powershell -ExecutionPolicy Bypass -File build_bundle.ps1"
   },
   "author": "Tanakrit Phetdum",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "framer-motion": "^14.14.0",
+    "lucide-react": "^1.75.0"
+  }
 }

@@ -898,8 +898,383 @@ img, svg { display: block; max-width: 100%; }
   #printable-invoice { position: absolute; left: 0; top: 0; width: 100%; }
 }
 
+/* ==================== PRISMA HERO THEME & LAYOUT ==================== */
+.prisma-hero-wrapper {
+  padding: 12px 16px 36px;
+  background: #041415;
+  color: #E1E0CC;
+  position: relative;
+  overflow: hidden;
+}
+
+.prisma-hero-container {
+  position: relative;
+  min-height: calc(100vh - 70px);
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  border-radius: 2rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(225, 224, 204, 0.1);
+  background: #06191a;
+}
+
+.prisma-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* Noise overlay */
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.65;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.18'/%3E%3C/svg%3E");
+}
+
+/* Gradient overlay */
+.gradient-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(4, 20, 21, 0.2) 35%, rgba(4, 20, 21, 0.88) 80%, #041415 100%);
+}
+
+/* Floating Navbar */
+.prisma-navbar {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: calc(100% - 32px);
+  max-width: 1160px;
+}
+
+.prisma-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: rgba(4, 16, 17, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(225, 224, 204, 0.14);
+  border-radius: 9999px;
+  padding: 8px 18px 8px 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.prisma-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.prisma-brand .logo-box {
+  width: 38px;
+  height: 38px;
+  background: #E1E0CC;
+  color: #041415;
+  font-weight: 800;
+  font-size: 1.05rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Kanit', sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.prisma-brand .brand-text {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #E1E0CC;
+  letter-spacing: -0.02em;
+}
+
+.prisma-brand .brand-sub-badge {
+  font-size: 0.72rem;
+  color: rgba(225, 224, 204, 0.7);
+  background: rgba(225, 224, 204, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-family: 'Sarabun', sans-serif;
+}
+
+.prisma-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.prisma-link {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(225, 224, 204, 0.75);
+  text-decoration: none;
+  transition: all 0.25s ease;
+  letter-spacing: -0.01em;
+}
+
+.prisma-link:hover {
+  color: #E1E0CC;
+  text-shadow: 0 0 12px rgba(225, 224, 204, 0.5);
+}
+
+.prisma-login-btn {
+  background: rgba(225, 224, 204, 0.12);
+  color: #E1E0CC;
+  border: 1px solid rgba(225, 224, 204, 0.25);
+  border-radius: 9999px;
+  padding: 8px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Kanit', sans-serif;
+}
+
+.prisma-login-btn:hover {
+  background: #E1E0CC;
+  color: #041415;
+  box-shadow: 0 4px 20px rgba(225, 224, 204, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Hero Content */
+.prisma-hero-content {
+  position: relative;
+  z-index: 10;
+  padding: 130px 48px 48px;
+  width: 100%;
+}
+
+.prisma-hero-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  align-items: flex-end;
+  gap: 40px;
+}
+
+.hero-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(225, 224, 204, 0.08);
+  border: 1px solid rgba(225, 224, 204, 0.2);
+  color: #E1E0CC;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--emerald);
+  box-shadow: 0 0 10px var(--emerald);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.35); }
+}
+
+.prisma-title {
+  font-family: 'Kanit', sans-serif;
+  font-weight: 600;
+  line-height: 0.84;
+  letter-spacing: -0.06em;
+  font-size: clamp(4.6rem, 15vw, 13.5rem);
+  color: #E1E0CC;
+  margin: 0;
+  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-start;
+}
+
+.prisma-asterisk {
+  font-size: 0.32em;
+  color: #E1E0CC;
+  margin-left: 2px;
+  opacity: 0.9;
+}
+
+.prisma-hero-sub {
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: rgba(225, 224, 204, 0.68);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 14px;
+  font-family: 'Kanit', sans-serif;
+}
+
+.prisma-right {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-bottom: 6px;
+}
+
+.prisma-desc {
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: rgba(225, 224, 204, 0.82);
+  margin: 0;
+  max-width: 540px;
+}
+
+.prisma-action-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* Prisma CTA Pill Button */
+.prisma-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #E1E0CC;
+  color: #041415;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 600;
+  font-size: 0.96rem;
+  border-radius: 9999px;
+  padding: 5px 6px 5px 22px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+.prisma-cta-btn:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(225, 224, 204, 0.35);
+}
+
+.prisma-arrow-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #041415;
+  color: #E1E0CC;
+  transition: transform 0.3s ease;
+}
+
+.prisma-cta-btn:hover .prisma-arrow-circle {
+  transform: scale(1.1) rotate(-15deg);
+}
+
+.arrow-svg {
+  width: 18px;
+  height: 18px;
+}
+
+.prisma-secondary-btn {
+  background: rgba(225, 224, 204, 0.08);
+  color: #E1E0CC;
+  border: 1px solid rgba(225, 224, 204, 0.25);
+  font-family: 'Kanit', sans-serif;
+  font-weight: 500;
+  font-size: 0.92rem;
+  border-radius: 9999px;
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.prisma-secondary-btn:hover {
+  background: rgba(225, 224, 204, 0.18);
+  border-color: #E1E0CC;
+  color: #fff;
+}
+
+/* WordsPullUp animation */
+@keyframes wordsPullUp {
+  0% {
+    transform: translateY(32px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.word-pull-up {
+  display: inline-block;
+  animation: wordsPullUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.prisma-stats-strip {
+  margin-top: 24px !important;
+  background: rgba(6, 24, 25, 0.85) !important;
+  border: 1px solid rgba(225, 224, 204, 0.12) !important;
+  backdrop-filter: blur(14px);
+  border-radius: 20px !important;
+}
+
+.prisma-stats-strip .hstat-item .num {
+  color: #E1E0CC !important;
+}
+
+.prisma-stats-strip .hstat-item .lbl {
+  color: rgba(225, 224, 204, 0.7) !important;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 900px) {
+  .prisma-hero-wrapper {
+    padding: 8px 10px 24px;
+  }
+  .prisma-hero-container {
+    border-radius: 1.25rem;
+    min-height: calc(100vh - 40px);
+  }
+  .prisma-hero-content {
+    padding: 85px 20px 28px;
+  }
+  .prisma-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .prisma-title {
+    font-size: clamp(3.6rem, 18vw, 7.5rem);
+  }
+  .prisma-nav-links {
+    display: none;
+  }
+  .prisma-nav-inner {
+    padding: 6px 14px 6px 10px;
+  }
   .navbar { padding: 14px 20px; }
   .nav-menu a:not(#btn-toggle-login) { display: none; }
   .hero h1 { font-size: 2.3rem; }
