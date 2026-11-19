@@ -7,7 +7,7 @@
     <title>Tanakrit Dormitory — หอพักชายธนกฤษฎ์ นครศรีธรรมราช</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
 </head>
 
@@ -404,40 +404,154 @@
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer class="landing-footer">
-            <div class="footer-grid">
-                <div>
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-                        <div class="logo-box">TK</div>
-                        <span style="font-family:'Kanit'; font-weight:700; font-size:1.2rem; color:white;">Tanakrit Dormitory</span>
-                    </div>
-                    <p style="font-size:0.9rem; line-height:1.6; max-width:380px;">
-                        หอพักชายธนกฤษฎ์ นครศรีธรรมราช มุ่งมั่นให้บริการที่พักอาศัยที่ปลอดภัย สะอาด 
-                        และระบบบริหารจัดการที่โปร่งใส ทันสมัยเพื่อชีวิตความเป็นอยู่ที่ดีที่สุด
-                    </p>
-                </div>
-                <div>
-                    <h4 style="color:white; margin-bottom:14px;">เมนูด่วน</h4>
-                    <div style="display:flex; flex-direction:column; gap:8px; font-size:0.9rem;">
-                        <a href="#rooms">รูปแบบห้องพัก</a>
-                        <a href="#features">สิ่งอำนวยความสะดวก</a>
-                        <a href="#rates">อัตราค่าบริการ</a>
-                        <a href="#contact">ติดต่อเรา</a>
-                    </div>
-                </div>
-                <div>
-                    <h4 style="color:white; margin-bottom:14px;">ระบบสำหรับผู้พัก</h4>
-                    <div style="display:flex; flex-direction:column; gap:8px; font-size:0.9rem;">
-                        <a href="#" onclick="toggleLoginModal(true)">เข้าสู่ระบบจัดการ</a>
-                        <a href="#" onclick="toggleLoginModal(true)">ตรวจสอบค่าน้ำ-ค่าไฟ</a>
-                        <a href="#" onclick="toggleLoginModal(true)">แจ้งซ่อมอุปกรณ์</a>
-                        <a href="#" onclick="toggleLoginModal(true)">ตรวจสอบพัสดุ</a>
-                    </div>
+        <!-- Meadow Rise Footer — Closing Call-To-Action & Site Footer -->
+        <footer id="meadow-rise-footer" class="mrf-root" style="min-height:980px; --mrf-hero:clamp(460px, 58svh, 640px); --mrf-ground:#253019; --mrf-ink:#11140d; --mrf-sub:#3b4234; --mrf-pill:#ffffff; --mrf-pill-ink:#11140d; --mrf-text:#eef1e6; --mrf-muted:#a9b49c; --mrf-line:rgba(238, 241, 230, 0.16); --mrf-n:4; --mrf-max:1240px; --mrf-sans:'Kanit', 'Sarabun', sans-serif; --mrf-serif:'Instrument Serif', 'Kanit', Georgia, serif;">
+            <!-- Canvas Scene -->
+            <div class="mrf-scene">
+                <canvas aria-hidden="true"></canvas>
+            </div>
+
+            <!-- Hero Headline & CTA -->
+            <div class="mrf-hero">
+                <h2 class="mrf-h">
+                    <span class="mrf-line">
+                        <span class="mrf-w"><span class="mrf-wi" style="--d:520;">เริ่มต้นชีวิตที่</span></span>
+                        <span class="mrf-w"><span class="mrf-wi" style="--d:595;">สงบและอบอุ่นกับ</span></span>
+                    </span>
+                    <span class="mrf-line">
+                        <span class="mrf-w mrf-acc"><span class="mrf-wi" style="--d:900;">หอพักชายธนกฤษฎ์</span></span>
+                        <span class="mrf-w"><span class="mrf-wi" style="--d:670;">วันนี้</span></span>
+                    </span>
+                </h2>
+                <p class="mrf-sub mrf-r" style="--d:1150;">
+                    บริการห้องพักรายเดือนคุณภาพสูง 3 อาคาร บรรยากาศเงียบสงบ เป็นส่วนตัว ปลอดภัยตลอด 24 ชั่วโมง พร้อมระบบจัดการหอพักดิจิทัล
+                </p>
+                <div class="mrf-cta-wrap mrf-r" style="--d:1300;">
+                    <a class="mrf-cta" href="javascript:void(0)" onclick="window.openBookingModal && window.openBookingModal()">
+                        <span>จองห้องพักทันที</span>
+                        <span class="mrf-cta-arrow">
+                            <svg class="mrf-a1" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <svg class="mrf-a2" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </span>
+                    </a>
                 </div>
             </div>
-            <div class="footer-bottom">
-                © 2026 Tanakrit Dormitory. All rights reserved. หอพักชายธนกฤษฎ์ นครศรีธรรมราช
+
+            <!-- Footer Ground & Links -->
+            <div class="mrf-body">
+                <!-- Swaying Wildflowers Line Drawing -->
+                <svg class="mrf-botany" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax meet" aria-hidden="true"></svg>
+
+                <div class="mrf-wrap">
+                    <div class="mrf-grid">
+                        <!-- Brand Info & Newsletter -->
+                        <div class="mrf-brand">
+                            <a class="mrf-logo mrf-r" href="#" style="--d:1250;">
+                                <svg class="mrf-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+                                    <circle class="mrf-draw" cx="16" cy="16" r="14.6" pathLength="1" style="--d:1250;" />
+                                    <g class="mrf-petals">
+                                        <ellipse class="mrf-draw" cx="16" cy="10.4" rx="2.9" ry="5.6" pathLength="1" transform="rotate(0 16 16)" style="--d:1330;" />
+                                        <ellipse class="mrf-draw" cx="16" cy="10.4" rx="2.9" ry="5.6" pathLength="1" transform="rotate(45 16 16)" style="--d:1385;" />
+                                        <ellipse class="mrf-draw" cx="16" cy="10.4" rx="2.9" ry="5.6" pathLength="1" transform="rotate(90 16 16)" style="--d:1440;" />
+                                        <ellipse class="mrf-draw" cx="16" cy="10.4" rx="2.9" ry="5.6" pathLength="1" transform="rotate(135 16 16)" style="--d:1495;" />
+                                        <ellipse class="mrf-draw" cx="16" cy="10.4" rx="2.9" ry="5.6" pathLength="1" transform="rotate(180 16 16)" style="--d:1550;" />
+                                        <ellipse class="mrf-draw" cx="16" cy="10.4" rx="2.9" ry="5.6" pathLength="1" transform="rotate(225 16 16)" style="--d:1605;" />
+                                        <ellipse class="mrf-draw" cx="16" cy="10.4" rx="2.9" ry="5.6" pathLength="1" transform="rotate(270 16 16)" style="--d:1660;" />
+                                        <ellipse class="mrf-draw" cx="16" cy="10.4" rx="2.9" ry="5.6" pathLength="1" transform="rotate(315 16 16)" style="--d:1715;" />
+                                    </g>
+                                    <circle class="mrf-draw" cx="16" cy="16" r="2.2" pathLength="1" style="--d:1800;" />
+                                </svg>
+                                <span>Tanakrit Dormitory</span>
+                            </a>
+                            <p class="mrf-tag mrf-r" style="--d:1380;">
+                                หอพักชายธนกฤษฎ์ นครศรีธรรมราช (3 อาคาร 17 ห้อง) บริการห้องพักรายเดือนคุณภาพ บรรยากาศร่มรื่น เงียบสงบ ปลอดภัย
+                            </p>
+                            <form class="mrf-form mrf-r" style="--d:1500;" noValidate>
+                                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                                    <rect x="3.5" y="5.5" width="17" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+                                    <path d="M4.5 7.5l7.5 5.5 7.5-5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                                </svg>
+                                <input class="mrf-input" type="email" placeholder="กรอกอีเมลเพื่อรับแจ้งเตือนห้องว่าง" />
+                                <button class="mrf-send" type="submit" aria-label="Subscribe">
+                                    <svg class="mrf-a1" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    <svg class="mrf-a2" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    <svg class="mrf-spin" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 2.2a5.8 5.8 0 1 1-5.6 4.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+                                    <svg class="mrf-check" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.6" pathLength="1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                </button>
+                                <p class="mrf-msg" data-show="false"></p>
+                            </form>
+                        </div>
+
+                        <!-- Link Columns -->
+                        <nav class="mrf-cols" aria-label="Footer">
+                            <div class="mrf-col">
+                                <h3 class="mrf-r" style="--d:1300;">ห้องพัก 3 อาคาร</h3>
+                                <ul>
+                                    <li class="mrf-r" style="--d:1380;"><a class="mrf-link" href="#rooms">อาคาร ธนกฤษฎ์ (9 ห้อง)</a></li>
+                                    <li class="mrf-r" style="--d:1435;"><a class="mrf-link" href="#rooms">อาคาร กิ่งเพชร (5 ห้อง)</a></li>
+                                    <li class="mrf-r" style="--d:1490;"><a class="mrf-link" href="#rooms">อาคารใต้บ้าน (3 ห้อง)</a></li>
+                                    <li class="mrf-r" style="--d:1545;"><a class="mrf-link" href="#rates">คำนวณค่าแรกเข้าพัก</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="mrf-col">
+                                <h3 class="mrf-r" style="--d:1390;">สิ่งอำนวยความสะดวก</h3>
+                                <ul>
+                                    <li class="mrf-r" style="--d:1470;"><a class="mrf-link" href="#features">ตู้ซักผ้าหยอดเหรียญ 24 ชม.</a></li>
+                                    <li class="mrf-r" style="--d:1525;"><a class="mrf-link" href="#features">ตู้กดน้ำดื่มหยอดเหรียญ</a></li>
+                                    <li class="mrf-r" style="--d:1580;"><a class="mrf-link" href="#features">ศาลาส่วนกลางพักผ่อน</a></li>
+                                    <li class="mrf-r" style="--d:1635;"><a class="mrf-link" href="#features">บริการ Wi-Fi ความเร็วสูง</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="mrf-col">
+                                <h3 class="mrf-r" style="--d:1480;">ติดต่อ & ที่ตั้ง</h3>
+                                <ul>
+                                    <li class="mrf-r" style="--d:1560;"><a class="mrf-link" href="tel:075355289">📞 075-355-289</a></li>
+                                    <li class="mrf-r" style="--d:1615;"><a class="mrf-link" href="tel:0895900478">📱 089-590-0478</a></li>
+                                    <li class="mrf-r" style="--d:1670;"><a class="mrf-link" href="https://maps.app.goo.gl/AtzLYkyYmNba4XBh8" target="_blank" rel="noopener noreferrer">📍 แผนที่ Google Maps ↗</a></li>
+                                    <li class="mrf-r" style="--d:1725;"><a class="mrf-link" href="javascript:void(0)" onclick="toggleLoginModal(true)">🔐 เข้าสู่ระบบจัดการ</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="mrf-col">
+                                <h3 class="mrf-r" style="--d:1570;">ช่องทางติดต่อ</h3>
+                                <ul class="mrf-social">
+                                    <li class="mrf-r" style="--d:1650;">
+                                        <a class="mrf-icon" href="#contact" aria-label="Line">
+                                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 5.82 2 10.53c0 2.97 1.83 5.58 4.63 7.08-.2.74-.75 2.68-.86 3.09-.13.5.18.5.38.36.16-.11 2.21-1.5 3.12-2.12.87.16 1.78.24 2.73.24 5.52 0 10-3.82 10-8.53S17.52 2 12 2z"/></svg>
+                                        </a>
+                                    </li>
+                                    <li class="mrf-r" style="--d:1710;">
+                                        <a class="mrf-icon" href="https://maps.app.goo.gl/AtzLYkyYmNba4XBh8" target="_blank" rel="noopener noreferrer" aria-label="Google Maps">
+                                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                                        </a>
+                                    </li>
+                                    <li class="mrf-r" style="--d:1770;">
+                                        <a class="mrf-icon" href="tel:075355289" aria-label="Phone">
+                                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+
+                    <div class="mrf-spacer"></div>
+
+                    <!-- Bottom Bar -->
+                    <div class="mrf-bottom">
+                        <span class="mrf-rule" aria-hidden="true"></span>
+                        <p class="mrf-r" style="--d:1700;">
+                            © 2026 Tanakrit Dormitory. All rights reserved. หอพักชายธนกฤษฎ์ นครศรีธรรมราช
+                        </p>
+                        <ul class="mrf-legal mrf-r" style="--d:1800;">
+                            <li><a class="mrf-link" href="#rooms">ผังห้องพัก</a></li>
+                            <li><a class="mrf-link" href="#contact">ติดต่อสอบถาม</a></li>
+                            <li><a class="mrf-link" href="javascript:void(0)" onclick="toggleLoginModal(true)">ระบบผู้ดูแลหอพัก</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
@@ -545,6 +659,8 @@
 
     <!-- โหลดสคริปต์หลักของระบบ (รองรับทั้ง file:// และ http://) -->
     <script src="./js/bundle.js"></script>
+    <!-- Meadow Rise Footer Script -->
+    <script src="./js/meadow-footer.js"></script>
 
 </body>
 </html>
