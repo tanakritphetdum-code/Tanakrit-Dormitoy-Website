@@ -890,7 +890,7 @@ export function viewTenantDetails(id) {
         <button type="button" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 16px; height: 38px; font-size: 0.80rem;" onclick="window.closeAppModal()">
           ปิดหน้าต่าง
         </button>
-        <button type="button" class="smoky-pill-btn" style="width: auto; border-radius: 9999px; padding: 0 18px; height: 38px; background: #3B82F6; color: #ffffff; font-size: 0.80rem; font-weight: 600;" id="btn-modal-edit-now">
+        <button type="button" class="smoky-round-glass-btn btn-primary" style="width: auto; border-radius: 9999px; padding: 0 18px; height: 38px; background: #2563EB !important; color: #ffffff !important; font-size: 0.80rem; font-weight: 600; border: none; cursor: pointer;" id="btn-modal-edit-now">
           ✏️ แก้ไขข้อมูล
         </button>
       </div>
@@ -1006,7 +1006,7 @@ export function openEditTenantModal(tenant) {
       <button type="button" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 16px; height: 38px; font-size: 0.80rem;" onclick="window.closeAppModal()">
         ยกเลิก
       </button>
-      <button type="button" class="smoky-pill-btn" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #3B82F6; color: #ffffff; font-size: 0.80rem; font-weight: 600;" id="btn-submit-edit-tenant">
+      <button type="button" class="smoky-round-glass-btn btn-primary" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #2563EB !important; color: #ffffff !important; font-size: 0.82rem; font-weight: 600; border: none; cursor: pointer;" id="btn-submit-edit-tenant">
         บันทึกการแก้ไข
       </button>
     </div>
@@ -1188,7 +1188,7 @@ export function openAddTenantModal() {
       <button type="button" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 16px; height: 38px; font-size: 0.80rem;" onclick="window.closeAppModal()">
         ยกเลิก
       </button>
-      <button type="button" class="smoky-pill-btn" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #3B82F6; color: #ffffff; font-size: 0.80rem; font-weight: 600;" id="btn-submit-add-tenant">
+      <button type="button" class="smoky-round-glass-btn btn-primary" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #2563EB !important; color: #ffffff !important; font-size: 0.82rem; font-weight: 600; border: none; cursor: pointer;" id="btn-submit-add-tenant">
         + ยืนยันการลงทะเบียน
       </button>
     </div>

@@ -2953,7 +2953,7 @@ img, svg { display: block; max-width: 100%; }
   transform: rotate(35deg);
 }
 
-/* Light Mode Styles */
+/* Light Mode Styles - Premium Frosted Glass (Glassmorphism) */
 .theme-light.smoky-dashboard-root,
 .theme-light .smoky-dashboard-root {
   background: #EEF2F6;
@@ -2961,30 +2961,43 @@ img, svg { display: block; max-width: 100%; }
 }
 
 .theme-light .smoky-bg-underlay {
-  background-image: radial-gradient(circle at 50% 25%, rgba(219, 234, 254, 0.75) 0%, rgba(238, 242, 246, 0.98) 75%),
-    url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80');
-  opacity: 0.82;
+  background-image: 
+    radial-gradient(circle at 12% 18%, rgba(191, 219, 254, 0.75) 0%, transparent 45%),
+    radial-gradient(circle at 88% 15%, rgba(199, 210, 254, 0.7) 0%, transparent 40%),
+    radial-gradient(circle at 50% 55%, rgba(209, 250, 229, 0.65) 0%, transparent 50%),
+    radial-gradient(circle at 20% 85%, rgba(254, 215, 170, 0.55) 0%, transparent 45%),
+    radial-gradient(circle at 82% 82%, rgba(251, 207, 232, 0.55) 0%, transparent 45%),
+    linear-gradient(135deg, #EEF2F6 0%, #E2E8F0 100%);
+  opacity: 0.95;
   filter: blur(35px);
 }
 
 .theme-light .smoky-vignette-overlay {
-  background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.3) 0%, rgba(238, 242, 246, 0.85) 85%);
+  background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.2) 0%, rgba(238, 242, 246, 0.7) 85%);
 }
 
 .theme-light .smoky-app-shell {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
+  background: rgba(255, 255, 255, 0.68) !important;
+  backdrop-filter: blur(30px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.05), inset 0 1px 1px rgba(255, 255, 255, 1) !important;
 }
 
 .theme-light .smoky-sidebar {
-  background: rgba(255, 255, 255, 0.85);
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: inset -1px 0 0 rgba(226, 232, 240, 0.5) !important;
 }
 
 .theme-light .smoky-capsule-nav {
-  background: rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.07);
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
 }
 
 .theme-light .smoky-nav-btn {
@@ -2992,18 +3005,22 @@ img, svg { display: block; max-width: 100%; }
 }
 .theme-light .smoky-nav-btn:hover {
   color: #0F172A;
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .theme-light .smoky-nav-btn.active {
   color: #FFFFFF;
-  background: #3B82F6;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
-  border: 1px solid rgba(59, 130, 246, 0.5);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
 }
 
 .theme-light .smoky-topbar {
-  background: rgba(255, 255, 255, 0.85);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: inset 0 -1px 0 rgba(226, 232, 240, 0.5) !important;
 }
 
 .theme-light .smoky-tab {
@@ -3017,7 +3034,7 @@ img, svg { display: block; max-width: 100%; }
   font-weight: 700;
 }
 .theme-light .smoky-tab.active .tab-indicator {
-  background: #3B82F6;
+  background: #2563EB;
 }
 
 .theme-light .smoky-user-name {
@@ -3028,16 +3045,23 @@ img, svg { display: block; max-width: 100%; }
 }
 
 .theme-light .smoky-card {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.05),
+              0 2px 8px -2px rgba(15, 23, 42, 0.03),
+              inset 0 1px 1px rgba(255, 255, 255, 1) !important;
   color: #0F172A;
 }
 
 .theme-light .smoky-tile {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  background: rgba(255, 255, 255, 0.68) !important;
+  backdrop-filter: blur(18px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(170%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04), 
+              inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
 }
 
 .theme-light .smoky-meta-label {
@@ -3056,58 +3080,68 @@ img, svg { display: block; max-width: 100%; }
 }
 
 .theme-light .smoky-table-wrap {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04), 
+              inset 0 1px 1px rgba(255, 255, 255, 1) !important;
 }
 .theme-light .smoky-table th {
   color: #475569;
-  background: rgba(241, 245, 249, 0.85);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(241, 245, 249, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 .theme-light .smoky-table td {
   color: #0F172A;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
 }
 .theme-light .smoky-table tr:hover td {
-  background: rgba(241, 245, 249, 0.7);
+  background: rgba(241, 245, 249, 0.65) !important;
 }
 
 .theme-light .smoky-glass-input,
-.theme-light .smoky-search-input {
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  color: #0F172A;
+.theme-light .smoky-search-input,
+.theme-light .smoky-glass-select {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+  color: #0F172A !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
 .theme-light .smoky-glass-input::placeholder,
 .theme-light .smoky-search-input::placeholder {
   color: #94A3B8;
 }
 .theme-light .smoky-glass-input:focus,
-.theme-light .smoky-search-input:focus {
-  border-color: #3B82F6;
-  background: #FFFFFF;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-.theme-light .smoky-glass-select {
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  color: #0F172A;
+.theme-light .smoky-search-input:focus,
+.theme-light .smoky-glass-select:focus {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2), inset 0 1px 2px rgba(15, 23, 42, 0.04) !important;
 }
 
 .theme-light .smoky-round-glass-btn {
-  background: rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  color: #334155;
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  color: #334155 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
 }
 .theme-light .smoky-round-glass-btn:hover {
-  background: rgba(0, 0, 0, 0.08);
-  color: #0F172A;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0F172A !important;
+  border-color: rgba(203, 213, 225, 0.9) !important;
 }
 
 .theme-light .smoky-seg-control {
-  background: rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.07);
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
 }
 .theme-light .smoky-seg-btn {
   color: #64748B;
@@ -3116,9 +3150,9 @@ img, svg { display: block; max-width: 100%; }
   color: #0F172A;
 }
 .theme-light .smoky-seg-btn.active {
-  background: #FFFFFF;
-  color: #0F172A;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 .theme-light .smoky-tooltip {
@@ -3136,13 +3170,17 @@ img, svg { display: block; max-width: 100%; }
 /* Topbar right items & menu toggle in light mode */
 .theme-light #btn-sidebar-toggle {
   color: #0F172A !important;
-  background: rgba(0, 0, 0, 0.06) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
 }
 
-.theme-light .smoky-topbar-right button:not(#btn-theme-toggle) {
+.theme-light .smoky-topbar-right button:not(#btn-theme-toggle):not(.btn-primary) {
   color: #334155 !important;
-  background: rgba(0, 0, 0, 0.05) !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
 }
 
 .theme-light .smoky-topbar-right button span {
@@ -3151,52 +3189,100 @@ img, svg { display: block; max-width: 100%; }
 
 /* Room Cards in Light Mode */
 .theme-light .smoky-room-card {
-  background: #FFFFFF !important;
-  border: 1px solid #E2E8F0 !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04), 
+              inset 0 1px 1px rgba(255, 255, 255, 1) !important;
 }
 .theme-light .smoky-room-card:hover {
-  background: #FFFFFF !important;
-  border-color: #CBD5E1 !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.12), 
+              inset 0 1px 1px rgba(255, 255, 255, 1) !important;
+  transform: translateY(-2px);
 }
 
 /* Light Mode Swipe Container & Audio Waveform */
 .theme-light .smoky-swipe-container {
-  background: #F1F5F9 !important;
-  border-color: #CBD5E1 !important;
+  background: rgba(241, 245, 249, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
 }
 .theme-light .smoky-swipe-track-text {
   color: #64748B !important;
 }
 .theme-light .smoky-waveform-box {
-  background: #F8FAFC !important;
-  border: 1px solid #E2E8F0 !important;
+  background: rgba(248, 250, 252, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
 }
 .theme-light .smoky-wave-bar {
   background: #CBD5E1 !important;
 }
 .theme-light .smoky-wave-bar.played {
-  background: #3B82F6 !important;
+  background: #2563EB !important;
 }
 
 /* Radial Gauge Track & Chips in Light Mode */
 .theme-light .smoky-ring-box circle:first-child {
   stroke: #E2E8F0 !important;
 }
-.theme-light .smoky-pill-btn {
-  background: #FFFFFF !important;
+
+/* Filter Pill Buttons in Light Mode */
+.theme-light .smoky-pill-btn:not(.btn-primary):not([style*="background: #3B82F6"]):not([style*="background:#3B82F6"]):not([style*="background: #2563EB"]):not([style*="background:#2563EB"]) {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
+  color: #1E293B !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
+}
+.theme-light .smoky-pill-btn:not(.btn-primary):hover {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
   color: #0F172A !important;
-  border: 1px solid #CBD5E1 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
-.theme-light .smoky-pill-btn:hover {
-  background: #F8FAFC !important;
-  border-color: #94A3B8 !important;
+
+/* Primary Action Buttons across Light Mode */
+.theme-light .btn-primary,
+.theme-light .smoky-pill-btn.btn-primary,
+.theme-light button.btn-primary,
+.theme-light button[style*="background: #3B82F6"],
+.theme-light button[style*="background:#3B82F6"],
+.theme-light button[style*="background: #2563EB"],
+.theme-light button[style*="background:#2563EB"],
+.theme-light #btn-submit-edit-tenant,
+.theme-light #btn-submit-add-tenant,
+.theme-light #btn-modal-edit-now {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
+.theme-light .btn-primary:hover,
+.theme-light button[style*="background: #3B82F6"]:hover,
+.theme-light button[style*="background: #2563EB"]:hover,
+.theme-light #btn-submit-edit-tenant:hover,
+.theme-light #btn-submit-add-tenant:hover,
+.theme-light #btn-modal-edit-now:hover {
+  background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%) !important;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+
 .theme-light .smoky-chip {
-  background: #F1F5F9 !important;
-  border: 1px solid #E2E8F0 !important;
+  background: rgba(241, 245, 249, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
   color: #64748B !important;
 }
 .theme-light .smoky-chip .chip-val {
@@ -3204,8 +3290,8 @@ img, svg { display: block; max-width: 100%; }
 }
 .theme-light .smoky-chip.active {
   background: #FFFFFF !important;
-  border-color: #3B82F6 !important;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15) !important;
+  border-color: #2563EB !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15) !important;
 }
 .theme-light .smoky-chip.active .chip-lbl {
   color: #3B82F6 !important;
@@ -3426,16 +3512,25 @@ body:not(.theme-light) #app-modal-backdrop label {
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
-/* Light Mode Modals (App Backdrop) */
+/* Light Mode Modals (App Backdrop) - Frosted Glass */
+.theme-light #app-modal-backdrop {
+  background: rgba(15, 23, 42, 0.35) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+}
 .theme-light #app-modal-backdrop .modal-dialog {
-  background: #FFFFFF !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(32px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.16), 
+              inset 0 1px 1px rgba(255, 255, 255, 1) !important;
   color: #0F172A !important;
-  border: 1px solid #E2E8F0 !important;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.16) !important;
 }
 .theme-light #app-modal-backdrop .modal-header {
-  border-bottom: 1px solid #E2E8F0 !important;
-  background: #F8FAFC !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7) !important;
+  background: rgba(248, 250, 252, 0.65) !important;
+  backdrop-filter: blur(16px) !important;
 }
 .theme-light #app-modal-backdrop .modal-title {
   color: #0F172A !important;
@@ -3452,15 +3547,18 @@ body:not(.theme-light) #app-modal-backdrop label {
   color: #0F172A !important;
 }
 .theme-light #app-modal-backdrop .modal-footer {
-  border-top: 1px solid #E2E8F0 !important;
-  background: #F8FAFC !important;
+  border-top: 1px solid rgba(226, 232, 240, 0.7) !important;
+  background: rgba(248, 250, 252, 0.65) !important;
+  backdrop-filter: blur(16px) !important;
 }
 .theme-light #app-modal-backdrop input,
 .theme-light #app-modal-backdrop select,
 .theme-light #app-modal-backdrop textarea {
-  background: #FFFFFF !important;
-  border: 1px solid #CBD5E1 !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
   color: #0F172A !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04) !important;
 }
 .theme-light #app-modal-backdrop label,
 .theme-light #app-modal-backdrop .smoky-form-label {
@@ -3468,10 +3566,13 @@ body:not(.theme-light) #app-modal-backdrop label {
   font-weight: 600 !important;
 }
 
-/* Modal Inner Components - Light Mode */
+/* Modal Inner Components - Light Mode Frosted Glass */
 .theme-light #app-modal-backdrop .smoky-modal-card-header {
-  background: #F8FAFC !important;
-  border: 1px solid #E2E8F0 !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03), inset 0 1px 1px rgba(255, 255, 255, 1) !important;
 }
 .theme-light #app-modal-backdrop .smoky-modal-card-title {
   color: #0F172A !important;
@@ -3483,9 +3584,11 @@ body:not(.theme-light) #app-modal-backdrop label {
   color: #0F172A !important;
 }
 .theme-light #app-modal-backdrop .smoky-modal-block {
-  background: #F8FAFC !important;
-  border: 1px solid #E2E8F0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03), inset 0 1px 1px rgba(255, 255, 255, 1) !important;
 }
 .theme-light #app-modal-backdrop .smoky-modal-label {
   color: #475569 !important;
@@ -3501,8 +3604,9 @@ body:not(.theme-light) #app-modal-backdrop label {
   color: #64748B !important;
 }
 .theme-light #app-modal-backdrop .smoky-modal-notes {
-  background: #F1F5F9 !important;
-  border: 1px dashed #CBD5E1 !important;
+  background: rgba(241, 245, 249, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px dashed rgba(203, 213, 225, 0.9) !important;
   color: #334155 !important;
 }
 .theme-light #app-modal-backdrop .btn-modal-phone {
@@ -3543,13 +3647,13 @@ body:not(.theme-light) #app-modal-backdrop label {
 
 .theme-light #app-modal-backdrop div[style*="background: rgba(255"],
 .theme-light #app-modal-backdrop div[style*="background:rgba(255"] {
-  background: #F8FAFC !important;
-  border-color: #E2E8F0 !important;
+  background: rgba(255, 255, 255, 0.65) !important;
+  border-color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .theme-light #app-modal-backdrop div[style*="border: 1px dashed"],
 .theme-light #app-modal-backdrop div[style*="border:1px dashed"] {
-  background: #F8FAFC !important;
+  background: rgba(248, 250, 252, 0.75) !important;
   border-color: #CBD5E1 !important;
   color: #334155 !important;
 }
@@ -3579,21 +3683,53 @@ body:not(.theme-light) #app-modal-backdrop label {
 }
 
 /* Buttons in Modal Light Mode */
-.theme-light #app-modal-backdrop .smoky-round-glass-btn:not(.btn-modal-phone) {
-  background: #F1F5F9 !important;
+.theme-light #app-modal-backdrop .smoky-round-glass-btn:not(.btn-modal-phone):not(.btn-primary):not([style*="background: #2563EB"]):not([style*="background: #3B82F6"]) {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
   color: #334155 !important;
-  border: 1px solid #CBD5E1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
 }
-.theme-light #app-modal-backdrop .smoky-round-glass-btn:not(.btn-modal-phone):hover {
-  background: #E2E8F0 !important;
+.theme-light #app-modal-backdrop .smoky-round-glass-btn:not(.btn-modal-phone):not(.btn-primary):hover {
+  background: rgba(255, 255, 255, 0.95) !important;
   color: #0F172A !important;
 }
+
+/* Primary Modal Action Buttons - High Contrast Blue with Crisp White Text */
+.theme-light #app-modal-backdrop button#btn-submit-edit-tenant,
+.theme-light #app-modal-backdrop button#btn-submit-add-tenant,
+.theme-light #app-modal-backdrop button#btn-modal-edit-now,
+.theme-light #app-modal-backdrop button.btn-primary,
 .theme-light #app-modal-backdrop button[style*="background: #3B82F6"],
 .theme-light #app-modal-backdrop button[style*="background:#3B82F6"],
-.theme-light #app-modal-backdrop button[style*="background: #10B981"],
-.theme-light #app-modal-backdrop button[style*="background:#10B981"],
+.theme-light #app-modal-backdrop button[style*="background: #2563EB"],
+.theme-light #app-modal-backdrop button[style*="background:#2563EB"],
 .theme-light #app-modal-backdrop .smoky-pill-btn[style*="background: #3B82F6"],
 .theme-light #app-modal-backdrop .smoky-pill-btn[style*="background:#3B82F6"] {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.theme-light #app-modal-backdrop button#btn-submit-edit-tenant:hover,
+.theme-light #app-modal-backdrop button#btn-submit-add-tenant:hover,
+.theme-light #app-modal-backdrop button#btn-modal-edit-now:hover,
+.theme-light #app-modal-backdrop button.btn-primary:hover {
+  background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%) !important;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px);
+}
+.theme-light #app-modal-backdrop button#btn-submit-edit-tenant *,
+.theme-light #app-modal-backdrop button#btn-submit-add-tenant *,
+.theme-light #app-modal-backdrop button#btn-modal-edit-now *,
+.theme-light #app-modal-backdrop button.btn-primary * {
   color: #FFFFFF !important;
 }
 
