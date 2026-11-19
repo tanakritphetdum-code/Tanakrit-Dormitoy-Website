@@ -32,6 +32,33 @@
                 modal.classList.add('hidden');
             }
         }
+
+        function openBackendSystem() {
+            let user = null;
+            try {
+                const saved = localStorage.getItem('tanakrit_current_user') || localStorage.getItem('kp_current_user');
+                if (saved) user = JSON.parse(saved);
+            } catch (e) {}
+            if (user) {
+                document.getElementById('page-landing').classList.add('hidden');
+                document.getElementById('page-app').classList.remove('hidden');
+                if (window.setupSidebarMenu) window.setupSidebarMenu(user);
+                if (window.switchView) window.switchView('dashboard');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                toggleLoginModal(true);
+            }
+        }
+
+        function returnToLandingPage() {
+            const pageApp = document.getElementById('page-app');
+            const pageLanding = document.getElementById('page-landing');
+            if (pageApp) pageApp.classList.add('hidden');
+            if (pageLanding) pageLanding.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        window.openBackendSystem = openBackendSystem;
+        window.returnToLandingPage = returnToLandingPage;
     </script>
 
     <!-- Toast Notification Container -->
@@ -62,7 +89,7 @@
                 <!-- Gradient overlay -->
                 <div class="gradient-overlay"></div>
 
-                <!-- Floating Navbar Pill -->
+                <!-- Floating Navbar Pill (เหลือเฉพาะที่ใช้งานจริง กับระบบหลังบ้านของหอพัก) -->
                 <nav class="prisma-navbar">
                     <div class="prisma-nav-inner">
                         <a href="#" class="prisma-brand">
@@ -71,13 +98,13 @@
                             <span class="brand-sub-badge">นครศรีธรรมราช</span>
                         </a>
                         <div class="prisma-nav-links">
-                            <a href="#rooms" class="prisma-link">3 อาคารห้องพัก</a>
-                            <a href="#features" class="prisma-link">สิ่งอำนวยความสะดวก</a>
+                            <a href="#rooms" class="prisma-link">ห้องพัก</a>
                             <a href="#rates" class="prisma-link">อัตราค่าเช่า</a>
                             <a href="#contact" class="prisma-link">ติดต่อเรา</a>
                         </div>
-                        <button class="prisma-login-btn" id="btn-toggle-login" onclick="toggleLoginModal(true)">
-                            เข้าสู่ระบบจัดการ
+                        <button class="prisma-login-btn" id="btn-toggle-login" onclick="openBackendSystem()" title="เข้าสู่ระบบหลังบ้านหอพัก">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.2; margin-right: 5px; vertical-align: middle;"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                            ระบบหลังบ้านหอพัก
                         </button>
                     </div>
                 </nav>
@@ -766,29 +793,29 @@
 
             <!-- Main Content Container -->
             <div class="smoky-main-wrapper">
-                <!-- Top Bar -->
+                <!-- Top Bar (ระบบหลังบ้านของหอพัก) -->
                 <header class="smoky-topbar">
-                    <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px; overflow-x: auto; max-width: 72%;">
                         <button class="menu-toggle smoky-menu-toggle" id="btn-sidebar-toggle" style="color: white; border: none; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 8px; cursor: pointer;">☰</button>
-                        <!-- Text tabs: Overview / Sales / Marketing / Support -->
+                        <!-- Text tabs: เฉพาะระบบงานที่ใช้งานจริงของหอพัก -->
                         <div class="smoky-tabs" id="smoky-top-tabs">
-                            <button class="smoky-tab active" data-tab="Overview">Overview<span class="tab-indicator"></span></button>
-                            <button class="smoky-tab" data-tab="Sales">Sales<span class="tab-indicator"></span></button>
-                            <button class="smoky-tab" data-tab="Marketing">Marketing<span class="tab-indicator"></span></button>
-                            <button class="smoky-tab" data-tab="Support">Support<span class="tab-indicator"></span></button>
+                            <button class="smoky-tab active" data-tab="dashboard">ภาพรวมหอพัก<span class="tab-indicator"></span></button>
+                            <button class="smoky-tab" data-tab="rooms">ผังห้องพัก 3 อาคาร<span class="tab-indicator"></span></button>
+                            <button class="smoky-tab" data-tab="utilities">ค่าน้ำ-ค่าไฟ & บิล<span class="tab-indicator"></span></button>
+                            <button class="smoky-tab" data-tab="maintenance">แจ้งซ่อมบำรุง<span class="tab-indicator"></span></button>
+                            <button class="smoky-tab" data-tab="parcels">พัสดุไปรษณีย์<span class="tab-indicator"></span></button>
+                            <button class="smoky-tab" data-tab="tenants">ผู้พักอาศัย<span class="tab-indicator"></span></button>
                         </div>
                     </div>
 
                     <!-- Right Controls -->
                     <div class="smoky-topbar-right">
-                        <button class="smoky-round-dashed-btn" title="Create New" onclick="window.switchView('new-request')">
-                            <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        </button>
-                        <button class="smoky-round-glass-btn" title="Grid Layout" onclick="window.switchView('deals')">
-                            <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        <button class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 14px; font-size: 0.78rem; gap: 6px; height: 36px; background: rgba(255,255,255,0.08);" onclick="window.returnToLandingPage()" title="กลับหน้าแรกเว็บไซต์">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+                            <span>หน้าแรกเว็บไซต์</span>
                         </button>
                         <div class="relative">
-                            <button class="smoky-round-glass-btn" title="Notifications" onclick="window.switchView('announcements')">
+                            <button class="smoky-round-glass-btn" title="ประกาศหอพัก" onclick="window.switchView('announcements')">
                                 <svg class="icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                                 <span class="smoky-badge-count">3</span>
                             </button>

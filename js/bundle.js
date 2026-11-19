@@ -5996,22 +5996,19 @@ document.addEventListener('DOMContentLoaded', () => {
     switchView('dashboard');
   }
 
-  // ผูกการทำงานปุ่ม Topbar Tabs (Overview / Sales / Marketing / Support)
+  // ผูกการทำงานปุ่ม Topbar Tabs ในระบบหลังบ้านหอพัก
   const topTabs = document.querySelectorAll('#smoky-top-tabs .smoky-tab');
   topTabs.forEach(tab => {
     tab.addEventListener('click', () => {
       topTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       const target = tab.getAttribute('data-tab');
-      if (target === 'Overview') switchView('dashboard');
-      else if (target === 'Sales') switchView('reports');
-      else if (target === 'Marketing') switchView('deals');
-      else if (target === 'Support') switchView('maintenance');
+      switchView(target);
     });
   });
 });
 
-// ตั้งค่าเมนู Sidebar ตามสิทธิ์ผู้ใช้งาน (Role) — รูปแบบ Floating Capsule Icon-Only
+// ตั้งค่าเมนู Sidebar ตามสิทธิ์ผู้ใช้งาน (Role) — รูปแบบ Floating Capsule Icon-Only เฉพาะงานที่ใช้งานจริง
 function setupSidebarMenu(user) {
   const nameEl = document.getElementById('header-user-name');
   const roleEl = document.getElementById('header-user-role-label');
@@ -6023,24 +6020,24 @@ function setupSidebarMenu(user) {
   if (!nav) return;
 
   const items = (user.role === 'admin' || user.role === 'staff') ? [
-    { view: 'dashboard', icon: 'home', label: 'Overview / ภาพรวมระบบ' },
-    { view: 'search', icon: 'search', label: 'Search / ค้นหาด่วน' },
-    { view: 'products', icon: 'shoppingBag', label: 'Products / ผังห้องพัก 3 อาคาร' },
-    { view: 'parcels', icon: 'box', label: 'Deliveries / พัสดุไปรษณีย์' },
-    { view: 'customers', icon: 'users', label: 'Customers / ทะเบียนผู้พัก' },
-    { view: 'deals', icon: 'layoutGrid', label: 'Deals Pipeline / สัญญาเช่า' },
-    { view: 'announcements', icon: 'messageCircle', label: 'Messages / กระดานข่าวสาร', badge: 3 },
-    { view: 'bookings', icon: 'calendar', label: 'Schedules / การจองห้องพัก' },
-    { view: 'reports', icon: 'chart', label: 'Analytics / รายงานสถิติ' },
-    { view: 'utilities', icon: 'chevronDown', label: 'More Services / มิเตอร์น้ำ-ไฟ' },
+    { view: 'dashboard', icon: 'home', label: 'ภาพรวมหอพัก (Dashboard)' },
+    { view: 'rooms', icon: 'door', label: 'ผังห้องพัก 3 อาคาร (Floor Plan)' },
+    { view: 'tenants', icon: 'users', label: 'ทะเบียนผู้พักอาศัย (Tenants)' },
+    { view: 'utilities', icon: 'bill', label: 'ค่าน้ำ-ค่าไฟ & บิล (Utilities)' },
+    { view: 'maintenance', icon: 'wrench', label: 'แจ้งซ่อมบำรุง (Maintenance)' },
+    { view: 'parcels', icon: 'box', label: 'พัสดุไปรษณีย์ (Parcels)' },
+    { view: 'bookings', icon: 'calendar', label: 'การจองห้องพัก (Bookings)' },
+    { view: 'announcements', icon: 'bell', label: 'ประกาศข่าวสาร (Announcements)', badge: 3 },
+    { view: 'reports', icon: 'chart', label: 'รายงานและสถิติ (Reports)' },
+    { view: 'settings', icon: 'gear', label: 'ตั้งค่าระบบ (Settings)' },
   ] : [
-    { view: 'dashboard', icon: 'home', label: 'Home / หน้าหลักผู้พัก' },
-    { view: 'products', icon: 'shoppingBag', label: 'Room Info / ข้อมูลห้องพัก' },
-    { view: 'parcels', icon: 'box', label: 'Parcels / พัสดุของฉัน' },
-    { view: 'requests', icon: 'layoutGrid', label: 'Requests / ยื่นคำร้อง' },
-    { view: 'announcements', icon: 'messageCircle', label: 'Announcements / ประกาศหอพัก', badge: 1 },
-    { view: 'utilities', icon: 'chart', label: 'Invoices / บิลค่าน้ำ-ไฟ' },
-    { view: 'profile', icon: 'users', label: 'Profile / ข้อมูลส่วนตัว' },
+    { view: 'dashboard', icon: 'home', label: 'หน้าหลักห้องพัก' },
+    { view: 'utilities', icon: 'bill', label: 'บิลค่าน้ำ-ไฟ / ชำระเงิน' },
+    { view: 'maintenance', icon: 'wrench', label: 'แจ้งซ่อมอุปกรณ์' },
+    { view: 'parcels', icon: 'box', label: 'ตรวจสอบพัสดุ' },
+    { view: 'announcements', icon: 'bell', label: 'ประกาศหอพัก', badge: 1 },
+    { view: 'requests', icon: 'swap', label: 'ยื่นคำร้องสลับห้อง' },
+    { view: 'profile', icon: 'user', label: 'ข้อมูลส่วนตัว' },
   ];
 
   let html = '';
@@ -6075,17 +6072,12 @@ window.switchView = async function(viewName) {
   const bodyEl = document.getElementById('app-content-body');
   if (!bodyEl) return;
 
-  // อัปเดตสถานะ Active บน Topbar Tabs
+  // อัปเดตสถานะ Active บน Topbar Tabs ของระบบหลังบ้าน
   const topTabs = document.querySelectorAll('#smoky-top-tabs .smoky-tab');
   if (topTabs) {
     topTabs.forEach(tab => {
       const t = tab.getAttribute('data-tab');
-      let shouldActive = false;
-      if (viewName === 'dashboard' && t === 'Overview') shouldActive = true;
-      if ((viewName === 'reports' || viewName === 'utilities') && t === 'Sales') shouldActive = true;
-      if ((viewName === 'deals' || viewName === 'bookings' || viewName === 'products') && t === 'Marketing') shouldActive = true;
-      if ((viewName === 'maintenance' || viewName === 'parcels' || viewName === 'requests') && t === 'Support') shouldActive = true;
-      tab.classList.toggle('active', shouldActive);
+      tab.classList.toggle('active', t === viewName);
     });
   }
 
