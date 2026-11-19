@@ -6635,22 +6635,22 @@ async function renderSettingsView() {
         <form id="form-account-settings">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
             <div class="field">
-              <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">ชื่อผู้ใช้งาน (Username)</label>
+              <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อผู้ใช้งาน (Username)</label>
               <input type="text" class="smoky-glass-input" value="${currentUser ? currentUser.username : ''}" disabled style="width: 100%; opacity: 0.7; cursor: not-allowed;">
             </div>
             <div class="field">
-              <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">ระดับสิทธิ์ (Role)</label>
+              <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ระดับสิทธิ์ (Role)</label>
               <input type="text" class="smoky-glass-input" value="${currentUser ? currentUser.roleTitle : ''}" disabled style="width: 100%; opacity: 0.7; cursor: not-allowed;">
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
             <div class="field">
-              <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">รหัสผ่านใหม่ (ปล่อยว่างหากไม่เปลี่ยน)</label>
+              <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">รหัสผ่านใหม่ (ปล่อยว่างหากไม่เปลี่ยน)</label>
               <input type="password" id="set-new-pwd" class="smoky-glass-input" placeholder="••••••••" style="width: 100%;">
             </div>
             <div class="field">
-              <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">ยืนยันรหัสผ่านใหม่อีกครั้ง</label>
+              <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ยืนยันรหัสผ่านใหม่อีกครั้ง</label>
               <input type="password" id="set-confirm-pwd" class="smoky-glass-input" placeholder="••••••••" style="width: 100%;">
             </div>
           </div>
@@ -6674,43 +6674,43 @@ async function renderSettingsView() {
           <form id="form-dorm-settings">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="field">
-                <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">ชื่อหอพัก</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อหอพัก</label>
                 <input type="text" id="set-dorm-name" class="smoky-glass-input" value="${s.dorm_name || 'Tanakrit Dormitory'}" required style="width: 100%;">
               </div>
               <div class="field">
-                <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">สโลแกน / หน่วยงานสังกัด</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">สโลแกน / หน่วยงานสังกัด</label>
                 <input type="text" id="set-dorm-sub" class="smoky-glass-input" value="${s.sub_title || 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช'}" style="width: 100%;">
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="field">
-                <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">อัตราค่าน้ำประปา (บาท/หน่วย)</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">อัตราค่าน้ำประปา (บาท/หน่วย)</label>
                 <input type="number" id="set-water-rate" class="smoky-glass-input" value="${s.water_rate || 18}" required style="width: 100%;">
               </div>
               <div class="field">
-                <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">อัตราค่าไฟฟ้า (บาท/หน่วย)</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">อัตราค่าไฟฟ้า (บาท/หน่วย)</label>
                 <input type="number" id="set-elec-rate" class="smoky-glass-input" value="${s.electric_rate || 8}" required style="width: 100%;">
               </div>
               <div class="field">
-                <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">ค่าบริการส่วนกลาง (บาท/เดือน)</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ค่าบริการส่วนกลาง (บาท/เดือน)</label>
                 <input type="number" id="set-common-fee" class="smoky-glass-input" value="${s.common_fee || 100}" required style="width: 100%;">
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="field">
-                <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ</label>
                 <input type="text" id="set-phone" class="smoky-glass-input" value="${s.phone || '086-946-1654, 075-355-289'}" style="width: 100%;">
               </div>
               <div class="field">
-                <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">Line Official Account / Line ID</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">Line Official Account / Line ID</label>
                 <input type="text" id="set-line" class="smoky-glass-input" value="${s.line_id || '@tanakritdorm'}" style="width: 100%;">
               </div>
             </div>
 
             <div class="field" style="margin-bottom: 20px;">
-              <label style="font-size: 0.82rem; color: rgba(255,255,255,0.65); display: block; margin-bottom: 6px;">หมายเลขบัญชีพร้อมเพย์สำหรับรับโอนเงินค่าเช่า (PromptPay QR)</label>
+              <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">หมายเลขบัญชีพร้อมเพย์สำหรับรับโอนเงินค่าเช่า (PromptPay QR)</label>
               <input type="text" id="set-promptpay" class="smoky-glass-input" value="${s.promptpay_number || '086-946-1654'}" style="width: 100%;">
             </div>
 
@@ -6729,8 +6729,8 @@ async function renderSettingsView() {
                 <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 10px #34D399;"></span>
                 <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin: 0;">เชื่อมต่อฐานข้อมูล Supabase Cloud Live Production</h4>
               </div>
-              <p style="font-size: 0.80rem; color: rgba(255,255,255,0.55); margin: 4px 0 0 0;">
-                Endpoint: <span style="font-family: monospace; color: #93C5FD;">https://ewvqgccmyxpwnhjzagye.supabase.co</span> (3 อาคาร 17 ห้อง)
+              <p class="smoky-meta-label" style="font-size: 0.80rem; margin: 4px 0 0 0;">
+                Endpoint: <span style="font-family: monospace; color: #60A5FA;">https://ewvqgccmyxpwnhjzagye.supabase.co</span> (3 อาคาร 17 ห้อง)
               </p>
             </div>
             <button type="button" class="smoky-round-glass-btn" id="btn-reset-db" style="width: auto; height: 34px; padding: 0 14px; border-radius: 9999px; font-size: 0.78rem; gap: 5px; color: #34D399; border-color: rgba(52, 211, 153, 0.3); background: rgba(52, 211, 153, 0.08);">
