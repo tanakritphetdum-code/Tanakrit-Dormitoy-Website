@@ -191,16 +191,12 @@ window.switchView = async function(viewName) {
       bodyEl.innerHTML = currentUser && currentUser.role === 'student' ? renderStudentDashboard() : renderStaffDashboard();
     } else if (viewName === 'deals') {
       bodyEl.innerHTML = renderDealsPipelineView();
-    } else if (viewName === 'customers') {
-      bodyEl.innerHTML = renderCustomersView();
+    } else if (viewName === 'customers' || viewName === 'tenants' || viewName === 'search') {
+      bodyEl.innerHTML = await renderTenantsView();
     } else if (viewName === 'products') {
       bodyEl.innerHTML = renderProductsView();
-    } else if (viewName === 'search') {
-      bodyEl.innerHTML = renderCustomersView();
     } else if (viewName === 'rooms') {
       bodyEl.innerHTML = await renderRoomsView();
-    } else if (viewName === 'tenants') {
-      bodyEl.innerHTML = renderCustomersView();
     } else if (viewName === 'bookings') {
       bodyEl.innerHTML = await renderBookingsView();
     } else if (viewName === 'requests') {

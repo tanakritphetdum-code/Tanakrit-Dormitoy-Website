@@ -962,156 +962,25 @@ export function renderDealsPipelineView() {
   `;
 }
 
-// ==================== CRM SUB-PAGES: CUSTOMERS ====================
+// ==================== CRM SUB-PAGES: CUSTOMERS / TENANTS ====================
 export function renderCustomersView() {
-  return `
-    <div style="display: flex; flex-direction: column; gap: 24px;">
-      
-      <!-- 4 KPI Cards -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-        <div class="smoky-card" style="padding: 16px;">
-          <span class="smoky-meta-label">Total Accounts</span>
-          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">2,739</div>
-          <span class="smoky-delta-pos" style="margin-top: 4px;">+8.4%</span>
-        </div>
-        <div class="smoky-card" style="padding: 16px;">
-          <span class="smoky-meta-label">Active Subscriptions</span>
-          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">2,410</div>
-          <span class="smoky-delta-pos" style="margin-top: 4px;">92% active</span>
-        </div>
-        <div class="smoky-card" style="padding: 16px;">
-          <span class="smoky-meta-label">Net Retention</span>
-          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">118%</div>
-          <span class="smoky-delta-pos" style="margin-top: 4px;">+4%</span>
-        </div>
-        <div class="smoky-card" style="padding: 16px;">
-          <span class="smoky-meta-label">Avg LTV</span>
-          <div class="smoky-kpi-num" style="font-size: 1.6rem; margin-top: 4px;">$34,200</div>
-          <span class="smoky-kpi-sub">Per business account</span>
-        </div>
-      </div>
-
-      <!-- Filter Chips, Search, Export, Add Customer -->
-      <div class="smoky-card" style="padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="customer-filter-chips">
-          <button class="smoky-seg-btn active" onclick="window.filterCustomerTable('All', this)">All (2,739)</button>
-          <button class="smoky-seg-btn" onclick="window.filterCustomerTable('Active', this)">Active (2,410)</button>
-          <button class="smoky-seg-btn" onclick="window.filterCustomerTable('Trial', this)">Trial (184)</button>
-          <button class="smoky-seg-btn" onclick="window.filterCustomerTable('Lead', this)">Lead (95)</button>
-          <button class="smoky-seg-btn" onclick="window.filterCustomerTable('Churned', this)">Churned (50)</button>
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="position: relative;">
-            <input type="text" class="smoky-search-input" id="cust-search-input" placeholder="Search accounts..." oninput="window.searchCustomerTable(this.value)">
-            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); pointer-events: none;">🔍</span>
-          </div>
-          <button class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 14px; font-size: 0.78rem; gap: 6px; height: 34px;" onclick="toast('ส่งออกไฟล์ข้อมูล CSV สำเร็จ', 'success')">
-            ${ic('download')} Export
-          </button>
-          <button class="smoky-pill-btn" style="width: auto; border-radius: 9999px; padding: 0 16px; background: #ffffff; color: #0a0d14; font-size: 0.78rem; font-weight: 700; height: 34px;" onclick="window.switchView('tenants')">
-            + Add Customer
-          </button>
-        </div>
-      </div>
-
-      <!-- Customers Table -->
-      <div class="smoky-table-wrap">
-        <table class="smoky-table">
-          <thead>
-            <tr>
-              <th>Customer</th>
-              <th>Company</th>
-              <th>Status</th>
-              <th>Owner</th>
-              <th>Lifetime Value</th>
-              <th>Last Contact</th>
-            </tr>
-          </thead>
-          <tbody id="customers-table-body">
-            <tr data-status="Active">
-              <td style="display: flex; align-items: center; gap: 10px;">
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-                <strong>Arthur Pendelton</strong>
-              </td>
-              <td>Acme Corp</td>
-              <td><span class="smoky-delta-pos">Active</span></td>
-              <td>Alex M.</td>
-              <td style="font-family: monospace; font-weight: 700;">$48,200</td>
-              <td style="color: rgba(255,255,255,0.5);">2 hrs ago</td>
-            </tr>
-            <tr data-status="Active">
-              <td style="display: flex; align-items: center; gap: 10px;">
-                <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-                <strong>Miriam Sterling</strong>
-              </td>
-              <td>Nova Labs</td>
-              <td><span class="smoky-delta-pos">Active</span></td>
-              <td>Sarah C.</td>
-              <td style="font-family: monospace; font-weight: 700;">$32,150</td>
-              <td style="color: rgba(255,255,255,0.5);">Yesterday</td>
-            </tr>
-            <tr data-status="Trial">
-              <td style="display: flex; align-items: center; gap: 10px;">
-                <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-                <strong>Liam Gallagher</strong>
-              </td>
-              <td>Vertex Systems</td>
-              <td><span style="background: rgba(245,158,11,0.15); color: #F59E0B; padding: 2px 8px; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">Trial</span></td>
-              <td>David K.</td>
-              <td style="font-family: monospace; font-weight: 700;">$8,400</td>
-              <td style="color: rgba(255,255,255,0.5);">3 days ago</td>
-            </tr>
-            <tr data-status="Lead">
-              <td style="display: flex; align-items: center; gap: 10px;">
-                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-                <strong>Chloe Dubois</strong>
-              </td>
-              <td>Lumiere AI</td>
-              <td><span style="background: rgba(59,130,246,0.15); color: #3B82F6; padding: 2px 8px; border-radius: 9999px; font-size: 0.72rem; font-weight: 600;">Lead</span></td>
-              <td>Elena R.</td>
-              <td style="font-family: monospace; font-weight: 700;">$12,000</td>
-              <td style="color: rgba(255,255,255,0.5);">May 12</td>
-            </tr>
-            <tr data-status="Churned">
-              <td style="display: flex; align-items: center; gap: 10px;">
-                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&auto=format&fit=crop&q=80" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-                <strong>Jonathan Reeves</strong>
-              </td>
-              <td>Beacon Tech</td>
-              <td><span class="smoky-delta-neg">Churned</span></td>
-              <td>Alex M.</td>
-              <td style="font-family: monospace; font-weight: 700;">$19,500</td>
-              <td style="color: rgba(255,255,255,0.5);">Apr 28</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-  `;
+  setTimeout(async () => {
+    if (window.renderTenantsView) {
+      const container = document.getElementById('app-content-body');
+      if (container) {
+        container.innerHTML = await window.renderTenantsView();
+      }
+    }
+  }, 0);
+  return '<div style="padding: 24px; color: rgba(255,255,255,0.7);">กำลังโหลดข้อมูลทะเบียนผู้พักอาศัย...</div>';
 }
 
 window.filterCustomerTable = function(status, btn) {
-  document.querySelectorAll('#customer-filter-chips .smoky-seg-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const rows = document.querySelectorAll('#customers-table-body tr');
-  rows.forEach(r => {
-    if (status === 'All' || r.getAttribute('data-status') === status) {
-      r.style.display = '';
-    } else {
-      r.style.display = 'none';
-    }
-  });
+  if (window.renderTenantsTable) window.renderTenantsTable();
 };
 
 window.searchCustomerTable = function(query) {
-  const q = query.toLowerCase();
-  const rows = document.querySelectorAll('#customers-table-body tr');
-  rows.forEach(r => {
-    const text = r.textContent.toLowerCase();
-    r.style.display = text.includes(q) ? '' : 'none';
-  });
+  if (window.renderTenantsTable) window.renderTenantsTable();
 };
 
 // ==================== CRM SUB-PAGES: PRODUCTS & ROOMS ====================
