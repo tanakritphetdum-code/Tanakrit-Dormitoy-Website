@@ -22,8 +22,112 @@ let cachedSettings = {
   water_rate: 18,
   electric_rate: 8,
   common_fee: 100,
-  promptpay_number: '0899998877'
+  promptpay_number: '086-946-1654'
 };
+
+// อัปเดตข้อมูลบนหน้า Landing Page (index.html) ตามการตั้งค่า
+function applySettingsToLandingPage(settings) {
+  if (!settings) return;
+  const update = () => {
+    // 1. Hero Live Badge
+    const heroBadgeText = document.getElementById('landing-hero-badge-text');
+    if (heroBadgeText) {
+      const sub = settings.sub_title || 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช';
+      heroBadgeText.textContent = `${sub} (3 อาคาร 17 ห้อง)`;
+    }
+
+    // 2. Hero Title & Sub
+    const heroTitle = document.getElementById('landing-hero-title');
+    if (heroTitle && settings.dorm_name) {
+      const parts = settings.dorm_name.trim().split(' ');
+      heroTitle.textContent = parts[0] || 'Tanakrit';
+    }
+    const heroSub = document.getElementById('landing-hero-sub');
+    if (heroSub && settings.dorm_name) {
+      const parts = settings.dorm_name.trim().split(' ');
+      if (parts.length > 1) {
+        heroSub.textContent = parts.slice(1).join(' ') + ' & Living Space';
+      }
+    }
+
+    // 3. Utility Rates
+    const rateWater = document.getElementById('landing-rate-water');
+    if (rateWater && settings.water_rate !== undefined) {
+      rateWater.textContent = settings.water_rate;
+    }
+    const rateElec = document.getElementById('landing-rate-elec');
+    if (rateElec && settings.electric_rate !== undefined) {
+      rateElec.textContent = settings.electric_rate;
+    }
+    const rateCommon = document.getElementById('landing-rate-common');
+    if (rateCommon && settings.common_fee !== undefined) {
+      rateCommon.textContent = settings.common_fee;
+    }
+
+    // 4. Contact Office: Address, Phone, Line
+    const contactAddr = document.getElementById('landing-contact-address');
+    if (contactAddr && settings.address) {
+      contactAddr.textContent = settings.address;
+    }
+    const contactPhone = document.getElementById('landing-contact-phone');
+    if (contactPhone && settings.phone) {
+      contactPhone.textContent = settings.phone;
+    }
+    const contactLine = document.getElementById('landing-contact-line');
+    if (contactLine && settings.line_id) {
+      contactLine.textContent = settings.line_id;
+    }
+
+    // 5. Footer: Phones, Logo, Copyright
+    const phoneList = settings.phone ? settings.phone.split(',').map(p => p.trim()).filter(Boolean) : [];
+    const footerPhone1 = document.getElementById('landing-footer-phone1');
+    if (footerPhone1 && phoneList[0]) {
+      const cleanPhone1 = phoneList[0].replace(/[^0-9]/g, '');
+      footerPhone1.textContent = '📞 ' + phoneList[0];
+      footerPhone1.setAttribute('href', 'tel:' + cleanPhone1);
+    }
+    const footerPhone2 = document.getElementById('landing-footer-phone2');
+    if (footerPhone2) {
+      if (phoneList[1]) {
+        const cleanPhone2 = phoneList[1].replace(/[^0-9]/g, '');
+        footerPhone2.textContent = '📱 ' + phoneList[1];
+        footerPhone2.setAttribute('href', 'tel:' + cleanPhone2);
+        if (footerPhone2.parentElement) footerPhone2.parentElement.style.display = '';
+      } else {
+        if (footerPhone2.parentElement) footerPhone2.parentElement.style.display = 'none';
+      }
+    }
+    const footerPhoneIcon = document.getElementById('landing-footer-phone-icon');
+    if (footerPhoneIcon && phoneList[0]) {
+      const cleanPhone1 = phoneList[0].replace(/[^0-9]/g, '');
+      footerPhoneIcon.setAttribute('href', 'tel:' + cleanPhone1);
+    }
+
+    const footerCopyright = document.getElementById('landing-footer-copyright');
+    if (footerCopyright) {
+      const dormName = settings.dorm_name || 'Tanakrit Dormitory';
+      const subTitle = settings.sub_title || 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช';
+      footerCopyright.textContent = `© 2026 ${dormName}. All rights reserved. ${subTitle}`;
+    }
+
+    const footerBrandName = document.getElementById('landing-footer-brand-name');
+    if (footerBrandName && settings.dorm_name) {
+      footerBrandName.textContent = settings.dorm_name;
+    }
+    const footerTag = document.getElementById('landing-footer-tag');
+    if (footerTag && settings.sub_title) {
+      footerTag.textContent = `${settings.sub_title} (3 อาคาร 17 ห้อง) บริการห้องพักรายเดือนคุณภาพ บรรยากาศร่มรื่น เงียบสงบ ปลอดภัย`;
+    }
+  };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', update, { once: true });
+    } else {
+      update();
+    }
+  }
+}
 
 // ซิงค์การตั้งค่าเริ่มต้นจาก LocalStorage Cache ถ้ามี
 try {
@@ -33,6 +137,13 @@ try {
   }
 } catch (e) {
   console.warn('Could not load local settings cache:', e);
+}
+
+// ผูกฟังก์ชันระดับ Window
+if (typeof window !== 'undefined') {
+  window.applySettingsToLandingPage = applySettingsToLandingPage;
+  window.getCurrentSettings = () => cachedSettings;
+  applySettingsToLandingPage(cachedSettings);
 }
 
 // ฟังก์ชันซิงค์การตั้งค่าจาก Supabase Cloud แบบ Background
@@ -50,6 +161,9 @@ async function syncSettingsFromCloud() {
       if (rows && rows.length > 0) {
         cachedSettings = { ...cachedSettings, ...rows[0] };
         localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(cachedSettings));
+        if (typeof window !== 'undefined' && window.applySettingsToLandingPage) {
+          window.applySettingsToLandingPage(cachedSettings);
+        }
       }
     }
   } catch (err) {
@@ -178,6 +292,9 @@ class QueryBuilder {
       if (this.table === 'settings' && this.operation === 'UPDATE' && this.payload) {
         cachedSettings = { ...cachedSettings, ...this.payload };
         localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(cachedSettings));
+        if (typeof window !== 'undefined' && window.applySettingsToLandingPage) {
+          window.applySettingsToLandingPage(cachedSettings);
+        }
       }
 
       return { data: data, error: null };
@@ -699,7 +816,7 @@ async function renderUtilitiesView() {
               <th>ค่าส่วนกลาง & สัญญา</th>
               <th>ยอดรวมทั้งสิ้น</th>
               <th>สถานะการชำระ</th>
-              <th style="text-align: right; padding-right: 22px;">จัดการบิล</th>
+              <th style="text-align: right; padding-right: 22px; width: 170px;">จัดการบิล</th>
             </tr>
           </thead>
           <tbody id="utilities-tbody">
@@ -895,6 +1012,9 @@ async function loadUtilitiesData() {
             <button class="smoky-round-glass-btn btn-toggle-pay" data-id="${r.id}" style="width: 32px; height: 32px; border-radius: 8px; background: ${isPaid ? 'rgba(255,255,255,0.06)' : 'rgba(52,211,153,0.22)'}; border: 1px solid ${isPaid ? 'rgba(255,255,255,0.12)' : 'rgba(52,211,153,0.4)'}; color: ${isPaid ? 'rgba(255,255,255,0.5)' : '#34D399'};" title="${isPaid ? 'เปลี่ยนเป็นยังไม่ชำระ' : 'ยืนยันรับชำระเงิน'}">
               ${isPaid ? ic('x') : ic('check')}
             </button>
+            <button class="smoky-round-glass-btn btn-del-bill" data-id="${r.id}" style="width: 32px; height: 32px; padding: 0; border-radius: 8px; color: #FB7185; border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.1);" title="ลบใบแจ้งหนี้">
+              ${ic('trash')}
+            </button>
           </div>
         </td>
       </tr>
@@ -922,6 +1042,24 @@ async function loadUtilitiesData() {
       await supabase.from('meter_readings').eq('id', id).update({ status: nextStatus });
       toast(`เปลี่ยนสถานะบิล ${target.id} เป็น "${nextStatus === 'paid' ? 'ชำระแล้ว' : 'รอชำระ'}"`, 'success');
       loadUtilitiesData();
+    };
+  });
+
+  // Delete Bill
+  tbody.querySelectorAll('.btn-del-bill').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute('data-id');
+      const target = readings.find(x => x.id === id);
+      if (!target) return;
+      if (confirm(`คุณต้องการลบใบแจ้งหนี้ "${target.id}" (ห้อง ${target.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('meter_readings').eq('id', id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบบิล', 'error');
+          return;
+        }
+        toast(`ลบใบแจ้งหนี้ ${target.id} เรียบร้อยแล้ว`, 'success');
+        loadUtilitiesData();
+      }
     };
   });
 }
@@ -1171,6 +1309,7 @@ function openInvoiceModal(bill) {
   `;
 
   const footer = `
+    <button type="button" class="btn btn-outline" id="btn-modal-del-bill" style="color:var(--danger); border-color:#fadbd8; margin-right:auto;">${ic('trash')} ลบบิลนี้</button>
     <button type="button" class="btn btn-outline" onclick="window.printInvoice()">${ic('printer')} พิมพ์ใบแจ้งหนี้ / ใบเสร็จ</button>
     <button type="button" class="btn btn-primary" onclick="window.closeAppModal()">ปิด</button>
   `;
@@ -1181,6 +1320,22 @@ function openInvoiceModal(bill) {
     footer,
     maxWidth: '640px'
   });
+
+  const btnModalDel = document.getElementById('btn-modal-del-bill');
+  if (btnModalDel) {
+    btnModalDel.onclick = async () => {
+      if (confirm(`คุณต้องการลบใบแจ้งหนี้ "${bill.id}" (ห้อง ${bill.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('meter_readings').eq('id', bill.id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบบิล', 'error');
+          return;
+        }
+        toast(`ลบใบแจ้งหนี้ ${bill.id} เรียบร้อยแล้ว`, 'success');
+        closeModal();
+        if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+      }
+    };
+  }
 
   // Bind Events สำหรับอัปโหลดสลิป
   let selectedSlipFile = null;
@@ -2546,11 +2701,11 @@ async function fetchTenantsList() {
 
   try {
     const { data, error } = await supabase.from('tenants').select('*').order('room', { ascending: true });
-    if (!error && Array.isArray(data) && data.length > 0) {
-      // ทำการแมปข้อมูลที่ได้จาก Supabase
+    if (!error && Array.isArray(data)) {
+      // ทำการแมปข้อมูลที่ได้จาก Supabase ตรงตามจริง
       const mapped = data.map(dbItem => {
         const bInfo = getBuildingInfo(dbItem.room);
-        const existing = (cachedTenants.length > 0 ? cachedTenants : DEFAULT_TENANTS).find(x => x.room === dbItem.room || x.id === dbItem.id);
+        const existing = (cachedTenants.length > 0 ? cachedTenants : []).find(x => x.room === dbItem.room || x.id === dbItem.id);
         return {
           id: dbItem.id || 'T-' + Math.random().toString(36).substring(2, 7),
           tenant_id: dbItem.tenant_id || (existing ? existing.tenant_id : '6512000'),
@@ -2573,19 +2728,12 @@ async function fetchTenantsList() {
         };
       });
 
-      // ผสานรวมกับห้องพักที่มีใน DEFAULT_TENANTS หากยังไม่มีใน DB เพื่อให้ครบทุกห้อง
-      DEFAULT_TENANTS.forEach(def => {
-        if (!mapped.some(m => m.room === def.room)) {
-          mapped.push(def);
-        }
-      });
-
       cachedTenants = mapped;
       localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
-    } else {
+    } else if (error) {
+      console.warn('Fetch tenants error, fallback to cache:', error);
       if (cachedTenants.length === 0) {
         cachedTenants = [...DEFAULT_TENANTS];
-        localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
       }
     }
   } catch (err) {
@@ -4608,7 +4756,7 @@ async function renderMaintenanceView() {
               <th style="width: 105px;">ความเร่งด่วน</th>
               <th style="min-width: 130px;">ช่างผู้รับผิดชอบ</th>
               <th style="min-width: 155px; width: 160px;">สถานะ</th>
-              <th style="text-align: right; padding-right: 22px; width: 110px;">การกระทำ</th>
+              <th style="text-align: right; padding-right: 22px; width: 145px;">การกระทำ</th>
             </tr>
           </thead>
           <tbody id="maintenance-tbody">
@@ -4628,7 +4776,7 @@ async function loadMaintenanceData() {
   const { data: tickets, error } = await supabase.from('maintenance').select('*').order('created_at', { ascending: false });
 
   let allTickets = tickets;
-  if (error || !allTickets || allTickets.length === 0) {
+  if (error || !allTickets) {
     allTickets = DEFAULT_MAINTENANCE_TICKETS;
   }
   cachedTickets = allTickets;
@@ -4744,10 +4892,15 @@ async function loadMaintenanceData() {
         </td>
         <td>${statusPill}</td>
         <td style="text-align: right; padding-right: 18px;">
-          <button class="smoky-round-glass-btn btn-update-ticket" data-id="${t.id}" style="width: auto; height: 32px; padding: 0 12px; border-radius: 9999px; font-size: 0.78rem; gap: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #ffffff;" title="อัปเดตสถานะงานซ่อม">
-            ${ic('gear')}
-            <span>อัปเดต</span>
-          </button>
+          <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+            <button class="smoky-round-glass-btn btn-update-ticket" data-id="${t.id}" style="width: auto; height: 32px; padding: 0 12px; border-radius: 9999px; font-size: 0.78rem; gap: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #ffffff;" title="อัปเดตสถานะงานซ่อม">
+              ${ic('gear')}
+              <span>อัปเดต</span>
+            </button>
+            <button class="smoky-round-glass-btn btn-del-ticket" data-id="${t.id}" style="width: 32px; height: 32px; padding: 0; border-radius: 9999px; color: #FB7185; border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.1);" title="ลบรายการแจ้งซ่อม">
+              ${ic('trash')}
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -4760,6 +4913,25 @@ async function loadMaintenanceData() {
       const id = btn.getAttribute('data-id');
       const target = cachedTickets.find(x => x.id === id);
       if (target) openUpdateTicketModal(target);
+    };
+  });
+
+  // Delete Ticket
+  tbody.querySelectorAll('.btn-del-ticket').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute('data-id');
+      const target = cachedTickets.find(x => x.id === id);
+      if (!target) return;
+      if (confirm(`คุณต้องการลบรายการแจ้งซ่อม ${target.id} (ห้อง ${target.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('maintenance').eq('id', id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบรายการแจ้งซ่อม', 'error');
+          return;
+        }
+        cachedTickets = cachedTickets.filter(x => x.id !== id);
+        toast(`ลบรายการแจ้งซ่อม ${target.id} เรียบร้อยแล้ว`, 'success');
+        loadMaintenanceData();
+      }
     };
   });
 }
@@ -5040,6 +5212,7 @@ function openUpdateTicketModal(ticket) {
   `;
 
   const footer = `
+    <button type="button" class="btn btn-outline" id="btn-modal-del-ticket" style="color:var(--danger); border-color:#fadbd8; margin-right:auto;">${ic('trash')} ลบรายการซ่อมนี้</button>
     <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
     <button type="button" class="btn btn-primary" id="btn-save-ticket-status" style="background: #3B82F6; border-color: #3B82F6;">บันทึกความคืบหน้า</button>
   `;
@@ -5050,6 +5223,23 @@ function openUpdateTicketModal(ticket) {
     footer,
     maxWidth: '520px'
   });
+
+  const btnModalDelTicket = document.getElementById('btn-modal-del-ticket');
+  if (btnModalDelTicket) {
+    btnModalDelTicket.onclick = async () => {
+      if (confirm(`คุณต้องการลบรายการแจ้งซ่อม ${ticket.id} (ห้อง ${ticket.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('maintenance').eq('id', ticket.id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบรายการแจ้งซ่อม', 'error');
+          return;
+        }
+        cachedTickets = cachedTickets.filter(x => x.id !== ticket.id);
+        toast(`ลบรายการแจ้งซ่อม ${ticket.id} เรียบร้อยแล้ว`, 'success');
+        closeModal();
+        loadMaintenanceData();
+      }
+    };
+  }
 
   document.getElementById('btn-save-ticket-status').onclick = async () => {
     const st = document.getElementById('up-status').value;
@@ -5235,7 +5425,7 @@ async function renderParcelsView() {
               <th style="min-width: 180px;">ลักษณะพัสดุ</th>
               <th style="min-width: 150px;">วันที่มาถึง / รับมอบ</th>
               <th style="min-width: 155px; width: 160px;">สถานะ</th>
-              <th style="text-align: right; padding-right: 22px; width: 140px;">การดำเนินการ</th>
+              <th style="text-align: right; padding-right: 22px; width: 175px;">การดำเนินการ</th>
             </tr>
           </thead>
           <tbody id="parcels-tbody">
@@ -5255,7 +5445,7 @@ async function loadParcelsData() {
   const { data: parcels, error } = await supabase.from('parcels').select('*').order('arrived_at', { ascending: false });
 
   let allParcels = parcels;
-  if (error || !allParcels || allParcels.length === 0) {
+  if (error || !allParcels) {
     allParcels = DEFAULT_PARCELS;
   }
   cachedParcels = allParcels;
@@ -5355,17 +5545,22 @@ async function loadParcelsData() {
         </td>
         <td>${statusPill}</td>
         <td style="text-align: right; padding-right: 18px;">
-          ${!isCollected ? `
-            <button class="smoky-round-glass-btn btn-collect-parcel" data-id="${p.id}" style="width: auto; height: 32px; padding: 0 14px; border-radius: 9999px; font-size: 0.78rem; gap: 6px; background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.38); color: #60A5FA; font-weight: 600;" title="บันทึกว่ารับแล้ว">
-              ${ic('check')}
-              <span>ยืนยันรับพัสดุ</span>
+          <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+            ${!isCollected ? `
+              <button class="smoky-round-glass-btn btn-collect-parcel" data-id="${p.id}" style="width: auto; height: 32px; padding: 0 14px; border-radius: 9999px; font-size: 0.78rem; gap: 6px; background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.38); color: #60A5FA; font-weight: 600;" title="บันทึกว่ารับแล้ว">
+                ${ic('check')}
+                <span>ยืนยันรับพัสดุ</span>
+              </button>
+            ` : `
+              <span style="font-size: 0.78rem; color: #34D399; display: inline-flex; align-items: center; gap: 4px;">
+                ${ic('check')}
+                <span>รับมอบเรียบร้อย</span>
+              </span>
+            `}
+            <button class="smoky-round-glass-btn btn-del-parcel" data-id="${p.id}" style="width: 32px; height: 32px; padding: 0; border-radius: 9999px; color: #FB7185; border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.1);" title="ลบรายการพัสดุ">
+              ${ic('trash')}
             </button>
-          ` : `
-            <span style="font-size: 0.78rem; color: #34D399; display: inline-flex; align-items: center; gap: 4px;">
-              ${ic('check')}
-              <span>รับมอบเรียบร้อย</span>
-            </span>
-          `}
+          </div>
         </td>
       </tr>
     `;
@@ -5384,6 +5579,25 @@ async function loadParcelsData() {
           collected_at: new Date().toISOString().split('T')[0]
         });
         toast('บันทึกการรับพัสดุเรียบร้อยแล้ว', 'success');
+        loadParcelsData();
+      }
+    };
+  });
+
+  // Delete Parcel
+  tbody.querySelectorAll('.btn-del-parcel').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute('data-id');
+      const target = cachedParcels.find(x => x.id === id);
+      if (!target) return;
+      if (confirm(`คุณต้องการลบรายการพัสดุ ${target.tracking_number} (ห้อง ${target.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('parcels').eq('id', id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบพัสดุ', 'error');
+          return;
+        }
+        cachedParcels = cachedParcels.filter(x => x.id !== id);
+        toast(`ลบรายการพัสดุ ${target.tracking_number} เรียบร้อยแล้ว`, 'success');
         loadParcelsData();
       }
     };
@@ -6606,8 +6820,7 @@ function openUserModal(user = null) {
 // ตั้งค่าระบบและบัญชีผู้ใช้งาน (System Settings)
 // ออกแบบด้วย Smoky Frosted Glass Design System
 async function renderSettingsView() {
-  const db = supabase.getRawData();
-  const s = db.settings || {};
+  const s = await supabase.getSettings();
   const isAdmin = currentUser && currentUser.role === 'admin';
 
   setTimeout(() => {
@@ -6679,43 +6892,48 @@ async function renderSettingsView() {
             <div style="color: #34D399;">${ic('door')}</div>
             <h3 style="font-size: 1.10rem; font-weight: 700; color: #ffffff; margin: 0;">ข้อมูลหอพักและอัตราค่าสาธารณูปโภค (สำหรับ Admin)</h3>
           </div>
-          <p style="color: rgba(255,255,255,0.45); font-size: 0.80rem; margin: 0 0 18px 0;">กำหนดข้อมูลแม่บทของหอพัก ค่าน้ำ ค่าไฟ และช่องทางรับชำระเงิน</p>
+          <p style="color: rgba(255,255,255,0.45); font-size: 0.80rem; margin: 0 0 18px 0;">กำหนดข้อมูลแม่บทของหอพัก ค่าน้ำ ค่าไฟ และช่องทางติดต่อ ซึ่งจะอัปเดตแสดงผลบนหน้าแรกเว็บไซต์ (Landing Page) โดยอัตโนมัติ</p>
 
           <form id="form-dorm-settings">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="field">
-                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อหอพัก</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อหอพัก (Dormitory Name)</label>
                 <input type="text" id="set-dorm-name" class="smoky-glass-input" value="${s.dorm_name || 'Tanakrit Dormitory'}" required style="width: 100%;">
               </div>
               <div class="field">
-                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">สโลแกน / หน่วยงานสังกัด</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">สโลแกน / หน่วยงานสังกัด (Sub-title)</label>
                 <input type="text" id="set-dorm-sub" class="smoky-glass-input" value="${s.sub_title || 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช'}" style="width: 100%;">
               </div>
+            </div>
+
+            <div class="field" style="margin-bottom: 16px;">
+              <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ที่อยู่หอพัก (Address แสดงบนหน้าเว็บไซต์)</label>
+              <input type="text" id="set-address" class="smoky-glass-input" value="${s.address || '69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320'}" required style="width: 100%;">
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">อัตราค่าน้ำประปา (บาท/หน่วย)</label>
-                <input type="number" id="set-water-rate" class="smoky-glass-input" value="${s.water_rate || 18}" required style="width: 100%;">
+                <input type="number" id="set-water-rate" class="smoky-glass-input" value="${s.water_rate !== undefined ? s.water_rate : 18}" required style="width: 100%;">
               </div>
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">อัตราค่าไฟฟ้า (บาท/หน่วย)</label>
-                <input type="number" id="set-elec-rate" class="smoky-glass-input" value="${s.electric_rate || 8}" required style="width: 100%;">
+                <input type="number" id="set-elec-rate" class="smoky-glass-input" value="${s.electric_rate !== undefined ? s.electric_rate : 8}" required style="width: 100%;">
               </div>
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ค่าบริการส่วนกลาง (บาท/เดือน)</label>
-                <input type="number" id="set-common-fee" class="smoky-glass-input" value="${s.common_fee || 100}" required style="width: 100%;">
+                <input type="number" id="set-common-fee" class="smoky-glass-input" value="${s.common_fee !== undefined ? s.common_fee : 100}" required style="width: 100%;">
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ</label>
-                <input type="text" id="set-phone" class="smoky-glass-input" value="${s.phone || '086-946-1654, 075-355-289'}" style="width: 100%;">
+                <input type="text" id="set-phone" class="smoky-glass-input" value="${s.phone || '075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985'}" style="width: 100%;">
               </div>
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">Line Official Account / Line ID</label>
-                <input type="text" id="set-line" class="smoky-glass-input" value="${s.line_id || '@tanakritdorm'}" style="width: 100%;">
+                <input type="text" id="set-line" class="smoky-glass-input" value="${s.line_id || 'Tonyeiei'}" style="width: 100%;">
               </div>
             </div>
 
@@ -6824,9 +7042,16 @@ function bindSettingsEvents() {
   if (dormForm) {
     dormForm.onsubmit = async (e) => {
       e.preventDefault();
+      const submitBtn = dormForm.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'กำลังบันทึกข้อมูล...';
+      }
+
       const newSettings = {
         dorm_name: document.getElementById('set-dorm-name').value.trim(),
         sub_title: document.getElementById('set-dorm-sub').value.trim(),
+        address: document.getElementById('set-address').value.trim(),
         water_rate: Number(document.getElementById('set-water-rate').value),
         electric_rate: Number(document.getElementById('set-elec-rate').value),
         common_fee: Number(document.getElementById('set-common-fee').value),
@@ -6834,12 +7059,29 @@ function bindSettingsEvents() {
         line_id: document.getElementById('set-line').value.trim(),
         promptpay_number: document.getElementById('set-promptpay').value.trim()
       };
-      const { error } = await supabase.from('settings').eq('id', 'default').update(newSettings);
-      if (error) {
-        toast('เกิดข้อผิดพลาดในการบันทึกขึ้นระบบ Supabase', 'error');
-        return;
+
+      try {
+        const { error } = await supabase.from('settings').eq('id', 'default').update(newSettings);
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการบันทึกขึ้นระบบ Supabase: ' + (error.message || ''), 'error');
+          return;
+        }
+
+        // ซิงค์อัปเดตข้อมูลบนหน้า index ทันที
+        if (typeof window !== 'undefined' && window.applySettingsToLandingPage) {
+          window.applySettingsToLandingPage(newSettings);
+        }
+
+        toast('บันทึกการตั้งค่าหอพักและอัปเดตข้อมูลหน้าเว็บเรียบร้อยแล้ว', 'success');
+      } catch (err) {
+        console.error('Save dorm settings error:', err);
+        toast('เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `${ic('check')}<span>บันทึกการตั้งค่าหอพัก</span>`;
+        }
       }
-      toast('บันทึกการตั้งค่าหอพักขึ้น Supabase เรียบร้อยแล้ว', 'success');
     };
   }
 

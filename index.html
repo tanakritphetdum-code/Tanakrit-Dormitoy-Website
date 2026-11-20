@@ -65,6 +65,9 @@
             const pageLanding = document.getElementById('page-landing');
             if (pageApp) pageApp.classList.add('hidden');
             if (pageLanding) pageLanding.classList.remove('hidden');
+            if (window.applySettingsToLandingPage && window.getCurrentSettings) {
+                window.applySettingsToLandingPage(window.getCurrentSettings());
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         window.openBackendSystem = openBackendSystem;
@@ -124,14 +127,14 @@
                     <div class="prisma-hero-grid">
                         <!-- Left: Giant Typography with WordsPullUp -->
                         <div class="prisma-left">
-                            <div class="hero-live-badge">
+                            <div class="hero-live-badge" id="landing-hero-badge">
                                 <span class="pulse-dot"></span>
-                                หอพักชายธนกฤษฎ์ นครศรีธรรมราช (3 อาคาร 17 ห้อง)
+                                <span id="landing-hero-badge-text">หอพักชายธนกฤษฎ์ นครศรีธรรมราช (3 อาคาร 17 ห้อง)</span>
                             </div>
                             <h1 class="prisma-title">
-                                <span class="word-pull-up">Tanakrit</span><span class="prisma-asterisk">*</span>
+                                <span class="word-pull-up" id="landing-hero-title">Tanakrit</span><span class="prisma-asterisk">*</span>
                             </h1>
-                            <div class="prisma-hero-sub">Dormitory & Living Space</div>
+                            <div class="prisma-hero-sub" id="landing-hero-sub">Dormitory & Living Space</div>
                         </div>
 
                         <!-- Right: Story, CTA & Fast Actions -->
@@ -462,9 +465,9 @@
                     <div style="background:var(--mint-50); border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:20px;">
                         <span style="font-size:0.85rem; color:var(--muted); display:block; margin-bottom:4px;">เงื่อนไขอัตราค่าสาธารณูปโภค:</span>
                         <div style="font-size:0.88rem; color:var(--teal-900); font-weight:500; line-height:1.7;">
-                            • ค่าน้ำประปา: 18 บาท/หน่วย<br>
-                            • ค่าไฟฟ้า: 8 บาท/หน่วย<br>
-                            • ค่าบริการส่วนกลาง  : 100 บาท/เดือน<br>
+                            • ค่าน้ำประปา: <span id="landing-rate-water">18</span> บาท/หน่วย<br>
+                            • ค่าไฟฟ้า: <span id="landing-rate-elec">8</span> บาท/หน่วย<br>
+                            • ค่าบริการส่วนกลาง  : <span id="landing-rate-common">100</span> บาท/เดือน<br>
                             • Wi-Fi : 100 บาท/เดือน<br>
                             • ค่าบริการกำจัดขยะ  : 20 บาท/เดือน
                         </div>
@@ -529,19 +532,19 @@
                             <span style="font-size:1.2rem;">📍</span>
                             <div>
                                 <strong>ที่อยู่หอพัก:</strong><br>
-                                69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320
+                                <span id="landing-contact-address">69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320</span>
                             </div>
                         </div>
                         <div style="display:flex; gap:12px; align-items:center;">
                             <span style="font-size:1.2rem;">📞</span>
                             <div>
-                                <strong>โทรศัพท์:</strong> 075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985
+                                <strong>โทรศัพท์:</strong> <span id="landing-contact-phone">075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985</span>
                             </div>
                         </div>
                         <div style="display:flex; gap:12px; align-items:center;">
                             <span style="font-size:1.2rem;">💬</span>
                             <div>
-                                <strong>Line Official :</strong> Tonyeiei
+                                <strong>Line Official :</strong> <span id="landing-contact-line">Tonyeiei</span>
                             </div>
                         </div>
                         <div style="display:flex; gap:12px; align-items:center;">
@@ -632,7 +635,7 @@
                                 </svg>
                                 <span>Tanakrit Dormitory</span>
                             </a>
-                            <p class="mrf-tag mrf-r" style="--d:1380;">
+                            <p class="mrf-tag mrf-r" style="--d:1380;" id="landing-footer-tag">
                                 หอพักชายธนกฤษฎ์ นครศรีธรรมราช (3 อาคาร 17 ห้อง) บริการห้องพักรายเดือนคุณภาพ บรรยากาศร่มรื่น เงียบสงบ ปลอดภัย
                             </p>
                             <form class="mrf-form mrf-r" style="--d:1500;" noValidate>
@@ -676,8 +679,8 @@
                             <div class="mrf-col">
                                 <h3 class="mrf-r" style="--d:1480;">ติดต่อ & ที่ตั้ง</h3>
                                 <ul>
-                                    <li class="mrf-r" style="--d:1560;"><a class="mrf-link" href="tel:075355289">📞 075-355-289</a></li>
-                                    <li class="mrf-r" style="--d:1615;"><a class="mrf-link" href="tel:0895900478">📱 089-590-0478</a></li>
+                                    <li class="mrf-r" style="--d:1560;"><a class="mrf-link" id="landing-footer-phone1" href="tel:075355289">📞 075-355-289</a></li>
+                                    <li class="mrf-r" style="--d:1615;"><a class="mrf-link" id="landing-footer-phone2" href="tel:0895900478">📱 089-590-0478</a></li>
                                     <li class="mrf-r" style="--d:1670;"><a class="mrf-link" href="https://maps.app.goo.gl/AtzLYkyYmNba4XBh8" target="_blank" rel="noopener noreferrer">📍 แผนที่ Google Maps ↗</a></li>
                                     <li class="mrf-r" style="--d:1725;"><a class="mrf-link" href="javascript:void(0)" onclick="toggleLoginModal(true)">🔐 เข้าสู่ระบบจัดการ</a></li>
                                 </ul>
@@ -697,7 +700,7 @@
                                         </a>
                                     </li>
                                     <li class="mrf-r" style="--d:1770;">
-                                        <a class="mrf-icon" href="tel:075355289" aria-label="Phone">
+                                        <a class="mrf-icon" id="landing-footer-phone-icon" href="tel:075355289" aria-label="Phone">
                                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                                         </a>
                                     </li>
@@ -711,7 +714,7 @@
                     <!-- Bottom Bar -->
                     <div class="mrf-bottom">
                         <span class="mrf-rule" aria-hidden="true"></span>
-                        <p class="mrf-r" style="--d:1700;">
+                        <p class="mrf-r" style="--d:1700;" id="landing-footer-copyright">
                             © 2026 Tanakrit Dormitory. All rights reserved. หอพักชายธนกฤษฎ์ นครศรีธรรมราช
                         </p>
                         <ul class="mrf-legal mrf-r" style="--d:1800;">

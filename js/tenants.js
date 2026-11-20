@@ -265,11 +265,11 @@ async function fetchTenantsList() {
 
   try {
     const { data, error } = await supabase.from('tenants').select('*').order('room', { ascending: true });
-    if (!error && Array.isArray(data) && data.length > 0) {
-      // ทำการแมปข้อมูลที่ได้จาก Supabase
+    if (!error && Array.isArray(data)) {
+      // ทำการแมปข้อมูลที่ได้จาก Supabase ตรงตามจริง
       const mapped = data.map(dbItem => {
         const bInfo = getBuildingInfo(dbItem.room);
-        const existing = (cachedTenants.length > 0 ? cachedTenants : DEFAULT_TENANTS).find(x => x.room === dbItem.room || x.id === dbItem.id);
+        const existing = (cachedTenants.length > 0 ? cachedTenants : []).find(x => x.room === dbItem.room || x.id === dbItem.id);
         return {
           id: dbItem.id || 'T-' + Math.random().toString(36).substring(2, 7),
           tenant_id: dbItem.tenant_id || (existing ? existing.tenant_id : '6512000'),
@@ -292,19 +292,12 @@ async function fetchTenantsList() {
         };
       });
 
-      // ผสานรวมกับห้องพักที่มีใน DEFAULT_TENANTS หากยังไม่มีใน DB เพื่อให้ครบทุกห้อง
-      DEFAULT_TENANTS.forEach(def => {
-        if (!mapped.some(m => m.room === def.room)) {
-          mapped.push(def);
-        }
-      });
-
       cachedTenants = mapped;
       localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
-    } else {
+    } else if (error) {
+      console.warn('Fetch tenants error, fallback to cache:', error);
       if (cachedTenants.length === 0) {
         cachedTenants = [...DEFAULT_TENANTS];
-        localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
       }
     }
   } catch (err) {

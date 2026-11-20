@@ -17,8 +17,112 @@ let cachedSettings = {
   water_rate: 18,
   electric_rate: 8,
   common_fee: 100,
-  promptpay_number: '0899998877'
+  promptpay_number: '086-946-1654'
 };
+
+// อัปเดตข้อมูลบนหน้า Landing Page (index.html) ตามการตั้งค่า
+export function applySettingsToLandingPage(settings) {
+  if (!settings) return;
+  const update = () => {
+    // 1. Hero Live Badge
+    const heroBadgeText = document.getElementById('landing-hero-badge-text');
+    if (heroBadgeText) {
+      const sub = settings.sub_title || 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช';
+      heroBadgeText.textContent = `${sub} (3 อาคาร 17 ห้อง)`;
+    }
+
+    // 2. Hero Title & Sub
+    const heroTitle = document.getElementById('landing-hero-title');
+    if (heroTitle && settings.dorm_name) {
+      const parts = settings.dorm_name.trim().split(' ');
+      heroTitle.textContent = parts[0] || 'Tanakrit';
+    }
+    const heroSub = document.getElementById('landing-hero-sub');
+    if (heroSub && settings.dorm_name) {
+      const parts = settings.dorm_name.trim().split(' ');
+      if (parts.length > 1) {
+        heroSub.textContent = parts.slice(1).join(' ') + ' & Living Space';
+      }
+    }
+
+    // 3. Utility Rates
+    const rateWater = document.getElementById('landing-rate-water');
+    if (rateWater && settings.water_rate !== undefined) {
+      rateWater.textContent = settings.water_rate;
+    }
+    const rateElec = document.getElementById('landing-rate-elec');
+    if (rateElec && settings.electric_rate !== undefined) {
+      rateElec.textContent = settings.electric_rate;
+    }
+    const rateCommon = document.getElementById('landing-rate-common');
+    if (rateCommon && settings.common_fee !== undefined) {
+      rateCommon.textContent = settings.common_fee;
+    }
+
+    // 4. Contact Office: Address, Phone, Line
+    const contactAddr = document.getElementById('landing-contact-address');
+    if (contactAddr && settings.address) {
+      contactAddr.textContent = settings.address;
+    }
+    const contactPhone = document.getElementById('landing-contact-phone');
+    if (contactPhone && settings.phone) {
+      contactPhone.textContent = settings.phone;
+    }
+    const contactLine = document.getElementById('landing-contact-line');
+    if (contactLine && settings.line_id) {
+      contactLine.textContent = settings.line_id;
+    }
+
+    // 5. Footer: Phones, Logo, Copyright
+    const phoneList = settings.phone ? settings.phone.split(',').map(p => p.trim()).filter(Boolean) : [];
+    const footerPhone1 = document.getElementById('landing-footer-phone1');
+    if (footerPhone1 && phoneList[0]) {
+      const cleanPhone1 = phoneList[0].replace(/[^0-9]/g, '');
+      footerPhone1.textContent = '📞 ' + phoneList[0];
+      footerPhone1.setAttribute('href', 'tel:' + cleanPhone1);
+    }
+    const footerPhone2 = document.getElementById('landing-footer-phone2');
+    if (footerPhone2) {
+      if (phoneList[1]) {
+        const cleanPhone2 = phoneList[1].replace(/[^0-9]/g, '');
+        footerPhone2.textContent = '📱 ' + phoneList[1];
+        footerPhone2.setAttribute('href', 'tel:' + cleanPhone2);
+        if (footerPhone2.parentElement) footerPhone2.parentElement.style.display = '';
+      } else {
+        if (footerPhone2.parentElement) footerPhone2.parentElement.style.display = 'none';
+      }
+    }
+    const footerPhoneIcon = document.getElementById('landing-footer-phone-icon');
+    if (footerPhoneIcon && phoneList[0]) {
+      const cleanPhone1 = phoneList[0].replace(/[^0-9]/g, '');
+      footerPhoneIcon.setAttribute('href', 'tel:' + cleanPhone1);
+    }
+
+    const footerCopyright = document.getElementById('landing-footer-copyright');
+    if (footerCopyright) {
+      const dormName = settings.dorm_name || 'Tanakrit Dormitory';
+      const subTitle = settings.sub_title || 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช';
+      footerCopyright.textContent = `© 2026 ${dormName}. All rights reserved. ${subTitle}`;
+    }
+
+    const footerBrandName = document.getElementById('landing-footer-brand-name');
+    if (footerBrandName && settings.dorm_name) {
+      footerBrandName.textContent = settings.dorm_name;
+    }
+    const footerTag = document.getElementById('landing-footer-tag');
+    if (footerTag && settings.sub_title) {
+      footerTag.textContent = `${settings.sub_title} (3 อาคาร 17 ห้อง) บริการห้องพักรายเดือนคุณภาพ บรรยากาศร่มรื่น เงียบสงบ ปลอดภัย`;
+    }
+  };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', update, { once: true });
+    } else {
+      update();
+    }
+  }
+}
 
 // ซิงค์การตั้งค่าเริ่มต้นจาก LocalStorage Cache ถ้ามี
 try {
@@ -28,6 +132,13 @@ try {
   }
 } catch (e) {
   console.warn('Could not load local settings cache:', e);
+}
+
+// ผูกฟังก์ชันระดับ Window
+if (typeof window !== 'undefined') {
+  window.applySettingsToLandingPage = applySettingsToLandingPage;
+  window.getCurrentSettings = () => cachedSettings;
+  applySettingsToLandingPage(cachedSettings);
 }
 
 // ฟังก์ชันซิงค์การตั้งค่าจาก Supabase Cloud แบบ Background
@@ -45,6 +156,9 @@ async function syncSettingsFromCloud() {
       if (rows && rows.length > 0) {
         cachedSettings = { ...cachedSettings, ...rows[0] };
         localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(cachedSettings));
+        if (typeof window !== 'undefined' && window.applySettingsToLandingPage) {
+          window.applySettingsToLandingPage(cachedSettings);
+        }
       }
     }
   } catch (err) {
@@ -173,6 +287,9 @@ class QueryBuilder {
       if (this.table === 'settings' && this.operation === 'UPDATE' && this.payload) {
         cachedSettings = { ...cachedSettings, ...this.payload };
         localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(cachedSettings));
+        if (typeof window !== 'undefined' && window.applySettingsToLandingPage) {
+          window.applySettingsToLandingPage(cachedSettings);
+        }
       }
 
       return { data: data, error: null };

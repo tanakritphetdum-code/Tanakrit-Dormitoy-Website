@@ -90,7 +90,7 @@ export async function renderUtilitiesView() {
               <th>ค่าส่วนกลาง & สัญญา</th>
               <th>ยอดรวมทั้งสิ้น</th>
               <th>สถานะการชำระ</th>
-              <th style="text-align: right; padding-right: 22px;">จัดการบิล</th>
+              <th style="text-align: right; padding-right: 22px; width: 170px;">จัดการบิล</th>
             </tr>
           </thead>
           <tbody id="utilities-tbody">
@@ -286,6 +286,9 @@ async function loadUtilitiesData() {
             <button class="smoky-round-glass-btn btn-toggle-pay" data-id="${r.id}" style="width: 32px; height: 32px; border-radius: 8px; background: ${isPaid ? 'rgba(255,255,255,0.06)' : 'rgba(52,211,153,0.22)'}; border: 1px solid ${isPaid ? 'rgba(255,255,255,0.12)' : 'rgba(52,211,153,0.4)'}; color: ${isPaid ? 'rgba(255,255,255,0.5)' : '#34D399'};" title="${isPaid ? 'เปลี่ยนเป็นยังไม่ชำระ' : 'ยืนยันรับชำระเงิน'}">
               ${isPaid ? ic('x') : ic('check')}
             </button>
+            <button class="smoky-round-glass-btn btn-del-bill" data-id="${r.id}" style="width: 32px; height: 32px; padding: 0; border-radius: 8px; color: #FB7185; border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.1);" title="ลบใบแจ้งหนี้">
+              ${ic('trash')}
+            </button>
           </div>
         </td>
       </tr>
@@ -313,6 +316,24 @@ async function loadUtilitiesData() {
       await supabase.from('meter_readings').eq('id', id).update({ status: nextStatus });
       toast(`เปลี่ยนสถานะบิล ${target.id} เป็น "${nextStatus === 'paid' ? 'ชำระแล้ว' : 'รอชำระ'}"`, 'success');
       loadUtilitiesData();
+    };
+  });
+
+  // Delete Bill
+  tbody.querySelectorAll('.btn-del-bill').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute('data-id');
+      const target = readings.find(x => x.id === id);
+      if (!target) return;
+      if (confirm(`คุณต้องการลบใบแจ้งหนี้ "${target.id}" (ห้อง ${target.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('meter_readings').eq('id', id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบบิล', 'error');
+          return;
+        }
+        toast(`ลบใบแจ้งหนี้ ${target.id} เรียบร้อยแล้ว`, 'success');
+        loadUtilitiesData();
+      }
     };
   });
 }
@@ -562,6 +583,7 @@ export function openInvoiceModal(bill) {
   `;
 
   const footer = `
+    <button type="button" class="btn btn-outline" id="btn-modal-del-bill" style="color:var(--danger); border-color:#fadbd8; margin-right:auto;">${ic('trash')} ลบบิลนี้</button>
     <button type="button" class="btn btn-outline" onclick="window.printInvoice()">${ic('printer')} พิมพ์ใบแจ้งหนี้ / ใบเสร็จ</button>
     <button type="button" class="btn btn-primary" onclick="window.closeAppModal()">ปิด</button>
   `;
@@ -572,6 +594,22 @@ export function openInvoiceModal(bill) {
     footer,
     maxWidth: '640px'
   });
+
+  const btnModalDel = document.getElementById('btn-modal-del-bill');
+  if (btnModalDel) {
+    btnModalDel.onclick = async () => {
+      if (confirm(`คุณต้องการลบใบแจ้งหนี้ "${bill.id}" (ห้อง ${bill.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('meter_readings').eq('id', bill.id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบบิล', 'error');
+          return;
+        }
+        toast(`ลบใบแจ้งหนี้ ${bill.id} เรียบร้อยแล้ว`, 'success');
+        closeModal();
+        if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+      }
+    };
+  }
 
   // Bind Events สำหรับอัปโหลดสลิป
   let selectedSlipFile = null;

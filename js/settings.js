@@ -6,8 +6,7 @@ import { ic, toast } from './api.js';
 import { currentUser } from './auth.js';
 
 export async function renderSettingsView() {
-  const db = supabase.getRawData();
-  const s = db.settings || {};
+  const s = await supabase.getSettings();
   const isAdmin = currentUser && currentUser.role === 'admin';
 
   setTimeout(() => {
@@ -79,43 +78,48 @@ export async function renderSettingsView() {
             <div style="color: #34D399;">${ic('door')}</div>
             <h3 style="font-size: 1.10rem; font-weight: 700; color: #ffffff; margin: 0;">ข้อมูลหอพักและอัตราค่าสาธารณูปโภค (สำหรับ Admin)</h3>
           </div>
-          <p style="color: rgba(255,255,255,0.45); font-size: 0.80rem; margin: 0 0 18px 0;">กำหนดข้อมูลแม่บทของหอพัก ค่าน้ำ ค่าไฟ และช่องทางรับชำระเงิน</p>
+          <p style="color: rgba(255,255,255,0.45); font-size: 0.80rem; margin: 0 0 18px 0;">กำหนดข้อมูลแม่บทของหอพัก ค่าน้ำ ค่าไฟ และช่องทางติดต่อ ซึ่งจะอัปเดตแสดงผลบนหน้าแรกเว็บไซต์ (Landing Page) โดยอัตโนมัติ</p>
 
           <form id="form-dorm-settings">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="field">
-                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อหอพัก</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อหอพัก (Dormitory Name)</label>
                 <input type="text" id="set-dorm-name" class="smoky-glass-input" value="${s.dorm_name || 'Tanakrit Dormitory'}" required style="width: 100%;">
               </div>
               <div class="field">
-                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">สโลแกน / หน่วยงานสังกัด</label>
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">สโลแกน / หน่วยงานสังกัด (Sub-title)</label>
                 <input type="text" id="set-dorm-sub" class="smoky-glass-input" value="${s.sub_title || 'หอพักชายธนกฤษฎ์ นครศรีธรรมราช'}" style="width: 100%;">
               </div>
+            </div>
+
+            <div class="field" style="margin-bottom: 16px;">
+              <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ที่อยู่หอพัก (Address แสดงบนหน้าเว็บไซต์)</label>
+              <input type="text" id="set-address" class="smoky-glass-input" value="${s.address || '69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320'}" required style="width: 100%;">
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">อัตราค่าน้ำประปา (บาท/หน่วย)</label>
-                <input type="number" id="set-water-rate" class="smoky-glass-input" value="${s.water_rate || 18}" required style="width: 100%;">
+                <input type="number" id="set-water-rate" class="smoky-glass-input" value="${s.water_rate !== undefined ? s.water_rate : 18}" required style="width: 100%;">
               </div>
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">อัตราค่าไฟฟ้า (บาท/หน่วย)</label>
-                <input type="number" id="set-elec-rate" class="smoky-glass-input" value="${s.electric_rate || 8}" required style="width: 100%;">
+                <input type="number" id="set-elec-rate" class="smoky-glass-input" value="${s.electric_rate !== undefined ? s.electric_rate : 8}" required style="width: 100%;">
               </div>
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ค่าบริการส่วนกลาง (บาท/เดือน)</label>
-                <input type="number" id="set-common-fee" class="smoky-glass-input" value="${s.common_fee || 100}" required style="width: 100%;">
+                <input type="number" id="set-common-fee" class="smoky-glass-input" value="${s.common_fee !== undefined ? s.common_fee : 100}" required style="width: 100%;">
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ</label>
-                <input type="text" id="set-phone" class="smoky-glass-input" value="${s.phone || '086-946-1654, 075-355-289'}" style="width: 100%;">
+                <input type="text" id="set-phone" class="smoky-glass-input" value="${s.phone || '075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985'}" style="width: 100%;">
               </div>
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">Line Official Account / Line ID</label>
-                <input type="text" id="set-line" class="smoky-glass-input" value="${s.line_id || '@tanakritdorm'}" style="width: 100%;">
+                <input type="text" id="set-line" class="smoky-glass-input" value="${s.line_id || 'Tonyeiei'}" style="width: 100%;">
               </div>
             </div>
 
@@ -224,9 +228,16 @@ function bindSettingsEvents() {
   if (dormForm) {
     dormForm.onsubmit = async (e) => {
       e.preventDefault();
+      const submitBtn = dormForm.querySelector('button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'กำลังบันทึกข้อมูล...';
+      }
+
       const newSettings = {
         dorm_name: document.getElementById('set-dorm-name').value.trim(),
         sub_title: document.getElementById('set-dorm-sub').value.trim(),
+        address: document.getElementById('set-address').value.trim(),
         water_rate: Number(document.getElementById('set-water-rate').value),
         electric_rate: Number(document.getElementById('set-elec-rate').value),
         common_fee: Number(document.getElementById('set-common-fee').value),
@@ -234,12 +245,29 @@ function bindSettingsEvents() {
         line_id: document.getElementById('set-line').value.trim(),
         promptpay_number: document.getElementById('set-promptpay').value.trim()
       };
-      const { error } = await supabase.from('settings').eq('id', 'default').update(newSettings);
-      if (error) {
-        toast('เกิดข้อผิดพลาดในการบันทึกขึ้นระบบ Supabase', 'error');
-        return;
+
+      try {
+        const { error } = await supabase.from('settings').eq('id', 'default').update(newSettings);
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการบันทึกขึ้นระบบ Supabase: ' + (error.message || ''), 'error');
+          return;
+        }
+
+        // ซิงค์อัปเดตข้อมูลบนหน้า index ทันที
+        if (typeof window !== 'undefined' && window.applySettingsToLandingPage) {
+          window.applySettingsToLandingPage(newSettings);
+        }
+
+        toast('บันทึกการตั้งค่าหอพักและอัปเดตข้อมูลหน้าเว็บเรียบร้อยแล้ว', 'success');
+      } catch (err) {
+        console.error('Save dorm settings error:', err);
+        toast('เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `${ic('check')}<span>บันทึกการตั้งค่าหอพัก</span>`;
+        }
       }
-      toast('บันทึกการตั้งค่าหอพักขึ้น Supabase เรียบร้อยแล้ว', 'success');
     };
   }
 

@@ -169,7 +169,7 @@ export async function renderParcelsView() {
               <th style="min-width: 180px;">ลักษณะพัสดุ</th>
               <th style="min-width: 150px;">วันที่มาถึง / รับมอบ</th>
               <th style="min-width: 155px; width: 160px;">สถานะ</th>
-              <th style="text-align: right; padding-right: 22px; width: 140px;">การดำเนินการ</th>
+              <th style="text-align: right; padding-right: 22px; width: 175px;">การดำเนินการ</th>
             </tr>
           </thead>
           <tbody id="parcels-tbody">
@@ -189,7 +189,7 @@ async function loadParcelsData() {
   const { data: parcels, error } = await supabase.from('parcels').select('*').order('arrived_at', { ascending: false });
 
   let allParcels = parcels;
-  if (error || !allParcels || allParcels.length === 0) {
+  if (error || !allParcels) {
     allParcels = DEFAULT_PARCELS;
   }
   cachedParcels = allParcels;
@@ -289,17 +289,22 @@ async function loadParcelsData() {
         </td>
         <td>${statusPill}</td>
         <td style="text-align: right; padding-right: 18px;">
-          ${!isCollected ? `
-            <button class="smoky-round-glass-btn btn-collect-parcel" data-id="${p.id}" style="width: auto; height: 32px; padding: 0 14px; border-radius: 9999px; font-size: 0.78rem; gap: 6px; background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.38); color: #60A5FA; font-weight: 600;" title="บันทึกว่ารับแล้ว">
-              ${ic('check')}
-              <span>ยืนยันรับพัสดุ</span>
+          <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+            ${!isCollected ? `
+              <button class="smoky-round-glass-btn btn-collect-parcel" data-id="${p.id}" style="width: auto; height: 32px; padding: 0 14px; border-radius: 9999px; font-size: 0.78rem; gap: 6px; background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.38); color: #60A5FA; font-weight: 600;" title="บันทึกว่ารับแล้ว">
+                ${ic('check')}
+                <span>ยืนยันรับพัสดุ</span>
+              </button>
+            ` : `
+              <span style="font-size: 0.78rem; color: #34D399; display: inline-flex; align-items: center; gap: 4px;">
+                ${ic('check')}
+                <span>รับมอบเรียบร้อย</span>
+              </span>
+            `}
+            <button class="smoky-round-glass-btn btn-del-parcel" data-id="${p.id}" style="width: 32px; height: 32px; padding: 0; border-radius: 9999px; color: #FB7185; border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.1);" title="ลบรายการพัสดุ">
+              ${ic('trash')}
             </button>
-          ` : `
-            <span style="font-size: 0.78rem; color: #34D399; display: inline-flex; align-items: center; gap: 4px;">
-              ${ic('check')}
-              <span>รับมอบเรียบร้อย</span>
-            </span>
-          `}
+          </div>
         </td>
       </tr>
     `;
@@ -318,6 +323,25 @@ async function loadParcelsData() {
           collected_at: new Date().toISOString().split('T')[0]
         });
         toast('บันทึกการรับพัสดุเรียบร้อยแล้ว', 'success');
+        loadParcelsData();
+      }
+    };
+  });
+
+  // Delete Parcel
+  tbody.querySelectorAll('.btn-del-parcel').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute('data-id');
+      const target = cachedParcels.find(x => x.id === id);
+      if (!target) return;
+      if (confirm(`คุณต้องการลบรายการพัสดุ ${target.tracking_number} (ห้อง ${target.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('parcels').eq('id', id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบพัสดุ', 'error');
+          return;
+        }
+        cachedParcels = cachedParcels.filter(x => x.id !== id);
+        toast(`ลบรายการพัสดุ ${target.tracking_number} เรียบร้อยแล้ว`, 'success');
         loadParcelsData();
       }
     };

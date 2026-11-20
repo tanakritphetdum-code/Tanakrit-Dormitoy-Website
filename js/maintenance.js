@@ -176,7 +176,7 @@ export async function renderMaintenanceView() {
               <th style="width: 105px;">ความเร่งด่วน</th>
               <th style="min-width: 130px;">ช่างผู้รับผิดชอบ</th>
               <th style="min-width: 155px; width: 160px;">สถานะ</th>
-              <th style="text-align: right; padding-right: 22px; width: 110px;">การกระทำ</th>
+              <th style="text-align: right; padding-right: 22px; width: 145px;">การกระทำ</th>
             </tr>
           </thead>
           <tbody id="maintenance-tbody">
@@ -196,7 +196,7 @@ async function loadMaintenanceData() {
   const { data: tickets, error } = await supabase.from('maintenance').select('*').order('created_at', { ascending: false });
 
   let allTickets = tickets;
-  if (error || !allTickets || allTickets.length === 0) {
+  if (error || !allTickets) {
     allTickets = DEFAULT_MAINTENANCE_TICKETS;
   }
   cachedTickets = allTickets;
@@ -312,10 +312,15 @@ async function loadMaintenanceData() {
         </td>
         <td>${statusPill}</td>
         <td style="text-align: right; padding-right: 18px;">
-          <button class="smoky-round-glass-btn btn-update-ticket" data-id="${t.id}" style="width: auto; height: 32px; padding: 0 12px; border-radius: 9999px; font-size: 0.78rem; gap: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #ffffff;" title="อัปเดตสถานะงานซ่อม">
-            ${ic('gear')}
-            <span>อัปเดต</span>
-          </button>
+          <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+            <button class="smoky-round-glass-btn btn-update-ticket" data-id="${t.id}" style="width: auto; height: 32px; padding: 0 12px; border-radius: 9999px; font-size: 0.78rem; gap: 5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #ffffff;" title="อัปเดตสถานะงานซ่อม">
+              ${ic('gear')}
+              <span>อัปเดต</span>
+            </button>
+            <button class="smoky-round-glass-btn btn-del-ticket" data-id="${t.id}" style="width: 32px; height: 32px; padding: 0; border-radius: 9999px; color: #FB7185; border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.1);" title="ลบรายการแจ้งซ่อม">
+              ${ic('trash')}
+            </button>
+          </div>
         </td>
       </tr>
     `;
@@ -328,6 +333,25 @@ async function loadMaintenanceData() {
       const id = btn.getAttribute('data-id');
       const target = cachedTickets.find(x => x.id === id);
       if (target) openUpdateTicketModal(target);
+    };
+  });
+
+  // Delete Ticket
+  tbody.querySelectorAll('.btn-del-ticket').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.getAttribute('data-id');
+      const target = cachedTickets.find(x => x.id === id);
+      if (!target) return;
+      if (confirm(`คุณต้องการลบรายการแจ้งซ่อม ${target.id} (ห้อง ${target.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('maintenance').eq('id', id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบรายการแจ้งซ่อม', 'error');
+          return;
+        }
+        cachedTickets = cachedTickets.filter(x => x.id !== id);
+        toast(`ลบรายการแจ้งซ่อม ${target.id} เรียบร้อยแล้ว`, 'success');
+        loadMaintenanceData();
+      }
     };
   });
 }
@@ -608,6 +632,7 @@ function openUpdateTicketModal(ticket) {
   `;
 
   const footer = `
+    <button type="button" class="btn btn-outline" id="btn-modal-del-ticket" style="color:var(--danger); border-color:#fadbd8; margin-right:auto;">${ic('trash')} ลบรายการซ่อมนี้</button>
     <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
     <button type="button" class="btn btn-primary" id="btn-save-ticket-status" style="background: #3B82F6; border-color: #3B82F6;">บันทึกความคืบหน้า</button>
   `;
@@ -618,6 +643,23 @@ function openUpdateTicketModal(ticket) {
     footer,
     maxWidth: '520px'
   });
+
+  const btnModalDelTicket = document.getElementById('btn-modal-del-ticket');
+  if (btnModalDelTicket) {
+    btnModalDelTicket.onclick = async () => {
+      if (confirm(`คุณต้องการลบรายการแจ้งซ่อม ${ticket.id} (ห้อง ${ticket.room_number}) ออกจากระบบใช่หรือไม่?`)) {
+        const { error } = await supabase.from('maintenance').eq('id', ticket.id).delete();
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการลบรายการแจ้งซ่อม', 'error');
+          return;
+        }
+        cachedTickets = cachedTickets.filter(x => x.id !== ticket.id);
+        toast(`ลบรายการแจ้งซ่อม ${ticket.id} เรียบร้อยแล้ว`, 'success');
+        closeModal();
+        loadMaintenanceData();
+      }
+    };
+  }
 
   document.getElementById('btn-save-ticket-status').onclick = async () => {
     const st = document.getElementById('up-status').value;
