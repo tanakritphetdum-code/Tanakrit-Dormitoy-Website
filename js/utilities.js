@@ -511,44 +511,44 @@ export function openInvoiceModal(bill) {
 
       <!-- ส่วนชำระเงิน และแนบสลิปโอนเงิน -->
       ${!isPaid ? `
-        <div class="qr-payment-box" style="margin-top:20px;">
+        <div class="qr-payment-box smoky-modal-block" style="margin-top:20px; padding: 16px; border-radius: 12px;">
           <div style="flex: 1;">
-            <div style="font-weight: 600; color: var(--teal-950); margin-bottom: 6px; font-size: 1rem;">
+            <div class="smoky-modal-card-title" style="font-weight: 600; margin-bottom: 6px; font-size: 1rem;">
               📱 สแกนจ่ายผ่าน Thai QR PromptPay
             </div>
-            <p style="font-size: 0.85rem; color: var(--muted); margin: 0 0 8px 0; line-height: 1.5;">
+            <p class="smoky-modal-meta" style="font-size: 0.85rem; margin: 0 0 8px 0; line-height: 1.5;">
               รองรับทุกแอปพลิเคชันธนาคาร (พร้อมเพย์: 086-946-1654 นายเกียรติศักดิ์ บริหาร)<br>
-              เมื่อโอนชำระเรียบรวย สามารถแนบสลิปด้านล่างเพื่อให้เจ้าหน้าที่อนุมัติทันที
+              เมื่อโอนชำระเรียบร้อย สามารถแนบสลิปด้านล่างเพื่อให้เจ้าหน้าที่อนุมัติทันที
             </p>
           </div>
           <div style="text-align: center;">
-            <img src="${qrMockUrl}" alt="PromptPay QR Code" class="qr-img">
-            <div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">สแกนเพื่อจ่ายเงิน</div>
+            <img src="${qrMockUrl}" alt="PromptPay QR Code" class="qr-img" style="background:#fff; padding:6px; border-radius:10px;">
+            <div class="smoky-modal-meta" style="font-size: 0.75rem; margin-top: 4px;">สแกนเพื่อจ่ายเงิน</div>
           </div>
         </div>
 
         <!-- ฟอร์มอัปโหลดสลิป -->
-        <div style="margin-top:18px; background:#FAFDFB; border:1.5px solid var(--line); border-radius:12px; padding:18px;">
-          <h4 style="margin:0 0 8px 0; color:var(--teal-950); display:flex; align-items:center; gap:8px;">
+        <div class="smoky-modal-block" style="margin-top:18px; border-radius:12px; padding:18px;">
+          <h4 class="smoky-modal-card-title" style="margin:0 0 8px 0; display:flex; align-items:center; gap:8px;">
             ${ic('image')} แนบสลิปหลักฐานการโอนเงิน (Upload Payment Slip)
           </h4>
-          <p style="font-size:0.85rem; color:var(--muted); margin:0 0 14px 0;">
+          <p class="smoky-modal-meta" style="font-size:0.85rem; margin:0 0 14px 0;">
             คลิกกล่องด้านล่างเพื่อเลือกรูปสลิปจากเครื่อง หรือถ่ายรูปสลิป
           </p>
 
           <input type="file" id="slip-file-input" accept="image/*" style="display:none;">
 
-          <div class="upload-dropzone" id="slip-dropzone">
+          <div class="upload-dropzone smoky-modal-notes" id="slip-dropzone" style="cursor: pointer; padding: 16px; text-align: center; border-radius: 10px;">
             <div id="slip-dropzone-content">
               <div style="font-size:2rem; margin-bottom:4px;">📸</div>
-              <div style="font-weight:600; color:var(--teal-950); font-size:0.95rem;">คลิกเพื่อเลือกไฟล์รูปภาพสลิป</div>
-              <div style="font-size:0.8rem; color:var(--muted); margin-top:4px;">รองรับ JPG, PNG, WEBP (ระบบบีบอัดขนาดให้อัตโนมัติ)</div>
+              <div class="smoky-modal-val" style="font-weight:600; font-size:0.95rem;">คลิกเพื่อเลือกไฟล์รูปภาพสลิป</div>
+              <div class="smoky-modal-meta" style="font-size:0.8rem; margin-top:4px;">รองรับ JPG, PNG, WEBP (ระบบบีบอัดขนาดให้อัตโนมัติ)</div>
             </div>
             <div id="slip-preview-wrap" style="display:none; align-items:center; justify-content:center; gap:14px;">
-              <img id="slip-preview-img" style="max-height:120px; border-radius:8px; border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+              <img id="slip-preview-img" style="max-height:120px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); box-shadow:0 2px 8px rgba(0,0,0,0.2);">
               <div>
-                <div id="slip-filename" style="font-size:0.85rem; font-weight:600; color:var(--teal-950); margin-bottom:6px;"></div>
-                <button type="button" class="btn btn-outline btn-sm" id="btn-change-slip">เปลี่ยนรูปภาพ</button>
+                <div id="slip-filename" class="smoky-modal-val" style="font-size:0.85rem; font-weight:600; margin-bottom:6px;"></div>
+                <button type="button" class="smoky-round-glass-btn btn-sm" id="btn-change-slip" style="width:auto; padding:4px 12px; font-size:0.75rem;">เปลี่ยนรูปภาพ</button>
               </div>
             </div>
           </div>
@@ -721,20 +721,20 @@ async function openAddMeterModal() {
   const body = `
     <form id="form-meter-reading" style="display: flex; flex-direction: column; gap: 14px;">
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">เลือกห้องพัก (3 อาคาร 17 ห้อง) *</label>
-        <select id="mr-room" class="form-select" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">เลือกห้องพัก (3 อาคาร 17 ห้อง) *</label>
+        <select id="mr-room" class="smoky-glass-select" style="width: 100%;">
           ${roomOptions}
         </select>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">รอบเดือนประจำบิล</label>
-          <input type="month" id="mr-month" value="2026-11" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">รอบเดือนประจำบิล</label>
+          <input type="month" id="mr-month" value="2026-11" class="smoky-glass-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ค่าเช่าห้องพัก (บาท/เดือน)</label>
-          <input type="number" id="mr-room-price" value="2800" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ค่าเช่าห้องพัก (บาท/เดือน)</label>
+          <input type="number" id="mr-room-price" value="2800" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
@@ -745,16 +745,16 @@ async function openAddMeterModal() {
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งก่อน</label>
-            <input type="number" id="mr-water-prev" value="100" class="form-input" style="width: 100%;">
+            <label class="smoky-form-label" style="font-size: 0.74rem;">เลขครั้งก่อน</label>
+            <input type="number" id="mr-water-prev" value="100" class="smoky-glass-input" style="width: 100%;">
           </div>
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งนี้ *</label>
-            <input type="number" id="mr-water-curr" value="105" class="form-input" style="width: 100%;" required>
+            <label class="smoky-form-label" style="font-size: 0.74rem;">เลขครั้งนี้ *</label>
+            <input type="number" id="mr-water-curr" value="105" class="smoky-glass-input" style="width: 100%;" required>
           </div>
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">รวมเงินค่าน้ำ</label>
-            <input type="text" id="mr-water-total" disabled value="90 ฿" class="form-input" style="width: 100%; background: rgba(255,255,255,0.04); color: #60A5FA; font-weight: 700;">
+            <label class="smoky-form-label" style="font-size: 0.74rem;">รวมเงินค่าน้ำ</label>
+            <input type="text" id="mr-water-total" disabled value="90 ฿" class="smoky-glass-input" style="width: 100%; color: #60A5FA; font-weight: 700;">
           </div>
         </div>
       </div>
@@ -766,16 +766,16 @@ async function openAddMeterModal() {
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งก่อน</label>
-            <input type="number" id="mr-elec-prev" value="500" class="form-input" style="width: 100%;">
+            <label class="smoky-form-label" style="font-size: 0.74rem;">เลขครั้งก่อน</label>
+            <input type="number" id="mr-elec-prev" value="500" class="smoky-glass-input" style="width: 100%;">
           </div>
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งนี้ *</label>
-            <input type="number" id="mr-elec-curr" value="545" class="form-input" style="width: 100%;" required>
+            <label class="smoky-form-label" style="font-size: 0.74rem;">เลขครั้งนี้ *</label>
+            <input type="number" id="mr-elec-curr" value="545" class="smoky-glass-input" style="width: 100%;" required>
           </div>
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">รวมเงินค่าไฟ</label>
-            <input type="text" id="mr-elec-total" disabled value="360 ฿" class="form-input" style="width: 100%; background: rgba(255,255,255,0.04); color: #F59E0B; font-weight: 700;">
+            <label class="smoky-form-label" style="font-size: 0.74rem;">รวมเงินค่าไฟ</label>
+            <input type="text" id="mr-elec-total" disabled value="360 ฿" class="smoky-glass-input" style="width: 100%; color: #F59E0B; font-weight: 700;">
           </div>
         </div>
       </div>

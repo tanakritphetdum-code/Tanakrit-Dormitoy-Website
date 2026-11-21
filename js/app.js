@@ -78,6 +78,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // ตรวจสอบ Theme เริ่มต้น
   initTheme();
 
+  // ล้างแคชข้อมูลจำลอง (Mock data) เก่าทั้งหมด เพื่อบังคับโหลด Realtime จาก Supabase Cloud 100%
+  try {
+    const DATA_VERSION = 'tanakrit_realtime_v5_clean';
+    if (localStorage.getItem('tanakrit_data_version') !== DATA_VERSION) {
+      localStorage.removeItem('tanakrit_rooms_cache');
+      localStorage.removeItem('tanakrit_rooms_cache_v3');
+      localStorage.removeItem('tanakrit_tenants_cache');
+      localStorage.removeItem('tanakrit_tenants_cache_v3');
+      localStorage.removeItem('tanakrit_bookings_cache');
+      localStorage.removeItem('tanakrit_parcels_cache');
+      localStorage.removeItem('tanakrit_maint_cache');
+      localStorage.setItem('tanakrit_data_version', DATA_VERSION);
+    }
+  } catch (_) {}
+
   // ตรวจสอบ Session ที่มีอยู่เดิม
   const existingUser = initAuth();
   if (existingUser) {
@@ -185,24 +200,19 @@ window.switchView = async function(viewName) {
     });
   }
 
-  // Animation fade out & skeleton effect
-  bodyEl.style.opacity = '0';
-  bodyEl.style.filter = 'blur(6px)';
-  bodyEl.style.transition = 'opacity 0.2s ease, filter 0.2s ease';
+  // Smooth view transition
+  bodyEl.style.opacity = '0.88';
+  bodyEl.style.transition = 'opacity 0.1s ease';
 
   setTimeout(async () => {
     if (viewName === 'dashboard') {
       bodyEl.innerHTML = currentUser && currentUser.role === 'student' ? renderStudentDashboard() : renderStaffDashboard();
-    } else if (viewName === 'deals') {
-      bodyEl.innerHTML = renderDealsPipelineView();
+    } else if (viewName === 'deals' || viewName === 'bookings') {
+      bodyEl.innerHTML = await renderBookingsView();
     } else if (viewName === 'customers' || viewName === 'tenants' || viewName === 'search') {
       bodyEl.innerHTML = await renderTenantsView();
-    } else if (viewName === 'products') {
-      bodyEl.innerHTML = renderProductsView();
-    } else if (viewName === 'rooms') {
+    } else if (viewName === 'products' || viewName === 'rooms') {
       bodyEl.innerHTML = await renderRoomsView();
-    } else if (viewName === 'bookings') {
-      bodyEl.innerHTML = await renderBookingsView();
     } else if (viewName === 'requests') {
       bodyEl.innerHTML = renderRequestsView();
     } else if (viewName === 'new-request') {
@@ -231,7 +241,7 @@ window.switchView = async function(viewName) {
     bodyEl.style.opacity = '1';
     bodyEl.style.filter = 'none';
     bodyEl.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 100);
+  }, 40);
 };
 
 function bindNewRequestForm() {

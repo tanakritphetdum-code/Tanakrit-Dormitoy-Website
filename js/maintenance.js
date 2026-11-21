@@ -9,47 +9,7 @@ let maintenanceFilter = 'all';
 let maintenanceSearchQuery = '';
 let cachedTickets = [];
 
-export const DEFAULT_MAINTENANCE_TICKETS = [
-  {
-    id: 'FIX-101',
-    room_number: '107',
-    requester_name: 'นายธนาธิป สุวรรณ',
-    phone: '089-123-4567',
-    category: 'เครื่องปรับอากาศ',
-    description: 'แอร์มีน้ำหยดบริเวณท่อด้านในห้อง และมีเสียงดังเวลากลางคืน',
-    urgency: 'high',
-    status: 'in_progress',
-    technician: 'ช่างวิเชียร (แอร์)',
-    created_at: '2026-10-20',
-    image_url: null
-  },
-  {
-    id: 'FIX-102',
-    room_number: '106',
-    requester_name: 'ส่วนกลาง',
-    phone: '075-345-678',
-    category: 'ระบบประปา',
-    description: 'ก๊อกน้ำในห้องน้ำรั่วซึม ปิดไม่สนิท กำลังเปลี่ยนชุดวาล์ว',
-    urgency: 'medium',
-    status: 'in_progress',
-    technician: 'ช่างสมบูรณ์',
-    created_at: '2026-10-19',
-    image_url: null
-  },
-  {
-    id: 'FIX-103',
-    room_number: '201',
-    requester_name: 'ณัฐพล ใจดี',
-    phone: '081-234-5678',
-    category: 'ไฟฟ้า/แสงสว่าง',
-    description: 'หลอดไฟระเบียงหลังห้องขาด 1 หลอด',
-    urgency: 'low',
-    status: 'completed',
-    technician: 'ช่างวิเชียร',
-    created_at: '2026-10-12',
-    image_url: null
-  }
-];
+export const DEFAULT_MAINTENANCE_TICKETS = [];
 
 export function getBuildingName(roomNum) {
   const r = String(roomNum || '').trim();
@@ -197,7 +157,7 @@ async function loadMaintenanceData() {
 
   let allTickets = tickets;
   if (error || !allTickets) {
-    allTickets = DEFAULT_MAINTENANCE_TICKETS;
+    allTickets = [];
   }
   cachedTickets = allTickets;
 
@@ -212,7 +172,7 @@ async function loadMaintenanceData() {
   const kpiProgress = document.getElementById('kpi-maint-progress');
   const kpiCompleted = document.getElementById('kpi-maint-completed');
 
-  if (kpiTotal) kpiTotal.textContent = `${totalCount} รายการ`;
+  if (kpiTotal) kpiTotal.textContent = `${totalCount}`;
   if (kpiPending) kpiPending.textContent = `${pendingCount}`;
   if (kpiProgress) kpiProgress.textContent = `${progressCount}`;
   if (kpiCompleted) kpiCompleted.textContent = `${completedCount}`;
@@ -418,14 +378,14 @@ function openCreateTicketModal() {
     <form id="form-create-ticket" style="display: flex; flex-direction: column; gap: 14px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หมายเลขห้องพัก / จุดที่ชำรุด *</label>
-          <select id="tk-room" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หมายเลขห้องพัก / จุดที่ชำรุด *</label>
+          <select id="tk-room" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             ${roomOptions}
           </select>
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หมวดหมู่งานซ่อม *</label>
-          <select id="tk-cat" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หมวดหมู่งานซ่อม *</label>
+          <select id="tk-cat" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="เครื่องปรับอากาศ">เครื่องปรับอากาศ (แอร์)</option>
             <option value="ระบบประปา">ระบบประปา / ห้องน้ำ / ก๊อกรั่ว</option>
             <option value="ไฟฟ้า/แสงสว่าง">ระบบไฟฟ้า / หลอดไฟ / ปลั๊กไฟ</option>
@@ -438,18 +398,18 @@ function openCreateTicketModal() {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ชื่อผู้แจ้ง *</label>
-          <input type="text" id="tk-name" value="${defaultName}" placeholder="เช่น นายสมชาย, น.ส.วิภาดา" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ชื่อผู้แจ้ง *</label>
+          <input type="text" id="tk-name" class="smoky-glass-input" value="${defaultName}" placeholder="เช่น นายสมชาย, น.ส.วิภาดา" required style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ *</label>
-          <input type="tel" id="tk-phone" value="${defaultPhone}" placeholder="เช่น 089-xxx-xxxx" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ *</label>
+          <input type="tel" id="tk-phone" class="smoky-glass-input" value="${defaultPhone}" placeholder="เช่น 089-xxx-xxxx" required style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ระดับความเร่งด่วน</label>
-        <select id="tk-urgency" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ระดับความเร่งด่วน</label>
+        <select id="tk-urgency" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
           <option value="low">ปกติ (1-3 วันทำการ)</option>
           <option value="medium">ปานกลาง (ภายใน 24 ชม.)</option>
           <option value="high">⚡ ด่วนมาก (ส่งผลกระทบต่อการพักอาศัยทันที)</option>
@@ -457,19 +417,19 @@ function openCreateTicketModal() {
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">รายละเอียดอาการที่ชำรุดเสียหาย *</label>
-        <textarea id="tk-desc" rows="3" placeholder="ระบุอาการชำรุด จุดที่เกิดปัญหา เช่น ท่อน้ำใต้ซิงค์รั่ว, แอร์มีน้ำหยด, ปลั๊กหัวเตียงไม่มีไฟ" required style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">รายละเอียดอาการที่ชำรุดเสียหาย *</label>
+        <textarea id="tk-desc" class="smoky-glass-input" rows="3" placeholder="ระบุอาการชำรุด จุดที่เกิดปัญหา เช่น ท่อน้ำใต้ซิงค์รั่ว, แอร์มีน้ำหยด, ปลั๊กหัวเตียงไม่มีไฟ" required style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
       </div>
 
       <!-- ส่วนแนบรูปภาพจุดชำรุด -->
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">แนบรูปภาพจุดที่ชำรุด (ไม่บังคับ แต่ช่วยให้ช่างเตรียมเครื่องมือได้ตรงจุด)</label>
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">แนบรูปภาพจุดที่ชำรุด (ไม่บังคับ แต่ช่วยให้ช่างเตรียมเครื่องมือได้ตรงจุด)</label>
         <input type="file" id="tk-photo-input" accept="image/*" style="display:none;">
-        <div class="upload-dropzone" id="tk-photo-dropzone" style="padding:14px; border: 2px dashed #CBD5E1; border-radius: 10px; cursor: pointer; text-align: center; background: #F8FAFC;">
+        <div class="upload-dropzone" id="tk-photo-dropzone" style="padding:14px; border: 2px dashed #CBD5E1; border-radius: 10px; cursor: pointer; text-align: center; background: rgba(255,255,255,0.04);">
           <div id="tk-dropzone-content">
             <div style="font-size:1.6rem; margin-bottom:2px;">📸</div>
-            <div style="font-size:0.88rem; font-weight:600; color:var(--teal-950);">คลิกเพื่อถ่ายรูป หรือเลือกรูปภาพความเสียหาย</div>
-            <div style="font-size:0.75rem; color:var(--muted); margin-top:2px;">รองรับ JPG, PNG, WEBP (ระบบจะบีบอัดให้อัตโนมัติ)</div>
+            <div style="font-size:0.88rem; font-weight:600;" id="tk-dropzone-title">คลิกเพื่อถ่ายรูป หรือเลือกรูปภาพความเสียหาย</div>
+            <div style="font-size:0.75rem; color: rgba(255,255,255,0.45); margin-top:2px;">รองรับ JPG, PNG, WEBP (ระบบจะบีบอัดให้อัตโนมัติ)</div>
           </div>
           <div id="tk-preview-wrap" style="display:none; align-items:center; justify-content:center; gap:12px;">
             <img id="tk-preview-img" style="max-height:100px; border-radius:8px; border:1px solid #CBD5E1; box-shadow:0 2px 8px rgba(0,0,0,0.1);">

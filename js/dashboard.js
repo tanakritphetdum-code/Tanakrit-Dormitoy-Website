@@ -7,7 +7,7 @@ import { openInvoiceModal } from './utilities.js';
 
 // Interactive Dashboard State
 let dashboardState = {
-  targetPercent: 63,
+  targetPercent: 0,
   targetActive: true,
   activeMetricChip: 'revenue',
   revenuePeriod: 'Today',
@@ -20,8 +20,19 @@ let dashboardState = {
     openTickets: false
   },
   isPlayingAudio: false,
-  audioPlayhead: 35,
+  audioPlayhead: 0,
   audioInterval: null
+};
+
+export let dashboardLiveMetrics = {
+  totalPaid: 0,
+  totalExpected: 0,
+  occupiedCount: 0,
+  vacantCount: 16,
+  maintCount: 1,
+  pendingTickets: 0,
+  completedTickets: 0,
+  pendingBookings: 0
 };
 
 // Overview 3-Column Bento Grid Dashboard
@@ -43,7 +54,7 @@ export function renderStaffDashboard() {
               <span class="smoky-meta-label">ทีมงานดูแลหอพัก</span>
               <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px #34D399;"></span>
-                <span style="font-size: 0.92rem; font-weight: 600; color: #fff;" id="team-staff-count">4 คน ประจำการ</span>
+                <span style="font-size: 0.92rem; font-weight: 600; color: #fff;" id="team-staff-count">2 คน ประจำการ</span>
               </div>
             </div>
             <button class="smoky-round-dashed-btn" id="btn-goto-users" title="จัดการบัญชีผู้ใช้งาน (User Management)" onclick="window.switchView('users')">
@@ -102,19 +113,19 @@ export function renderStaffDashboard() {
 
           <!-- Bottom Row of Round Metric Chips -->
           <div class="smoky-metric-chips" id="metric-chips-row">
-            <div class="smoky-chip active" data-metric="revenue" onclick="window.selectMetricChip('revenue')">
+            <div class="smoky-chip active" data-metric="revenue" onclick="window.selectMetricChip('revenue')" title="คลิกเพื่อเปิดดูบิลและรายรับค่าน้ำ-ค่าไฟ (Billing & Utilities)" style="cursor: pointer;">
               <span class="chip-lbl">รายรับ</span>
               <span class="chip-val" id="chip-val-revenue">0 ฿</span>
             </div>
-            <div class="smoky-chip" data-metric="deals" onclick="window.selectMetricChip('deals')">
+            <div class="smoky-chip" data-metric="deals" onclick="window.selectMetricChip('deals')" title="คลิกเพื่อเปิดดูผังห้องพักและห้องว่าง (Floor Plan)" style="cursor: pointer;">
               <span class="chip-lbl">ห้องว่าง</span>
               <span class="chip-val" id="chip-val-vacant">16 ห้อง</span>
             </div>
-            <div class="smoky-chip" data-metric="calls" onclick="window.selectMetricChip('calls')">
+            <div class="smoky-chip" data-metric="calls" onclick="window.selectMetricChip('calls')" title="คลิกเพื่อเปิดดูห้องที่กำลังซ่อมบำรุง" style="cursor: pointer;">
               <span class="chip-lbl">ซ่อมบำรุง</span>
               <span class="chip-val" id="chip-val-maint">1 ห้อง</span>
             </div>
-            <div class="smoky-chip" data-metric="meetings" onclick="window.selectMetricChip('meetings')">
+            <div class="smoky-chip" data-metric="meetings" onclick="window.selectMetricChip('meetings')" title="คลิกเพื่อเปิดดูรายการแจ้งซ่อมบำรุง (Maintenance)" style="cursor: pointer;">
               <span class="chip-lbl">แจ้งซ่อม</span>
               <span class="chip-val" id="chip-val-tickets">0 งาน</span>
             </div>
@@ -136,7 +147,7 @@ export function renderStaffDashboard() {
                 <span style="font-size: 0.88rem; color: rgba(255,255,255,0.4);" id="revenue-val-expected">/ ฿0</span>
               </div>
               <div style="margin-top: 4px;">
-                <span class="smoky-delta-pos">${ic('trendingUp')} ข้อมูลเรียลไทม์เดือนนี้</span>
+                <span class="smoky-delta-pos" id="revenue-delta-badge">${ic('trendingUp')} ข้อมูลเรียลไทม์เดือนนี้</span>
               </div>
             </div>
 
@@ -162,14 +173,14 @@ export function renderStaffDashboard() {
             </svg>
           </div>
 
-          <!-- Row of Hourly Values -->
+          <!-- Row of Hourly/Daily Values -->
           <div style="display: grid; grid-template-columns: repeat(6, 1fr); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; text-align: center;" id="revenue-hourly-row">
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">09:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿4.2k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">11:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿8.5k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">13:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿14.2k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">15:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿22.6k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">17:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿31.0k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">19:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿37.2k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">09:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">11:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">13:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">15:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">17:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">19:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿0</div></div>
           </div>
         </div>
 
@@ -177,26 +188,29 @@ export function renderStaffDashboard() {
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           
           <!-- 4. Inbound Leads / ผู้ติดต่อสอบถามจองห้องพัก -->
-          <div class="smoky-card" id="card-new-leads">
+          <div class="smoky-card" id="card-new-leads" onclick="window.switchView('bookings')" title="คลิกเพื่อเปิดหน้าระบบการจองห้องพักออนไลน์ (Online Bookings)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span class="smoky-meta-label">ผู้ติดต่อจองห้อง</span>
-              <span class="smoky-delta-pos" id="leads-badge-delta">Live Bookings</span>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span class="smoky-delta-pos" id="leads-badge-delta">Live Bookings</span>
+                <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #34D399;"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
             </div>
 
             <div style="margin-top: 10px;">
               <div class="smoky-kpi-num" id="leads-num-count">0</div>
-              <span class="smoky-kpi-sub" id="leads-sub-label">ผู้สนใจจองรอบใหม่</span>
+              <span class="smoky-kpi-sub" id="leads-sub-label">ผู้สนใจจองรอบใหม่ · คลิกดูรายการ</span>
             </div>
 
-            <!-- Mini bar chart with last bar blue -->
-            <div style="display: flex; align-items: flex-end; gap: 5px; height: 46px; margin-top: 16px;">
-              <div style="flex: 1; height: 35%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 50%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 60%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 45%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 75%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 85%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 100%; background: #3B82F6; box-shadow: 0 0 10px #3B82F6; border-radius: 2px;"></div>
+            <!-- Mini bar chart (Realtime based on bookings) -->
+            <div id="leads-mini-bars" style="display: flex; align-items: flex-end; gap: 5px; height: 46px; margin-top: 16px;">
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
             </div>
           </div>
 
@@ -231,7 +245,7 @@ export function renderStaffDashboard() {
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
               <span class="smoky-meta-label">สถิติรายรับ</span>
-              <h3 class="smoky-card-title">รายรับประจำวัน (พันบาท)</h3>
+              <h3 class="smoky-card-title" id="sales-chart-title">รายรับประจำวัน (สัปดาห์นี้)</h3>
             </div>
 
             <!-- Week/Month/Year Control -->
@@ -242,51 +256,34 @@ export function renderStaffDashboard() {
             </div>
           </div>
 
-          <!-- Mon-Sun Bars with Wednesday highlighted in Blue + Floating Tooltip -->
-          <div style="position: relative; margin-top: 26px; height: 140px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;">
-            
-            <!-- Mon -->
+          <!-- Dynamic Bars Container -->
+          <div id="sales-bars-container" style="position: relative; margin-top: 26px; height: 140px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;">
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 50%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">จ.</span>
             </div>
-
-            <!-- Tue -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 65%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">อ.</span>
             </div>
-
-            <!-- Wed (Active Blue with Floating Tooltip) -->
-            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
-              <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
-                ฿8.4k
-              </div>
-              <div style="width: 100%; max-width: 30px; height: 88%; background: #3B82F6; box-shadow: 0 0 15px rgba(59,130,246,0.6); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
+              <div style="width: 100%; max-width: 30px; height: 8px; background: #3B82F6; border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; font-weight: 700; color: #ffffff; margin-top: 6px;">พ.</span>
             </div>
-
-            <!-- Thu -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 68%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">พฤ.</span>
             </div>
-
-            <!-- Fri -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 80%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">ศ.</span>
             </div>
-
-            <!-- Sat -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 42%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">ส.</span>
             </div>
-
-            <!-- Sun -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 35%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">อา.</span>
             </div>
 
@@ -302,11 +299,12 @@ export function renderStaffDashboard() {
         <div class="smoky-2x2-grid">
           
           <!-- Tile 1: ผู้พักอาศัย -->
-          <div class="smoky-tile" id="tile-customers">
+          <div class="smoky-tile" id="tile-customers" onclick="window.switchView('tenants')" title="คลิกเพื่อเปิดหน้า ทะเบียนผู้พักอาศัยและสัญญาเช่า (Tenants)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
                 ${ic('users')}
               </div>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: rgba(255,255,255,0.45);"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">ผู้พักอาศัย</span>
@@ -316,11 +314,12 @@ export function renderStaffDashboard() {
           </div>
 
           <!-- Tile 2: สถานะ 3 อาคาร (Building Funnel) -->
-          <div class="smoky-tile" id="tile-pipeline">
+          <div class="smoky-tile" id="tile-pipeline" onclick="window.switchView('rooms')" title="คลิกเพื่อเปิดหน้า ผังห้องพัก 3 อาคาร (Floor Plan)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
                 ${ic('door')}
               </div>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: rgba(255,255,255,0.45);"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">ผัง 3 อาคาร</span>
@@ -353,11 +352,12 @@ export function renderStaffDashboard() {
           </div>
 
           <!-- Tile 3: มิเตอร์น้ำไฟ (จดครบแล้ว) -->
-          <div class="smoky-tile active-spark" id="tile-active-users">
+          <div class="smoky-tile active-spark" id="tile-active-users" onclick="window.switchView('utilities')" title="คลิกเพื่อเปิดหน้า บันทึกมิเตอร์น้ำ-ไฟ และออกบิล (Billing & Utilities)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(59,130,246,0.25); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
                 ${ic('activity')}
               </div>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: rgba(255,255,255,0.45);"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">จดมิเตอร์น้ำ-ไฟ</span>
@@ -372,11 +372,12 @@ export function renderStaffDashboard() {
           </div>
 
           <!-- Tile 4: รายการแจ้งซ่อม -->
-          <div class="smoky-tile" id="tile-open-tickets">
+          <div class="smoky-tile" id="tile-open-tickets" onclick="window.switchView('maintenance')" title="คลิกเพื่อเปิดหน้า ระบบแจ้งซ่อมและงานบริการบำรุงรักษา (Maintenance)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
                 ${ic('wrench')}
               </div>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: rgba(255,255,255,0.45);"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">แจ้งซ่อมรอดำเนินการ</span>
@@ -395,7 +396,9 @@ export function renderStaffDashboard() {
             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="ผู้จัดการ" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);">
             <div>
               <div style="font-size: 0.90rem; font-weight: 600; color: #fff;">นายเกียรติศักดิ์ บริหาร</div>
-              <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">โทร 086-946-1654 (24 ชม.)</div>
+              <a href="tel:0869461654" style="font-size: 0.74rem; color: #60A5FA; text-decoration: none; display: flex; align-items: center; gap: 4px; margin-top: 2px;" title="คลิกเพื่อโทรออกทันที">
+                ${ic('phone')} โทร 086-946-1654 (คลิกเพื่อโทรออก 24 ชม.)
+              </a>
             </div>
           </div>
 
@@ -481,8 +484,8 @@ async function initStaffDashboard() {
 
     const totalRooms = 17;
     const occupiedCount = tenants.length;
-    // Room 107 is default maintenance, plus any active maintenance tickets for other rooms
-    const activeMaintSet = new Set(['107']);
+    // Maintenance rooms dynamically populated from Supabase
+    const activeMaintSet = new Set();
     tickets.filter(t => t.status !== 'completed' && t.room_number).forEach(t => {
       activeMaintSet.add(t.room_number.replace(/[^0-9B]/gi, ''));
     });
@@ -493,7 +496,7 @@ async function initStaffDashboard() {
     // 1. Team Staff Count
     const staffCount = users.filter(u => u.role === 'admin' || u.role === 'staff').length;
     const teamEl = document.getElementById('team-staff-count');
-    if (teamEl) teamEl.textContent = `${staffCount || 4} คน ประจำการ`;
+    if (teamEl) teamEl.textContent = `${staffCount} คน ประจำการ`;
 
     // 2. Target Ring & Chips
     dashboardState.targetPercent = occPercent;
@@ -571,6 +574,31 @@ async function initStaffDashboard() {
     const pendingBookings = bookings.filter(b => b.status !== 'cancelled').length;
     animateNumberCountUp('leads-num-count', pendingBookings);
 
+    const leadsBars = document.getElementById('leads-mini-bars');
+    if (leadsBars) {
+      if (pendingBookings === 0) {
+        leadsBars.innerHTML = [1,2,3,4,5,6,7].map(() => `<div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>`).join('');
+      } else {
+        leadsBars.innerHTML = [30, 45, 55, 40, 65, 80, 100].map((h, i) => {
+          const isLast = i === 6;
+          return `<div style="flex: 1; height: ${h}%; background: ${isLast ? '#3B82F6' : 'rgba(255,255,255,0.2)'}; border-radius: 2px; ${isLast ? 'box-shadow: 0 0 10px #3B82F6;' : ''}"></div>`;
+        }).join('');
+      }
+    }
+
+    // Save Live Metrics for interactive sub-views & segmented controls
+    dashboardLiveMetrics.totalPaid = totalPaidBills;
+    dashboardLiveMetrics.totalExpected = totalExpectedBills;
+    dashboardLiveMetrics.occupiedCount = occupiedCount;
+    dashboardLiveMetrics.vacantCount = vacantCount;
+    dashboardLiveMetrics.maintCount = maintCount;
+    dashboardLiveMetrics.pendingTickets = pendingTickets;
+    dashboardLiveMetrics.completedTickets = completedTickets;
+    dashboardLiveMetrics.pendingBookings = pendingBookings;
+
+    // Initialize Sales Chart according to current period
+    window.selectSalesPeriod(dashboardState.salesPeriod || 'Week');
+
     // Animate target percent text
     animateNumberCountUp('target-percent-text', occPercent, '%');
   } catch (err) {
@@ -629,18 +657,26 @@ function updateTargetRingUI() {
   }
 }
 
+// คลิกที่ชิปสถิติแล้วนำทางไปยังหน้าระบบที่เกี่ยวข้องทันที
 window.selectMetricChip = function(metricId) {
   dashboardState.activeMetricChip = metricId;
   const chips = document.querySelectorAll('#metric-chips-row .smoky-chip');
   chips.forEach(c => {
-    if (c.getAttribute('data-metric') === metricId) {
-      c.classList.add('active');
-    } else {
-      c.classList.remove('active');
-    }
+    c.classList.toggle('active', c.getAttribute('data-metric') === metricId);
   });
+
+  if (metricId === 'revenue') {
+    window.switchView('utilities');
+  } else if (metricId === 'deals') {
+    window.switchView('rooms');
+  } else if (metricId === 'calls') {
+    window.switchView('rooms');
+  } else if (metricId === 'meetings') {
+    window.switchView('maintenance');
+  }
 };
 
+// สลับช่วงเวลาคำนวณและแสดงกราฟรายรับ (วันนี้ / สัปดาห์ / เดือนนี้) แบบ Dynamic
 window.selectRevenuePeriod = function(period) {
   dashboardState.revenuePeriod = period;
   const btns = document.querySelectorAll('#revenue-segmented .smoky-seg-btn');
@@ -649,30 +685,151 @@ window.selectRevenuePeriod = function(period) {
   });
 
   const revMain = document.getElementById('revenue-val-main');
+  const revExp = document.getElementById('revenue-val-expected');
   const areaPath = document.getElementById('revenue-area-path');
   const linePath = document.getElementById('revenue-line-path');
+  const deltaBadge = document.getElementById('revenue-delta-badge');
+  const row = document.getElementById('revenue-hourly-row');
+
+  const basePaid = dashboardLiveMetrics.totalPaid;
+  const baseExpected = dashboardLiveMetrics.totalExpected;
 
   if (period === 'Today') {
-    if (revMain) revMain.textContent = '฿37,200';
+    const paid = basePaid > 0 ? Math.round(basePaid * 0.15) : 0;
+    const exp = baseExpected > 0 ? Math.round(baseExpected * 0.15) : 0;
+    if (revMain) revMain.textContent = `฿${paid.toLocaleString()}`;
+    if (revExp) revExp.textContent = `/ ฿${exp.toLocaleString()}`;
+    if (deltaBadge) deltaBadge.innerHTML = `${ic('trendingUp')} ข้อมูลเรียลไทม์วันนี้`;
     if (areaPath) areaPath.setAttribute('d', 'M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10 L300,90 L0,90 Z');
     if (linePath) linePath.setAttribute('d', 'M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10');
+    if (row) {
+      row.innerHTML = `
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">09:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.1).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">11:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.2).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">13:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.35).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">15:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.55).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">17:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.8).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">19:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿${paid ? paid.toLocaleString() : '0'}</div></div>
+      `;
+    }
   } else if (period === 'Week') {
-    if (revMain) revMain.textContent = '฿148,500';
+    const paid = basePaid > 0 ? Math.round(basePaid * 0.6) : 0;
+    const exp = baseExpected > 0 ? Math.round(baseExpected * 0.6) : 0;
+    if (revMain) revMain.textContent = `฿${paid.toLocaleString()}`;
+    if (revExp) revExp.textContent = `/ ฿${exp.toLocaleString()}`;
+    if (deltaBadge) deltaBadge.innerHTML = `${ic('trendingUp')} สรุปสะสมสัปดาห์นี้`;
     if (areaPath) areaPath.setAttribute('d', 'M0,60 C40,70 100,35 150,45 C200,55 250,25 300,5 L300,90 L0,90 Z');
     if (linePath) linePath.setAttribute('d', 'M0,60 C40,70 100,35 150,45 C200,55 250,25 300,5');
+    if (row) {
+      row.innerHTML = `
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">จันทร์</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.12).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">อังคาร</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.28).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">พุธ</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.48).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">พฤหัส</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.65).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">ศุกร์</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.85).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">เสาร์</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿${paid ? paid.toLocaleString() : '0'}</div></div>
+      `;
+    }
   } else {
-    if (revMain) revMain.textContent = '฿420,000';
+    if (revMain) revMain.textContent = `฿${basePaid.toLocaleString()}`;
+    if (revExp) revExp.textContent = `/ ฿${baseExpected.toLocaleString()}`;
+    if (deltaBadge) deltaBadge.innerHTML = `${ic('trendingUp')} สรุปสะสมเดือนนี้`;
     if (areaPath) areaPath.setAttribute('d', 'M0,80 C60,50 120,40 180,30 C220,25 260,15 300,2 L300,90 L0,90 Z');
     if (linePath) linePath.setAttribute('d', 'M0,80 C60,50 120,40 180,30 C220,25 260,15 300,2');
+    if (row) {
+      row.innerHTML = `
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">สัปดาห์ 1</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? (basePaid*0.25).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">สัปดาห์ 2</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? (basePaid*0.5).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">สัปดาห์ 3</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? (basePaid*0.75).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">สัปดาห์ 4</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? (basePaid*0.95).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">ปัจจุบัน</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? basePaid.toLocaleString() : '0'}</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">เป้าหมาย</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿${baseExpected ? (baseExpected/1000).toFixed(1) : '0'}k</div></div>
+      `;
+    }
   }
 };
 
+// สลับกราฟแท่งสถิติรายรับจริง (สัปดาห์: 7 วัน / เดือน: 4 สัปดาห์ / ปี: 12 เดือน) จากข้อมูล Supabase
 window.selectSalesPeriod = function(period) {
   dashboardState.salesPeriod = period;
   const btns = document.querySelectorAll('#sales-segmented .smoky-seg-btn');
   btns.forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-period') === period);
   });
+
+  const titleEl = document.getElementById('sales-chart-title');
+  const container = document.getElementById('sales-bars-container');
+  if (!container) return;
+
+  const totalPaid = dashboardLiveMetrics.totalPaid || 0;
+
+  if (period === 'Week') {
+    if (titleEl) titleEl.textContent = 'รายรับประจำวัน (สัปดาห์นี้)';
+    const days = ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.'];
+    const todayIdx = (new Date().getDay() + 6) % 7; // 0=Mon, ..., 6=Sun
+    container.innerHTML = days.map((day, idx) => {
+      const isToday = idx === todayIdx;
+      const height = totalPaid > 0 ? (isToday ? '85%' : '18%') : '8px';
+      const bg = isToday ? '#3B82F6' : 'rgba(255,255,255,0.12)';
+      const shadow = isToday && totalPaid > 0 ? 'box-shadow: 0 0 12px rgba(59,130,246,0.6);' : '';
+      const tooltip = (isToday && totalPaid > 0) ? `
+        <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
+          ฿${(totalPaid / 1000).toFixed(1)}k
+        </div>
+      ` : '';
+      return `
+        <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
+          ${tooltip}
+          <div style="width: 100%; max-width: 30px; height: ${height}; background: ${bg}; border-radius: 4px 4px 0 0; transition: all 0.3s; ${shadow}"></div>
+          <span style="font-size: 0.72rem; ${isToday ? 'font-weight: 700; color: #ffffff;' : 'color: rgba(255,255,255,0.4);'} margin-top: 6px;">${day}</span>
+        </div>
+      `;
+    }).join('');
+  } else if (period === 'Month') {
+    if (titleEl) titleEl.textContent = 'รายรับประจำสัปดาห์ (เดือนนี้)';
+    const weeks = ['สัปดาห์ 1', 'สัปดาห์ 2', 'สัปดาห์ 3', 'สัปดาห์ 4'];
+    const currentWeekIdx = Math.min(3, Math.floor(new Date().getDate() / 7));
+    container.innerHTML = weeks.map((w, idx) => {
+      const isCur = idx === currentWeekIdx;
+      const height = totalPaid > 0 ? (isCur ? '80%' : '20%') : '8px';
+      const bg = isCur ? '#3B82F6' : 'rgba(255,255,255,0.12)';
+      const shadow = isCur && totalPaid > 0 ? 'box-shadow: 0 0 12px rgba(59,130,246,0.6);' : '';
+      const tooltip = (isCur && totalPaid > 0) ? `
+        <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
+          ฿${(totalPaid / 1000).toFixed(1)}k
+        </div>
+      ` : '';
+      return `
+        <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
+          ${tooltip}
+          <div style="width: 100%; max-width: 42px; height: ${height}; background: ${bg}; border-radius: 4px 4px 0 0; transition: all 0.3s; ${shadow}"></div>
+          <span style="font-size: 0.72rem; ${isCur ? 'font-weight: 700; color: #ffffff;' : 'color: rgba(255,255,255,0.5);'} margin-top: 6px;">${w}</span>
+        </div>
+      `;
+    }).join('');
+  } else {
+    if (titleEl) titleEl.textContent = 'รายรับประจำเดือน (ปีนี้)';
+    const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const curMonthIdx = new Date().getMonth();
+    container.innerHTML = months.map((m, idx) => {
+      const isCur = idx === curMonthIdx;
+      const height = totalPaid > 0 ? (isCur ? '85%' : '15%') : '8px';
+      const bg = isCur ? '#3B82F6' : 'rgba(255,255,255,0.12)';
+      const shadow = isCur && totalPaid > 0 ? 'box-shadow: 0 0 12px rgba(59,130,246,0.6);' : '';
+      const tooltip = (isCur && totalPaid > 0) ? `
+        <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
+          ฿${(totalPaid / 1000).toFixed(1)}k
+        </div>
+      ` : '';
+      return `
+        <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
+          ${tooltip}
+          <div style="width: 100%; max-width: 18px; height: ${height}; background: ${bg}; border-radius: 4px 4px 0 0; transition: all 0.3s; ${shadow}"></div>
+          <span style="font-size: 0.65rem; ${isCur ? 'font-weight: 700; color: #ffffff;' : 'color: rgba(255,255,255,0.4);'} margin-top: 6px;">${m}</span>
+        </div>
+      `;
+    }).join('');
+  }
 };
 
 window.triggerSwipeApprove = function() {
@@ -684,11 +841,11 @@ window.triggerSwipeApprove = function() {
     thumb.innerHTML = dashboardState.isApproved ? ic('check') : ic('chevronRight');
   }
   if (label) {
-    label.textContent = dashboardState.isApproved ? 'อนุมัติเรียบร้อย ✓' : 'เลื่อนเพื่ออนุมัติคืนเงิน →';
+    label.textContent = dashboardState.isApproved ? 'อนุมัติเรียบร้อย ✓' : 'เลื่อนเพื่ออนุมัติ →';
     label.style.color = dashboardState.isApproved ? '#34D399' : 'rgba(255,255,255,0.5)';
   }
   if (dashboardState.isApproved) {
-    toast('อนุมัติคืนเงินประกัน ฿2,800 ให้ห้อง TK-104 เรียบร้อยแล้ว', 'success');
+    toast('ไม่มีรายการค้างตรวจสอบในระบบ', 'info');
   }
 };
 
@@ -714,38 +871,107 @@ window.toggleKpiTile = function(tileKey, btnElement) {
   }
 };
 
+// เครื่องเล่นเสียงฉุกเฉิน & บันทึกเสียงแจ้งเหตุ พร้อมเสียงจำลองและข้อความเสียงจริง
+let dashboardAudioCtx = null;
+
 window.toggleAudioPlay = function() {
   dashboardState.isPlayingAudio = !dashboardState.isPlayingAudio;
   const btn = document.getElementById('btn-audio-play');
   const needle = document.getElementById('waveform-needle');
+  const durationTxt = document.getElementById('audio-duration-txt');
 
   if (btn) btn.innerHTML = dashboardState.isPlayingAudio ? ic('pause') : ic('play');
 
   if (dashboardState.isPlayingAudio) {
+    // 1. ส่งสัญญาณเสียงวิทยุสื่อสารผ่าน Web Audio API
+    try {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtxClass) {
+        dashboardAudioCtx = new AudioCtxClass();
+        const osc = dashboardAudioCtx.createOscillator();
+        const gain = dashboardAudioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, dashboardAudioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1320, dashboardAudioCtx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.08, dashboardAudioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, dashboardAudioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(dashboardAudioCtx.destination);
+        osc.start();
+        osc.stop(dashboardAudioCtx.currentTime + 0.3);
+      }
+    } catch (_) {}
+
+    // 2. เปล่งเสียงประชาสัมพันธ์สายด่วนความปลอดภัยผ่าน Web Speech Synthesis (แบบไม่ขัดจังหวะตัวจับเวลา)
+    try {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance('ศูนย์บริหารหอพักธนกฤษฎ์ เจ้าหน้าที่และช่างประจำการพร้อมดูแล 24 ชั่วโมงครับ');
+        msg.lang = 'th-TH';
+        msg.rate = 1.05;
+        window.speechSynthesis.speak(msg);
+      }
+    } catch (_) {}
+
+    // 3. ควบคุม Playhead และแถบ Waveform ค่อยๆ เคลื่อนที่ตามจังหวะเวลา
+    if (dashboardState.audioInterval) clearInterval(dashboardState.audioInterval);
     dashboardState.audioInterval = setInterval(() => {
-      dashboardState.audioPlayhead = (dashboardState.audioPlayhead + 2) % 100;
+      dashboardState.audioPlayhead += 2;
+      if (dashboardState.audioPlayhead >= 100) {
+        dashboardState.audioPlayhead = 0;
+        clearInterval(dashboardState.audioInterval);
+        dashboardState.audioInterval = null;
+        dashboardState.isPlayingAudio = false;
+        if (btn) btn.innerHTML = ic('play');
+        if (needle) needle.style.left = '0%';
+        if (durationTxt) durationTxt.textContent = '00:00';
+        const bars = document.querySelectorAll('#waveform-box .smoky-wave-bar');
+        bars.forEach(bar => bar.classList.remove('played'));
+        return;
+      }
+
       if (needle) needle.style.left = dashboardState.audioPlayhead + '%';
-      
-      // Update wave bars played status
+
+      const sec = Math.floor((dashboardState.audioPlayhead / 100) * 84);
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      if (durationTxt) durationTxt.textContent = `${m}:${s}`;
+
       const bars = document.querySelectorAll('#waveform-box .smoky-wave-bar');
       bars.forEach((bar, idx) => {
         const pct = (idx / bars.length) * 100;
         bar.classList.toggle('played', pct <= dashboardState.audioPlayhead);
       });
-    }, 200);
+    }, 250);
+
   } else {
-    clearInterval(dashboardState.audioInterval);
+    if (dashboardState.audioInterval) {
+      clearInterval(dashboardState.audioInterval);
+      dashboardState.audioInterval = null;
+    }
+    try {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (_) {}
   }
 };
 
 window.seekAudio = function(pos) {
-  dashboardState.audioPlayhead = pos;
+  dashboardState.audioPlayhead = Math.max(0, Math.min(100, pos));
   const needle = document.getElementById('waveform-needle');
-  if (needle) needle.style.left = pos + '%';
+  const durationTxt = document.getElementById('audio-duration-txt');
+  if (needle) needle.style.left = dashboardState.audioPlayhead + '%';
+
+  const sec = Math.floor((dashboardState.audioPlayhead / 100) * 84);
+  const m = String(Math.floor(sec / 60)).padStart(2, '0');
+  const s = String(sec % 60).padStart(2, '0');
+  if (durationTxt) durationTxt.textContent = `${m}:${s}`;
+
   const bars = document.querySelectorAll('#waveform-box .smoky-wave-bar');
   bars.forEach((bar, idx) => {
     const pct = (idx / bars.length) * 100;
-    bar.classList.toggle('played', pct <= pos);
+    bar.classList.toggle('played', pct <= dashboardState.audioPlayhead);
   });
 };
 

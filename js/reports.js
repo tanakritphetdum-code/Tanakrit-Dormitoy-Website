@@ -125,21 +125,38 @@ export async function renderReportsView() {
 }
 
 async function loadReportsData() {
-  const { data: rooms } = await supabase.from('rooms').select('*');
-  const { data: parcels } = await supabase.from('parcels').select('*');
-  const { data: bills } = await supabase.from('meter_readings').select('*');
-  const { data: tickets } = await supabase.from('maintenance').select('*');
+  const [
+    { data: tenantsData },
+    { data: parcelsData },
+    { data: billsData },
+    { data: ticketsData }
+  ] = await Promise.all([
+    supabase.from('tenants').select('*'),
+    supabase.from('parcels').select('*'),
+    supabase.from('meter_readings').select('*'),
+    supabase.from('maintenance').select('*')
+  ]);
 
-  // Fallbacks if data empty or loading
-  const totalRooms = rooms && rooms.length > 0 ? rooms.length : 17;
-  const occupied = rooms ? rooms.filter(r => r.status === 'occupied').length : 14;
-  const occRate = Math.round((occupied / totalRooms) * 100);
+  const tenants = Array.isArray(tenantsData) ? tenantsData.filter(t => t.status !== 'terminated') : [];
+  const parcels = Array.isArray(parcelsData) ? parcelsData : [];
+  const bills = Array.isArray(billsData) ? billsData : [];
+  const tickets = Array.isArray(ticketsData) ? ticketsData : [];
 
-  const totalRevenue = bills && bills.length > 0 ? bills.reduce((a, c) => a + (c.total_price || 0), 0) : 17336;
-  const paidRevenue = bills && bills.length > 0 ? bills.filter(b => b.status === 'paid').reduce((a, c) => a + (c.total_price || 0), 0) : 6796;
-  const collectionRate = totalRevenue > 0 ? Math.round((paidRevenue / totalRevenue) * 100) : 39;
+  const totalRooms = 17;
+  const occupied = tenants.length;
+  const activeMaintSet = new Set();
+  tickets.filter(t => t.status !== 'completed' && t.room_number).forEach(t => {
+    activeMaintSet.add(t.room_number.replace(/[^0-9B]/gi, ''));
+  });
+  const mnt = activeMaintSet.size;
+  const vac = Math.max(0, totalRooms - occupied - mnt);
+  const occRate = totalRooms > 0 ? Math.round((occupied / totalRooms) * 100) : 0;
 
-  const totalTickets = tickets && tickets.length > 0 ? tickets.length : 3;
+  const totalRevenue = bills.reduce((a, c) => a + (Number(c.total_price) || 0), 0);
+  const paidRevenue = bills.filter(b => b.status === 'paid').reduce((a, c) => a + (Number(c.total_price) || 0), 0);
+  const collectionRate = totalRevenue > 0 ? Math.round((paidRevenue / totalRevenue) * 100) : 0;
+
+  const totalTickets = tickets.length;
 
   const kpiOcc = document.getElementById('kpi-rep-occ');
   const kpiRev = document.getElementById('kpi-rep-rev');
@@ -149,7 +166,7 @@ async function loadReportsData() {
   if (kpiOcc) kpiOcc.textContent = `${occRate}%`;
   if (kpiRev) kpiRev.textContent = fmtCurrency(totalRevenue);
   if (kpiCol) kpiCol.textContent = `${collectionRate}%`;
-  if (kpiMaint) kpiMaint.textContent = `${totalTickets} รายการ`;
+  if (kpiMaint) kpiMaint.textContent = `${totalTickets}`;
 
   const btnRefresh = document.getElementById('btn-refresh-reports');
   if (btnRefresh) {
@@ -176,23 +193,19 @@ async function loadReportsData() {
   // 1. Occupancy Bars
   const occBox = document.getElementById('report-occupancy-bars');
   if (occBox) {
-    const tot = rooms && rooms.length > 0 ? rooms.length : 17;
-    const occ = rooms && rooms.length > 0 ? rooms.filter(r => r.status === 'occupied').length : 14;
-    const vac = rooms && rooms.length > 0 ? rooms.filter(r => r.status === 'vacant').length : 2;
-    const mnt = rooms && rooms.length > 0 ? rooms.filter(r => r.status === 'maintenance').length : 1;
     occBox.innerHTML = `
-      ${renderBar('มีผู้เช่าแล้ว (Occupied)', occ, tot, '#3B82F6')}
-      ${renderBar('ห้องว่างพร้อมเข้าอยู่ (Vacant)', vac, tot, '#34D399')}
-      ${renderBar('ปิดปรับปรุง / ซ่อมบำรุง (Maintenance)', mnt, tot, '#FBBF24')}
+      ${renderBar('มีผู้เช่าแล้ว (Occupied)', occupied, totalRooms, '#3B82F6')}
+      ${renderBar('ห้องว่างพร้อมเข้าอยู่ (Vacant)', vac, totalRooms, '#34D399')}
+      ${renderBar('ปิดปรับปรุง / ซ่อมบำรุง (Maintenance)', mnt, totalRooms, '#FBBF24')}
     `;
   }
 
   // 2. Parcels Bars
   const parcelBox = document.getElementById('report-parcels-bars');
   if (parcelBox) {
-    const tot = parcels && parcels.length > 0 ? parcels.length : 3;
-    const col = parcels && parcels.length > 0 ? parcels.filter(p => p.status === 'collected').length : 1;
-    const wai = parcels && parcels.length > 0 ? parcels.filter(p => p.status === 'waiting').length : 2;
+    const tot = parcels.length;
+    const col = parcels.filter(p => p.status === 'collected').length;
+    const wai = parcels.filter(p => p.status === 'waiting').length;
     parcelBox.innerHTML = `
       ${renderBar('รับมอบแล้วเรียบร้อย (Collected)', col, tot, '#34D399')}
       ${renderBar('รอผู้พักมารับ (Waiting)', wai, tot, '#FBBF24')}
@@ -202,9 +215,9 @@ async function loadReportsData() {
   // 3. Utilities Bars
   const utilBox = document.getElementById('report-utility-bars');
   if (utilBox) {
-    const tot = bills && bills.length > 0 ? bills.length : 5;
-    const paid = bills && bills.length > 0 ? bills.filter(b => b.status === 'paid').length : 2;
-    const pend = bills && bills.length > 0 ? bills.filter(b => b.status === 'pending').length : 3;
+    const tot = bills.length;
+    const paid = bills.filter(b => b.status === 'paid').length;
+    const pend = bills.filter(b => b.status === 'pending').length;
     utilBox.innerHTML = `
       ${renderBar('ชำระแล้วเรียบร้อย (Paid)', paid, tot, '#34D399')}
       ${renderBar('รอชำระเงิน / ค้างชำระ (Pending)', pend, tot, '#FB7185')}
@@ -214,10 +227,10 @@ async function loadReportsData() {
   // 4. Maintenance Bars
   const maintBox = document.getElementById('report-maint-bars');
   if (maintBox) {
-    const tot = tickets && tickets.length > 0 ? tickets.length : 3;
-    const comp = tickets && tickets.length > 0 ? tickets.filter(t => t.status === 'completed').length : 1;
-    const prog = tickets && tickets.length > 0 ? tickets.filter(t => t.status === 'in_progress').length : 2;
-    const pend = tickets && tickets.length > 0 ? tickets.filter(t => t.status === 'pending').length : 0;
+    const tot = tickets.length;
+    const comp = tickets.filter(t => t.status === 'completed').length;
+    const prog = tickets.filter(t => t.status === 'in_progress').length;
+    const pend = tickets.filter(t => t.status === 'pending').length;
     maintBox.innerHTML = `
       ${renderBar('ซ่อมเสร็จสิ้น (Completed)', comp, tot, '#34D399')}
       ${renderBar('กำลังดำเนินการซ่อม (In Progress)', prog, tot, '#60A5FA')}

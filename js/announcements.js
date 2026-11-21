@@ -9,32 +9,7 @@ let annCategoryFilter = 'all';
 let annSearchQuery = '';
 let cachedAnnouncements = [];
 
-export const DEFAULT_ANNOUNCEMENTS = [
-  {
-    id: 'ANN-01',
-    title: 'กำหนดการล้างเครื่องปรับอากาศประจำปี',
-    content: 'หอพักจะดำเนินการล้างแอร์ห้องพักทุกชั้น ระหว่างวันที่ 28-30 ตุลาคม 2569 เจ้าหน้าที่จะติดต่อแจ้งนัดเวลาล่วงหน้า 1 วัน ขอความร่วมมือผู้พักเก็บสัมภาระมีค่าให้เรียบร้อย',
-    category: 'ซ่อมบำรุง',
-    date: '2026-10-20',
-    pinned: true
-  },
-  {
-    id: 'ANN-02',
-    title: 'แจ้งกำหนดชำระค่าน้ำ-ค่าไฟ ประจำงวดเดือนตุลาคม',
-    content: 'ระบบได้ออกบิลค่าน้ำ-ค่าไฟเรียบร้อยแล้ว กรุณาชำระเงินภายในวันที่ 5 พฤศจิกายน 2569 ผ่านระบบ QR Code หรือติดต่อเคาน์เตอร์สำนักงานหอพัก',
-    category: 'การเงิน',
-    date: '2026-10-18',
-    pinned: true
-  },
-  {
-    id: 'ANN-03',
-    title: 'แจ้งเวลาเปิด-ปิด ประตูรั้วและระบบคีย์การ์ด',
-    content: 'เพื่อความปลอดภัยสูงสุด ประตูรั้วใหญ่ปิดเวลา 23:00 น. นักศึกษาสามารถสแกนคีย์การ์ดผ่านประตูด้านข้างได้ตลอด 24 ชั่วโมง',
-    category: 'กฎระเบียบ',
-    date: '2026-10-01',
-    pinned: false
-  }
-];
+export const DEFAULT_ANNOUNCEMENTS = [];
 
 export async function renderAnnouncementsView() {
   setTimeout(() => {
@@ -161,7 +136,7 @@ async function loadAnnouncementsData() {
 
   let allList = list;
   if (error || !allList) {
-    allList = DEFAULT_ANNOUNCEMENTS;
+    allList = [];
   }
   cachedAnnouncements = allList;
 
@@ -304,14 +279,14 @@ function openAddAnnouncementModal() {
   const body = `
     <form id="form-add-announcement" style="display: flex; flex-direction: column; gap: 14px;">
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หัวข้อประกาศ *</label>
-        <input type="text" id="ann-title" placeholder="เช่น แจ้งกำหนดการทำความสะอาดอาคาร หรือซ่อมบำรุง" required style="width: 100%; height: 42px; border-radius: 8px;">
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หัวข้อประกาศ *</label>
+        <input type="text" id="ann-title" class="smoky-glass-input" placeholder="เช่น แจ้งกำหนดการทำความสะอาดอาคาร หรือซ่อมบำรุง" required style="width: 100%; height: 42px; border-radius: 8px;">
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หมวดหมู่</label>
-          <select id="ann-cat" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หมวดหมู่</label>
+          <select id="ann-cat" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="ทั่วไป">ทั่วไป</option>
             <option value="ซ่อมบำรุง">ซ่อมบำรุง</option>
             <option value="การเงิน">การเงิน / ค่าเช่า</option>
@@ -321,13 +296,13 @@ function openAddAnnouncementModal() {
         </div>
         <div class="field" style="display:flex; align-items:center; gap:8px; margin-top:26px;">
           <input type="checkbox" id="ann-pinned" style="width:20px; height:20px; accent-color: #3B82F6;">
-          <label for="ann-pinned" style="margin:0; cursor:pointer; font-weight:600; font-size: 0.86rem; color: var(--teal-950);">📌 ปักหมุดไว้บนสุด</label>
+          <label for="ann-pinned" class="smoky-form-label" style="margin:0; cursor:pointer; font-size: 0.86rem;">📌 ปักหมุดไว้บนสุด</label>
         </div>
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">เนื้อหาประกาศ *</label>
-        <textarea id="ann-content" rows="4" placeholder="พิมพ์รายละเอียดประกาศที่ต้องการแจ้งให้ผู้พักทราบ..." required style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">เนื้อหาประกาศ *</label>
+        <textarea id="ann-content" class="smoky-glass-input" rows="4" placeholder="พิมพ์รายละเอียดประกาศที่ต้องการแจ้งให้ผู้พักทราบ..." required style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
       </div>
     </form>
   `;

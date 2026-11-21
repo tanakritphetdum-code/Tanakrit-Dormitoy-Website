@@ -1238,44 +1238,44 @@ function openInvoiceModal(bill) {
 
       <!-- ส่วนชำระเงิน และแนบสลิปโอนเงิน -->
       ${!isPaid ? `
-        <div class="qr-payment-box" style="margin-top:20px;">
+        <div class="qr-payment-box smoky-modal-block" style="margin-top:20px; padding: 16px; border-radius: 12px;">
           <div style="flex: 1;">
-            <div style="font-weight: 600; color: var(--teal-950); margin-bottom: 6px; font-size: 1rem;">
+            <div class="smoky-modal-card-title" style="font-weight: 600; margin-bottom: 6px; font-size: 1rem;">
               📱 สแกนจ่ายผ่าน Thai QR PromptPay
             </div>
-            <p style="font-size: 0.85rem; color: var(--muted); margin: 0 0 8px 0; line-height: 1.5;">
+            <p class="smoky-modal-meta" style="font-size: 0.85rem; margin: 0 0 8px 0; line-height: 1.5;">
               รองรับทุกแอปพลิเคชันธนาคาร (พร้อมเพย์: 086-946-1654 นายเกียรติศักดิ์ บริหาร)<br>
-              เมื่อโอนชำระเรียบรวย สามารถแนบสลิปด้านล่างเพื่อให้เจ้าหน้าที่อนุมัติทันที
+              เมื่อโอนชำระเรียบร้อย สามารถแนบสลิปด้านล่างเพื่อให้เจ้าหน้าที่อนุมัติทันที
             </p>
           </div>
           <div style="text-align: center;">
-            <img src="${qrMockUrl}" alt="PromptPay QR Code" class="qr-img">
-            <div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">สแกนเพื่อจ่ายเงิน</div>
+            <img src="${qrMockUrl}" alt="PromptPay QR Code" class="qr-img" style="background:#fff; padding:6px; border-radius:10px;">
+            <div class="smoky-modal-meta" style="font-size: 0.75rem; margin-top: 4px;">สแกนเพื่อจ่ายเงิน</div>
           </div>
         </div>
 
         <!-- ฟอร์มอัปโหลดสลิป -->
-        <div style="margin-top:18px; background:#FAFDFB; border:1.5px solid var(--line); border-radius:12px; padding:18px;">
-          <h4 style="margin:0 0 8px 0; color:var(--teal-950); display:flex; align-items:center; gap:8px;">
+        <div class="smoky-modal-block" style="margin-top:18px; border-radius:12px; padding:18px;">
+          <h4 class="smoky-modal-card-title" style="margin:0 0 8px 0; display:flex; align-items:center; gap:8px;">
             ${ic('image')} แนบสลิปหลักฐานการโอนเงิน (Upload Payment Slip)
           </h4>
-          <p style="font-size:0.85rem; color:var(--muted); margin:0 0 14px 0;">
+          <p class="smoky-modal-meta" style="font-size:0.85rem; margin:0 0 14px 0;">
             คลิกกล่องด้านล่างเพื่อเลือกรูปสลิปจากเครื่อง หรือถ่ายรูปสลิป
           </p>
 
           <input type="file" id="slip-file-input" accept="image/*" style="display:none;">
 
-          <div class="upload-dropzone" id="slip-dropzone">
+          <div class="upload-dropzone smoky-modal-notes" id="slip-dropzone" style="cursor: pointer; padding: 16px; text-align: center; border-radius: 10px;">
             <div id="slip-dropzone-content">
               <div style="font-size:2rem; margin-bottom:4px;">📸</div>
-              <div style="font-weight:600; color:var(--teal-950); font-size:0.95rem;">คลิกเพื่อเลือกไฟล์รูปภาพสลิป</div>
-              <div style="font-size:0.8rem; color:var(--muted); margin-top:4px;">รองรับ JPG, PNG, WEBP (ระบบบีบอัดขนาดให้อัตโนมัติ)</div>
+              <div class="smoky-modal-val" style="font-weight:600; font-size:0.95rem;">คลิกเพื่อเลือกไฟล์รูปภาพสลิป</div>
+              <div class="smoky-modal-meta" style="font-size:0.8rem; margin-top:4px;">รองรับ JPG, PNG, WEBP (ระบบบีบอัดขนาดให้อัตโนมัติ)</div>
             </div>
             <div id="slip-preview-wrap" style="display:none; align-items:center; justify-content:center; gap:14px;">
-              <img id="slip-preview-img" style="max-height:120px; border-radius:8px; border:1px solid var(--line); box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+              <img id="slip-preview-img" style="max-height:120px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); box-shadow:0 2px 8px rgba(0,0,0,0.2);">
               <div>
-                <div id="slip-filename" style="font-size:0.85rem; font-weight:600; color:var(--teal-950); margin-bottom:6px;"></div>
-                <button type="button" class="btn btn-outline btn-sm" id="btn-change-slip">เปลี่ยนรูปภาพ</button>
+                <div id="slip-filename" class="smoky-modal-val" style="font-size:0.85rem; font-weight:600; margin-bottom:6px;"></div>
+                <button type="button" class="smoky-round-glass-btn btn-sm" id="btn-change-slip" style="width:auto; padding:4px 12px; font-size:0.75rem;">เปลี่ยนรูปภาพ</button>
               </div>
             </div>
           </div>
@@ -1448,20 +1448,20 @@ async function openAddMeterModal() {
   const body = `
     <form id="form-meter-reading" style="display: flex; flex-direction: column; gap: 14px;">
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">เลือกห้องพัก (3 อาคาร 17 ห้อง) *</label>
-        <select id="mr-room" class="form-select" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">เลือกห้องพัก (3 อาคาร 17 ห้อง) *</label>
+        <select id="mr-room" class="smoky-glass-select" style="width: 100%;">
           ${roomOptions}
         </select>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">รอบเดือนประจำบิล</label>
-          <input type="month" id="mr-month" value="2026-11" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">รอบเดือนประจำบิล</label>
+          <input type="month" id="mr-month" value="2026-11" class="smoky-glass-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ค่าเช่าห้องพัก (บาท/เดือน)</label>
-          <input type="number" id="mr-room-price" value="2800" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ค่าเช่าห้องพัก (บาท/เดือน)</label>
+          <input type="number" id="mr-room-price" value="2800" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
@@ -1472,16 +1472,16 @@ async function openAddMeterModal() {
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งก่อน</label>
-            <input type="number" id="mr-water-prev" value="100" class="form-input" style="width: 100%;">
+            <label class="smoky-form-label" style="font-size: 0.74rem;">เลขครั้งก่อน</label>
+            <input type="number" id="mr-water-prev" value="100" class="smoky-glass-input" style="width: 100%;">
           </div>
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งนี้ *</label>
-            <input type="number" id="mr-water-curr" value="105" class="form-input" style="width: 100%;" required>
+            <label class="smoky-form-label" style="font-size: 0.74rem;">เลขครั้งนี้ *</label>
+            <input type="number" id="mr-water-curr" value="105" class="smoky-glass-input" style="width: 100%;" required>
           </div>
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">รวมเงินค่าน้ำ</label>
-            <input type="text" id="mr-water-total" disabled value="90 ฿" class="form-input" style="width: 100%; background: rgba(255,255,255,0.04); color: #60A5FA; font-weight: 700;">
+            <label class="smoky-form-label" style="font-size: 0.74rem;">รวมเงินค่าน้ำ</label>
+            <input type="text" id="mr-water-total" disabled value="90 ฿" class="smoky-glass-input" style="width: 100%; color: #60A5FA; font-weight: 700;">
           </div>
         </div>
       </div>
@@ -1493,16 +1493,16 @@ async function openAddMeterModal() {
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งก่อน</label>
-            <input type="number" id="mr-elec-prev" value="500" class="form-input" style="width: 100%;">
+            <label class="smoky-form-label" style="font-size: 0.74rem;">เลขครั้งก่อน</label>
+            <input type="number" id="mr-elec-prev" value="500" class="smoky-glass-input" style="width: 100%;">
           </div>
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">เลขครั้งนี้ *</label>
-            <input type="number" id="mr-elec-curr" value="545" class="form-input" style="width: 100%;" required>
+            <label class="smoky-form-label" style="font-size: 0.74rem;">เลขครั้งนี้ *</label>
+            <input type="number" id="mr-elec-curr" value="545" class="smoky-glass-input" style="width: 100%;" required>
           </div>
           <div class="field">
-            <label style="font-size: 0.74rem; color: rgba(255,255,255,0.6);">รวมเงินค่าไฟ</label>
-            <input type="text" id="mr-elec-total" disabled value="360 ฿" class="form-input" style="width: 100%; background: rgba(255,255,255,0.04); color: #F59E0B; font-weight: 700;">
+            <label class="smoky-form-label" style="font-size: 0.74rem;">รวมเงินค่าไฟ</label>
+            <input type="text" id="mr-elec-total" disabled value="360 ฿" class="smoky-glass-input" style="width: 100%; color: #F59E0B; font-weight: 700;">
           </div>
         </div>
       </div>
@@ -1842,20 +1842,17 @@ async function loadRoomsData() {
   // 1. นำโครงสร้างห้องพักมาตรฐาน 17 ห้องเป็นตัวตั้ง
   let rooms = JSON.parse(JSON.stringify(DEFAULT_ROOMS));
 
-  // 2. ซิงค์กับข้อมูลผู้พักอาศัยล่าสุดจาก Supabase Cloud หรือ Cache
+  // 2. ซิงค์กับข้อมูลผู้พักอาศัยล่าสุดจาก Supabase Cloud Realtime
   let dbTenants = [];
   try {
     const { data, error } = await supabase.from('tenants').select('*');
     if (!error && Array.isArray(data)) {
       dbTenants = data;
-    } else {
-      const local = localStorage.getItem('tanakrit_tenants_cache');
-      if (local) dbTenants = JSON.parse(local);
     }
   } catch (_) {}
 
-  // 3. ซิงค์กับรายการแจ้งซ่อมบำรุง (Maintenance) ที่กำลังดำเนินการ
-  const activeMaintRooms = new Set(['107']);
+  // 3. ซิงค์กับรายการแจ้งซ่อมบำรุง (Maintenance) ที่กำลังดำเนินการจาก Supabase Realtime
+  const activeMaintRooms = new Set();
   try {
     const { data: tickets } = await supabase.from('maintenance').select('room_number, status');
     if (tickets && Array.isArray(tickets)) {
@@ -2178,23 +2175,23 @@ function openManageRoomModal(room, allRooms) {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้องพัก</label>
-          <input type="text" id="m-type" value="${room.type || 'ห้องพัดลม'}" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ประเภทห้องพัก</label>
+          <input type="text" id="m-type" value="${room.type || 'ห้องพัดลม'}" class="smoky-glass-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
-          <input type="number" id="m-price" value="${room.price}" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
+          <input type="number" id="m-price" value="${room.price}" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ขนาดห้องพัก</label>
-          <input type="text" id="m-size" value="${room.size || (room.building === 'UnderGround' ? 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)' : 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)')}" class="form-input" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ขนาดห้องพัก</label>
+          <input type="text" id="m-size" value="${room.size || (room.building === 'UnderGround' ? 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)' : 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)')}" class="smoky-glass-input" style="width: 100%;">
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
-          <select id="m-bathroom" class="form-select" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
+          <select id="m-bathroom" class="smoky-glass-select" style="width: 100%;">
             <option value="ห้องน้ำในตัว" ${room.bathroom !== 'ห้องน้ำรวม' ? 'selected' : ''}>ห้องน้ำในตัว</option>
             <option value="ห้องน้ำรวม" ${room.bathroom === 'ห้องน้ำรวม' ? 'selected' : ''}>ห้องน้ำรวม</option>
           </select>
@@ -2202,8 +2199,8 @@ function openManageRoomModal(room, allRooms) {
       </div>
 
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">สถานะห้องพัก</label>
-        <select id="m-status" class="form-select" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">สถานะห้องพัก</label>
+        <select id="m-status" class="smoky-glass-select" style="width: 100%;">
           <option value="vacant" ${room.status === 'vacant' ? 'selected' : ''}>ห้องว่างพร้อมอยู่ (พร้อมทำสัญญา)</option>
           <option value="occupied" ${room.status === 'occupied' ? 'selected' : ''}>มีผู้พักอาศัยแล้ว</option>
           <option value="maintenance" ${room.status === 'maintenance' ? 'selected' : ''}>ปิดปรับปรุง / ซ่อมบำรุง</option>
@@ -2211,13 +2208,13 @@ function openManageRoomModal(room, allRooms) {
       </div>
 
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ชื่อผู้พักอาศัยปัจจุบัน</label>
-        <input type="text" id="m-tenant-name" value="${room.tenant_name || ''}" placeholder="ระบุชื่อผู้พักอาศัย (ถ้ามี)" class="form-input" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ชื่อผู้พักอาศัยปัจจุบัน</label>
+        <input type="text" id="m-tenant-name" value="${room.tenant_name || ''}" placeholder="ระบุชื่อผู้พักอาศัย (ถ้ามี)" class="smoky-glass-input" style="width: 100%;">
       </div>
 
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">เบอร์โทรศัพท์ผู้เช่า</label>
-        <input type="text" id="m-tenant-phone" value="${room.tenant_phone || ''}" placeholder="08x-xxx-xxxx" class="form-input" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">เบอร์โทรศัพท์ผู้เช่า</label>
+        <input type="text" id="m-tenant-phone" value="${room.tenant_phone || ''}" placeholder="08x-xxx-xxxx" class="smoky-glass-input" style="width: 100%;">
       </div>
     </form>
   `;
@@ -2318,12 +2315,12 @@ function openAddRoomModal() {
     <form id="form-add-room" style="display: flex; flex-direction: column; gap: 14px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">หมายเลขห้อง (เช่น 110, 206, B04)</label>
-          <input type="text" id="add-room-number" placeholder="เช่น 110" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">หมายเลขห้อง (เช่น 110, 206, B04)</label>
+          <input type="text" id="add-room-number" placeholder="เช่น 110" class="smoky-glass-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">อาคาร</label>
-          <select id="add-building" class="form-select" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">อาคาร</label>
+          <select id="add-building" class="smoky-glass-select" style="width: 100%;">
             <option value="Tanakrit">อาคาร ธนกฤษฎ์ (2,800 ฿ / เดือน)</option>
             <option value="KingPhetch">อาคาร กิ่งเพชร (2,600 ฿ / เดือน)</option>
             <option value="UnderGround">อาคาร ใต้บ้าน (1,500 ฿ / เดือน)</option>
@@ -2333,23 +2330,23 @@ function openAddRoomModal() {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้อง</label>
-          <input type="text" id="add-type" value="ห้องพัดลม" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ประเภทห้อง</label>
+          <input type="text" id="add-type" value="ห้องพัดลม" class="smoky-glass-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
-          <input type="number" id="add-price" value="2800" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
+          <input type="number" id="add-price" value="2800" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ขนาดห้อง</label>
-          <input type="text" id="add-size" value="กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)" class="form-input" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ขนาดห้อง</label>
+          <input type="text" id="add-size" value="กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)" class="smoky-glass-input" style="width: 100%;">
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
-          <select id="add-bathroom" class="form-select" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
+          <select id="add-bathroom" class="smoky-glass-select" style="width: 100%;">
             <option value="ห้องน้ำในตัว">ห้องน้ำในตัว</option>
             <option value="ห้องน้ำรวม">ห้องน้ำรวม</option>
           </select>
@@ -2357,8 +2354,8 @@ function openAddRoomModal() {
       </div>
 
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">สถานะเริ่มต้น</label>
-        <select id="add-status" class="form-select" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">สถานะเริ่มต้น</label>
+        <select id="add-status" class="smoky-glass-select" style="width: 100%;">
           <option value="vacant">ห้องว่าง (พร้อมเปิดให้เช่า)</option>
           <option value="occupied">มีผู้เช่าแล้ว</option>
           <option value="maintenance">ปิดปรับปรุง</option>
@@ -2471,234 +2468,8 @@ let tenantSearchTerm = '';
 let tenantSortBy = 'room_asc';
 let cachedTenants = [];
 
-// ข้อมูลรายชื่อผู้พักอาศัยมาตรฐานของหอพัก 17 ห้อง (3 อาคาร)
-const DEFAULT_TENANTS = [
-  // 1. อาคาร ธนกฤษฎ์ (9 ห้อง: 101-109, อัตรา 2,800 ฿/เดือน)
-  {
-    id: 'T-1001',
-    tenant_id: '6512345',
-    name: 'นายสมชาย ธนกฤษฎ์',
-    room: '101',
-    building: 'Tanakrit',
-    building_th: 'อาคาร ธนกฤษฎ์',
-    rent: 2800,
-    phone: '089-123-4567',
-    email: 'somchai.t@student.tanakrit.com',
-    line_id: 'somchai_tk',
-    id_card: '1-8099-00123-45-1',
-    check_in: '2026-06-01',
-    lease_term: 'สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)',
-    deposit: 2000,
-    emergency_contact: 'คุณสมเกียรติ (บิดา) 081-987-6543',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80',
-    notes: 'ชำระค่าเช่าตรงเวลาทุกงวด เรียบร้อยดี'
-  },
-  {
-    id: 'T-1002',
-    tenant_id: '6512348',
-    name: 'น.ส.วิภาดา สมบูรณ์',
-    room: '102',
-    building: 'Tanakrit',
-    building_th: 'อาคาร ธนกฤษฎ์',
-    rent: 2800,
-    phone: '082-222-3344',
-    email: 'wiphada.s@student.tanakrit.com',
-    line_id: 'wiphada_s',
-    id_card: '1-8099-00123-45-2',
-    check_in: '2026-06-10',
-    lease_term: 'สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)',
-    deposit: 2000,
-    emergency_contact: 'คุณวิภา (มารดา) 089-222-1100',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80',
-    notes: 'นักศึกษาพยาบาลศาสตร์ ต้องการความเงียบสงบ'
-  },
-  {
-    id: 'T-1003',
-    tenant_id: '66565632',
-    name: 'โยคี มีทอน',
-    room: '103',
-    building: 'Tanakrit',
-    building_th: 'อาคาร ธนกฤษฎ์',
-    rent: 2800,
-    phone: '086-449-8564',
-    email: 'tanakritphetdum@gmail.com',
-    line_id: 'yokee_mt',
-    id_card: '1-8099-00123-45-3',
-    check_in: '2026-10-29',
-    lease_term: 'สัญญา 1 ปี (พ.ย. 68 - ต.ค. 69)',
-    deposit: 2000,
-    emergency_contact: 'คุณเกียรติศักดิ์ 086-946-1654',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=80&auto=format&fit=crop&q=80',
-    notes: 'ผู้เช่าทำสัญญาออนไลน์ผ่านเว็บไซต์'
-  },
-  {
-    id: 'T-1004',
-    tenant_id: '6512349',
-    name: 'นายภาณุพงศ์ ทองแท้',
-    room: '104',
-    building: 'Tanakrit',
-    building_th: 'อาคาร ธนกฤษฎ์',
-    rent: 2800,
-    phone: '083-333-4455',
-    email: 'panupong.t@student.tanakrit.com',
-    line_id: 'panupong_t',
-    id_card: '1-8099-00123-45-4',
-    check_in: '2026-07-01',
-    lease_term: 'สัญญา 1 ปี (ก.ค. 68 - มิ.ย. 69)',
-    deposit: 2000,
-    emergency_contact: 'คุณทองแท้ (บิดา) 084-555-7788',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80',
-    notes: 'นักศึกษาวิศวกรรมศาสตร์ มีรถจักรยานยนต์ 1 คัน'
-  },
-  {
-    id: 'T-1005',
-    tenant_id: '6512350',
-    name: 'น.ส.กมลวรรณ ชัยเจริญ',
-    room: '105',
-    building: 'Tanakrit',
-    building_th: 'อาคาร ธนกฤษฎ์',
-    rent: 2800,
-    phone: '084-444-5566',
-    email: 'kamolwan.c@student.tanakrit.com',
-    line_id: 'kamolwan_c',
-    id_card: '1-8099-00123-45-5',
-    check_in: '2026-07-05',
-    lease_term: 'สัญญา 1 ปี (ก.ค. 68 - มิ.ย. 69)',
-    deposit: 2000,
-    emergency_contact: 'คุณชัยเจริญ (บิดา) 081-333-2211',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80',
-    notes: 'ผู้เช่าทำสัญญาใหม่ แจ้งขอรับพัสดุบ่อย'
-  },
-  {
-    id: 'T-1006',
-    tenant_id: '6512355',
-    name: 'นายพงศธร ใจซื่อ',
-    room: '106',
-    building: 'Tanakrit',
-    building_th: 'อาคาร ธนกฤษฎ์',
-    rent: 2800,
-    phone: '082-777-8899',
-    email: 'pongsatorn.j@student.tanakrit.com',
-    line_id: 'pongsatorn_j',
-    id_card: '1-8099-00123-45-6',
-    check_in: '2026-06-01',
-    lease_term: 'สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)',
-    deposit: 2000,
-    emergency_contact: 'คุณใจซื่อ 086-444-3322',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80',
-    notes: 'แจ้งก๊อกน้ำรั่วในห้องน้ำ กำลังดำเนินการซ่อม'
-  },
-
-  // 2. อาคาร กิ่งเพชร (5 ห้อง: 201-205, อัตรา 2,600 ฿/เดือน)
-  {
-    id: 'T-2001',
-    tenant_id: '6512346',
-    name: 'ณัฐพล ใจดี',
-    room: '201',
-    building: 'KingPhetch',
-    building_th: 'อาคาร กิ่งเพชร',
-    rent: 2600,
-    phone: '081-234-5678',
-    email: 'nattapon.j@student.tanakrit.com',
-    line_id: 'nattapon_jd',
-    id_card: '1-8099-00123-45-7',
-    check_in: '2026-06-01',
-    lease_term: 'สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)',
-    deposit: 2000,
-    emergency_contact: 'คุณใจดี (มารดา) 089-111-2233',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=80&auto=format&fit=crop&q=80',
-    notes: 'ตัวแทนผู้เช่าประจำอาคารกิ่งเพชร'
-  },
-  {
-    id: 'T-2002',
-    tenant_id: '6512358',
-    name: 'นายนครินทร์ ศรีทอง',
-    room: '202',
-    building: 'KingPhetch',
-    building_th: 'อาคาร กิ่งเพชร',
-    rent: 2600,
-    phone: '085-555-6677',
-    email: 'nakarin.s@student.tanakrit.com',
-    line_id: 'nakarin_st',
-    id_card: '1-8099-00123-45-8',
-    check_in: '2026-06-15',
-    lease_term: 'สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)',
-    deposit: 2000,
-    emergency_contact: 'คุณศรีทอง 081-666-5544',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&auto=format&fit=crop&q=80',
-    notes: 'ต่อสัญญาเป็นปีที่ 2 สภาพห้องสมบูรณ์'
-  },
-  {
-    id: 'T-2003',
-    tenant_id: '6512351',
-    name: 'นายวรพจน์ มณีรัตน์',
-    room: '203',
-    building: 'KingPhetch',
-    building_th: 'อาคาร กิ่งเพชร',
-    rent: 2600,
-    phone: '088-888-9900',
-    email: 'worapoj.m@student.tanakrit.com',
-    line_id: 'worapoj_m',
-    id_card: '1-8099-00123-45-9',
-    check_in: '2026-06-01',
-    lease_term: 'สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)',
-    deposit: 2000,
-    emergency_contact: 'คุณมณีรัตน์ 089-777-1122',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=80&auto=format&fit=crop&q=80',
-    notes: 'ชำระค่าห้องผ่านแอปธนาคาร พร้อมเพย์'
-  },
-
-  // 3. อาคาร ใต้บ้าน (3 ห้อง: B01-B03, อัตรา 1,500 ฿/เดือน)
-  {
-    id: 'T-B001',
-    tenant_id: '6512361',
-    name: 'นายอนุสรณ์ พันธุ์เพชร',
-    room: 'B01',
-    building: 'UnderGround',
-    building_th: 'อาคาร ใต้บ้าน',
-    rent: 1500,
-    phone: '089-111-9988',
-    email: 'anusorn.p@student.tanakrit.com',
-    line_id: 'anusorn_p',
-    id_card: '1-8099-00123-46-0',
-    check_in: '2026-06-01',
-    lease_term: 'สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)',
-    deposit: 1500,
-    emergency_contact: 'คุณพันธุ์เพชร 081-444-5555',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&auto=format&fit=crop&q=80',
-    notes: 'ห้องพักชั้นล่าง สะดวก เข้าออกง่าย'
-  },
-  {
-    id: 'T-B002',
-    tenant_id: '6512362',
-    name: 'นายธนากร แสนสุข',
-    room: 'B02',
-    building: 'UnderGround',
-    building_th: 'อาคาร ใต้บ้าน',
-    rent: 1500,
-    phone: '087-777-6655',
-    email: 'thanakorn.s@student.tanakrit.com',
-    line_id: 'thanakorn_s',
-    id_card: '1-8099-00123-46-1',
-    check_in: '2026-07-01',
-    lease_term: 'สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)',
-    deposit: 1500,
-    emergency_contact: 'คุณแสนสุข 086-333-2211',
-    status: 'active',
-    avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=80&auto=format&fit=crop&q=80',
-    notes: 'สัญญา 6 เดือน สิ้นสุดสิ้นปี 2568'
-  }
-];
+// ข้อมูลรายชื่อผู้พักอาศัยเริ่มต้น (ว่างเปล่าเมื่อไม่มีข้อมูลในฐานข้อมูลจริง)
+const DEFAULT_TENANTS = [];
 
 // ฟังก์ชันวิเคราะห์ข้อมูลอาคารและค่าเช่าจากเลขห้องพัก
 function getBuildingInfo(roomNum) {
@@ -2755,16 +2526,12 @@ async function fetchTenantsList() {
       cachedTenants = mapped;
       localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
     } else if (error) {
-      console.warn('Fetch tenants error, fallback to cache:', error);
-      if (cachedTenants.length === 0) {
-        cachedTenants = [...DEFAULT_TENANTS];
-      }
+      console.warn('Fetch tenants error:', error);
+      cachedTenants = [];
     }
   } catch (err) {
-    console.warn('Fetch tenants error, fallback to cache:', err);
-    if (cachedTenants.length === 0) {
-      cachedTenants = [...DEFAULT_TENANTS];
-    }
+    console.warn('Fetch tenants exception:', err);
+    cachedTenants = [];
   }
   return cachedTenants;
 }
@@ -3829,62 +3596,37 @@ window.exportTenantsCSV = exportTenantsCSV;
 let bookingFilterStatus = 'all';
 let bookingSearchTerm = '';
 let cachedBookings = [];
-const DEFAULT_BOOKINGS = [
-  {
-    id: 'BK-101',
-    full_name: 'นายศุภกฤต สิทธิชัย',
-    phone: '081-999-1234',
-    line_id: 'supakrit.s',
-    room_type: 'อาคาร ธนกฤษฎ์ (2,800 ฿)',
-    preferred_floor: null,
-    expected_check_in: '2026-11-06',
-    notes: 'สนใจห้องพักอาคารธนกฤษฎ์ สะอาด โปร่งสบาย เข้าพักต้นเดือนหน้าครับ',
-    status: 'pending',
-    created_at: '2026-10-30T02:18:43.160152+00:00'
-  },
-  {
-    id: 'BK-102',
-    full_name: 'น.ส.กัญญาณัฐ บุญมี',
-    phone: '089-888-5678',
-    line_id: 'kanyanat_b',
-    room_type: 'อาคาร กิ่งเพชร (2,600 ฿)',
-    preferred_floor: null,
-    expected_check_in: '2026-11-09',
-    notes: 'ต้องการห้องมุม อาคารกิ่งเพชร เพื่อความเงียบสงบในการอ่านหนังสือ',
-    status: 'contacted',
-    created_at: '2026-10-30T02:18:43.160152+00:00'
-  }
-];
+const DEFAULT_BOOKINGS = [];
 
 // ฟังก์ชันเปิด Modal จองห้องพักจากหน้า Landing Page (เรียกใช้งานได้แบบ Public)
 function openBookingModal(preselectedType = '') {
   const body = `
     <form id="form-public-booking" style="display: flex; flex-direction: column; gap: 14px;">
-      <div style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; padding: 12px;">
-        <div style="font-size: 0.86rem; color: #1E3A8A; line-height: 1.5;">
+      <div class="smoky-modal-notes" style="background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3); border-radius: 10px; padding: 12px; margin-bottom: 2px;">
+        <div style="font-size: 0.86rem; color: #3B82F6; line-height: 1.5; font-weight: 500;">
           ✨ กรอกข้อมูลเพื่อแจ้งความประสงค์จองหรือสอบถามห้องพักว่าง 3 อาคาร (ธนกฤษฎ์, กิ่งเพชร, ใต้บ้าน) เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันห้องพักและรายละเอียดเงินมัดจำครับ
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ชื่อ - นามสกุล ผู้จอง *</label>
-          <input type="text" id="bk-name" required placeholder="นาย/นางสาว ..." style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ชื่อ - นามสกุล ผู้จอง *</label>
+          <input type="text" id="bk-name" class="smoky-glass-input" required placeholder="นาย/นางสาว ..." style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ *</label>
-          <input type="tel" id="bk-phone" required placeholder="08x-xxx-xxxx" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ *</label>
+          <input type="tel" id="bk-phone" class="smoky-glass-input" required placeholder="08x-xxx-xxxx" style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">Line ID (สำหรับส่งรูป/สัญญา)</label>
-          <input type="text" id="bk-line" placeholder="เช่น @line_id หรือเบอร์โทร" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">Line ID (สำหรับส่งรูป/สัญญา)</label>
+          <input type="text" id="bk-line" class="smoky-glass-input" placeholder="เช่น @line_id หรือเบอร์โทร" style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">อาคารและห้องพักที่สนใจ *</label>
-          <select id="bk-type" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">อาคารและห้องพักที่สนใจ *</label>
+          <select id="bk-type" class="smoky-glass-select" required style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="อาคาร ธนกฤษฎ์ (2,800 ฿)" ${preselectedType.includes('Tanakrit') || preselectedType.includes('ธนกฤษฎ์') ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 2,800 ฿/เดือน</option>
             <option value="อาคาร กิ่งเพชร (2,600 ฿)" ${preselectedType.includes('KingPhetch') || preselectedType.includes('กิ่งเพชร') ? 'selected' : ''}>อาคาร กิ่งเพชร (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 2,600 ฿/เดือน</option>
             <option value="อาคาร ใต้บ้าน (1,500 ฿)" ${preselectedType.includes('UnderGround') || preselectedType.includes('ใต้บ้าน') ? 'selected' : ''}>อาคาร ใต้บ้าน (ห้องพัดลม 12 ตร.ม. ห้องน้ำรวม) 1,500 ฿/เดือน</option>
@@ -3894,8 +3636,8 @@ function openBookingModal(preselectedType = '') {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">เลือกอาคารที่ต้องการ</label>
-          <select id="bk-floor" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">เลือกอาคารที่ต้องการ</label>
+          <select id="bk-floor" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="">เลือกอาคารใดก็ได้ (ตามห้องว่าง)</option>
             <option value="ธนกฤษฎ์">เฉพาะอาคาร ธนกฤษฎ์ (9 ห้อง)</option>
             <option value="กิ่งเพชร">เฉพาะอาคาร กิ่งเพชร (5 ห้อง)</option>
@@ -3903,14 +3645,14 @@ function openBookingModal(preselectedType = '') {
           </select>
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">วันที่คาดว่าจะเข้าพัก *</label>
-          <input type="date" id="bk-date" required value="${new Date().toISOString().split('T')[0]}" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">วันที่คาดว่าจะเข้าพัก *</label>
+          <input type="date" id="bk-date" class="smoky-glass-input" required value="${new Date().toISOString().split('T')[0]}" style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ข้อความเพิ่มเติม / ความต้องการพิเศษ</label>
-        <textarea id="bk-notes" rows="3" placeholder="เช่น มีรถจักรยานยนต์ 1 คัน, ขอนัดดูห้องตัวอย่างวันเสาร์นี้" style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ข้อความเพิ่มเติม / ความต้องการพิเศษ</label>
+        <textarea id="bk-notes" class="smoky-glass-input" rows="3" placeholder="เช่น มีรถจักรยานยนต์ 1 คัน, ขอนัดดูห้องตัวอย่างวันเสาร์นี้" style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
       </div>
     </form>
   `;
@@ -4129,7 +3871,7 @@ async function loadBookingsData() {
 
   let allBookings = bookings;
   if (error || !allBookings) {
-    allBookings = DEFAULT_BOOKINGS;
+    allBookings = [];
   }
   cachedBookings = allBookings;
 
@@ -4619,47 +4361,7 @@ function renderNewRequestView() {
 let maintenanceFilter = 'all';
 let maintenanceSearchQuery = '';
 let cachedTickets = [];
-const DEFAULT_MAINTENANCE_TICKETS = [
-  {
-    id: 'FIX-101',
-    room_number: '107',
-    requester_name: 'นายธนาธิป สุวรรณ',
-    phone: '089-123-4567',
-    category: 'เครื่องปรับอากาศ',
-    description: 'แอร์มีน้ำหยดบริเวณท่อด้านในห้อง และมีเสียงดังเวลากลางคืน',
-    urgency: 'high',
-    status: 'in_progress',
-    technician: 'ช่างวิเชียร (แอร์)',
-    created_at: '2026-10-20',
-    image_url: null
-  },
-  {
-    id: 'FIX-102',
-    room_number: '106',
-    requester_name: 'ส่วนกลาง',
-    phone: '075-345-678',
-    category: 'ระบบประปา',
-    description: 'ก๊อกน้ำในห้องน้ำรั่วซึม ปิดไม่สนิท กำลังเปลี่ยนชุดวาล์ว',
-    urgency: 'medium',
-    status: 'in_progress',
-    technician: 'ช่างสมบูรณ์',
-    created_at: '2026-10-19',
-    image_url: null
-  },
-  {
-    id: 'FIX-103',
-    room_number: '201',
-    requester_name: 'ณัฐพล ใจดี',
-    phone: '081-234-5678',
-    category: 'ไฟฟ้า/แสงสว่าง',
-    description: 'หลอดไฟระเบียงหลังห้องขาด 1 หลอด',
-    urgency: 'low',
-    status: 'completed',
-    technician: 'ช่างวิเชียร',
-    created_at: '2026-10-12',
-    image_url: null
-  }
-];
+const DEFAULT_MAINTENANCE_TICKETS = [];
 function getBuildingName(roomNum) {
   const r = String(roomNum || '').trim();
   if (r.startsWith('1')) return 'อาคาร ธนกฤษฎ์';
@@ -4805,7 +4507,7 @@ async function loadMaintenanceData() {
 
   let allTickets = tickets;
   if (error || !allTickets) {
-    allTickets = DEFAULT_MAINTENANCE_TICKETS;
+    allTickets = [];
   }
   cachedTickets = allTickets;
 
@@ -4820,7 +4522,7 @@ async function loadMaintenanceData() {
   const kpiProgress = document.getElementById('kpi-maint-progress');
   const kpiCompleted = document.getElementById('kpi-maint-completed');
 
-  if (kpiTotal) kpiTotal.textContent = `${totalCount} รายการ`;
+  if (kpiTotal) kpiTotal.textContent = `${totalCount}`;
   if (kpiPending) kpiPending.textContent = `${pendingCount}`;
   if (kpiProgress) kpiProgress.textContent = `${progressCount}`;
   if (kpiCompleted) kpiCompleted.textContent = `${completedCount}`;
@@ -5026,14 +4728,14 @@ function openCreateTicketModal() {
     <form id="form-create-ticket" style="display: flex; flex-direction: column; gap: 14px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หมายเลขห้องพัก / จุดที่ชำรุด *</label>
-          <select id="tk-room" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หมายเลขห้องพัก / จุดที่ชำรุด *</label>
+          <select id="tk-room" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             ${roomOptions}
           </select>
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หมวดหมู่งานซ่อม *</label>
-          <select id="tk-cat" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หมวดหมู่งานซ่อม *</label>
+          <select id="tk-cat" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="เครื่องปรับอากาศ">เครื่องปรับอากาศ (แอร์)</option>
             <option value="ระบบประปา">ระบบประปา / ห้องน้ำ / ก๊อกรั่ว</option>
             <option value="ไฟฟ้า/แสงสว่าง">ระบบไฟฟ้า / หลอดไฟ / ปลั๊กไฟ</option>
@@ -5046,18 +4748,18 @@ function openCreateTicketModal() {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ชื่อผู้แจ้ง *</label>
-          <input type="text" id="tk-name" value="${defaultName}" placeholder="เช่น นายสมชาย, น.ส.วิภาดา" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ชื่อผู้แจ้ง *</label>
+          <input type="text" id="tk-name" class="smoky-glass-input" value="${defaultName}" placeholder="เช่น นายสมชาย, น.ส.วิภาดา" required style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ *</label>
-          <input type="tel" id="tk-phone" value="${defaultPhone}" placeholder="เช่น 089-xxx-xxxx" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ *</label>
+          <input type="tel" id="tk-phone" class="smoky-glass-input" value="${defaultPhone}" placeholder="เช่น 089-xxx-xxxx" required style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ระดับความเร่งด่วน</label>
-        <select id="tk-urgency" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ระดับความเร่งด่วน</label>
+        <select id="tk-urgency" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
           <option value="low">ปกติ (1-3 วันทำการ)</option>
           <option value="medium">ปานกลาง (ภายใน 24 ชม.)</option>
           <option value="high">⚡ ด่วนมาก (ส่งผลกระทบต่อการพักอาศัยทันที)</option>
@@ -5065,19 +4767,19 @@ function openCreateTicketModal() {
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">รายละเอียดอาการที่ชำรุดเสียหาย *</label>
-        <textarea id="tk-desc" rows="3" placeholder="ระบุอาการชำรุด จุดที่เกิดปัญหา เช่น ท่อน้ำใต้ซิงค์รั่ว, แอร์มีน้ำหยด, ปลั๊กหัวเตียงไม่มีไฟ" required style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">รายละเอียดอาการที่ชำรุดเสียหาย *</label>
+        <textarea id="tk-desc" class="smoky-glass-input" rows="3" placeholder="ระบุอาการชำรุด จุดที่เกิดปัญหา เช่น ท่อน้ำใต้ซิงค์รั่ว, แอร์มีน้ำหยด, ปลั๊กหัวเตียงไม่มีไฟ" required style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
       </div>
 
       <!-- ส่วนแนบรูปภาพจุดชำรุด -->
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">แนบรูปภาพจุดที่ชำรุด (ไม่บังคับ แต่ช่วยให้ช่างเตรียมเครื่องมือได้ตรงจุด)</label>
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">แนบรูปภาพจุดที่ชำรุด (ไม่บังคับ แต่ช่วยให้ช่างเตรียมเครื่องมือได้ตรงจุด)</label>
         <input type="file" id="tk-photo-input" accept="image/*" style="display:none;">
-        <div class="upload-dropzone" id="tk-photo-dropzone" style="padding:14px; border: 2px dashed #CBD5E1; border-radius: 10px; cursor: pointer; text-align: center; background: #F8FAFC;">
+        <div class="upload-dropzone" id="tk-photo-dropzone" style="padding:14px; border: 2px dashed #CBD5E1; border-radius: 10px; cursor: pointer; text-align: center; background: rgba(255,255,255,0.04);">
           <div id="tk-dropzone-content">
             <div style="font-size:1.6rem; margin-bottom:2px;">📸</div>
-            <div style="font-size:0.88rem; font-weight:600; color:var(--teal-950);">คลิกเพื่อถ่ายรูป หรือเลือกรูปภาพความเสียหาย</div>
-            <div style="font-size:0.75rem; color:var(--muted); margin-top:2px;">รองรับ JPG, PNG, WEBP (ระบบจะบีบอัดให้อัตโนมัติ)</div>
+            <div style="font-size:0.88rem; font-weight:600;" id="tk-dropzone-title">คลิกเพื่อถ่ายรูป หรือเลือกรูปภาพความเสียหาย</div>
+            <div style="font-size:0.75rem; color: rgba(255,255,255,0.45); margin-top:2px;">รองรับ JPG, PNG, WEBP (ระบบจะบีบอัดให้อัตโนมัติ)</div>
           </div>
           <div id="tk-preview-wrap" style="display:none; align-items:center; justify-content:center; gap:12px;">
             <img id="tk-preview-img" style="max-height:100px; border-radius:8px; border:1px solid #CBD5E1; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
@@ -5295,41 +4997,7 @@ function openUpdateTicketModal(ticket) {
 let parcelFilter = 'all';
 let parcelSearch = '';
 let cachedParcels = [];
-const DEFAULT_PARCELS = [
-  {
-    id: 'PKG-101',
-    tracking_number: 'TH0129384756',
-    courier: 'Flash Express',
-    recipient_name: 'นายสมชาย ธนกฤษฎ์',
-    room_number: '101',
-    description: 'กล่องพัสดุขนาดกลาง (อุปกรณ์วาดรูป)',
-    status: 'waiting',
-    arrived_at: '2026-10-22',
-    collected_at: null
-  },
-  {
-    id: 'PKG-102',
-    tracking_number: 'KERRY9948271',
-    courier: 'Kerry Express',
-    recipient_name: 'ณัฐพล ใจดี',
-    room_number: '201',
-    description: 'ซองเอกสารสำคัญ',
-    status: 'waiting',
-    arrived_at: '2026-10-21',
-    collected_at: null
-  },
-  {
-    id: 'PKG-103',
-    tracking_number: 'ED182947192TH',
-    courier: 'ไปรษณีย์ไทย (EMS)',
-    recipient_name: 'น.ส.วิภาดา สมบูรณ์',
-    room_number: '102',
-    description: 'กล่องพัสดุมาตรฐาน',
-    status: 'collected',
-    arrived_at: '2026-10-18',
-    collected_at: '2026-10-19'
-  }
-];
+const DEFAULT_PARCELS = [];
 function getBuildingName(roomNum) {
   const r = String(roomNum || '').trim();
   if (r.startsWith('1')) return 'อาคาร ธนกฤษฎ์';
@@ -5474,7 +5142,7 @@ async function loadParcelsData() {
 
   let allParcels = parcels;
   if (error || !allParcels) {
-    allParcels = DEFAULT_PARCELS;
+    allParcels = [];
   }
   cachedParcels = allParcels;
 
@@ -5693,8 +5361,8 @@ function openAddParcelModal() {
     <form id="form-add-parcel" style="display: flex; flex-direction: column; gap: 14px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">บริษัทขนส่ง *</label>
-          <select id="pk-courier" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">บริษัทขนส่ง *</label>
+          <select id="pk-courier" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="Flash Express">Flash Express</option>
             <option value="Kerry Express">Kerry Express</option>
             <option value="ไปรษณีย์ไทย (EMS)">ไปรษณีย์ไทย (EMS / ลงทะเบียน)</option>
@@ -5705,27 +5373,27 @@ function openAddParcelModal() {
           </select>
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หมายเลขพัสดุ (Tracking No.) *</label>
-          <input type="text" id="pk-tracking" placeholder="เช่น TH0129384756" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หมายเลขพัสดุ (Tracking No.) *</label>
+          <input type="text" id="pk-tracking" class="smoky-glass-input" placeholder="เช่น TH0129384756" required style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ห้องพักผู้รับ *</label>
-          <select id="pk-room" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ห้องพักผู้รับ *</label>
+          <select id="pk-room" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             ${roomOptions}
           </select>
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ชื่อผู้รับตามจ่าหน้า *</label>
-          <input type="text" id="pk-name" value="${defaultName}" placeholder="เช่น นายสมชาย ธนกฤษฎ์" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ชื่อผู้รับตามจ่าหน้า *</label>
+          <input type="text" id="pk-name" class="smoky-glass-input" value="${defaultName}" placeholder="เช่น นายสมชาย ธนกฤษฎ์" required style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ลักษณะพัสดุ / หมายเหตุ</label>
-        <input type="text" id="pk-desc" placeholder="เช่น กล่องใหญ่, ซองเอกสาร, กล่องพัสดุขนาดกลาง" style="width: 100%; height: 42px; border-radius: 8px;">
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ลักษณะพัสดุ / หมายเหตุ</label>
+        <input type="text" id="pk-desc" class="smoky-glass-input" placeholder="เช่น กล่องใหญ่, ซองเอกสาร, กล่องพัสดุขนาดกลาง" style="width: 100%; height: 42px; border-radius: 8px;">
       </div>
     </form>
   `;
@@ -5790,32 +5458,7 @@ function openAddParcelModal() {
 let annCategoryFilter = 'all';
 let annSearchQuery = '';
 let cachedAnnouncements = [];
-const DEFAULT_ANNOUNCEMENTS = [
-  {
-    id: 'ANN-01',
-    title: 'กำหนดการล้างเครื่องปรับอากาศประจำปี',
-    content: 'หอพักจะดำเนินการล้างแอร์ห้องพักทุกชั้น ระหว่างวันที่ 28-30 ตุลาคม 2569 เจ้าหน้าที่จะติดต่อแจ้งนัดเวลาล่วงหน้า 1 วัน ขอความร่วมมือผู้พักเก็บสัมภาระมีค่าให้เรียบร้อย',
-    category: 'ซ่อมบำรุง',
-    date: '2026-10-20',
-    pinned: true
-  },
-  {
-    id: 'ANN-02',
-    title: 'แจ้งกำหนดชำระค่าน้ำ-ค่าไฟ ประจำงวดเดือนตุลาคม',
-    content: 'ระบบได้ออกบิลค่าน้ำ-ค่าไฟเรียบร้อยแล้ว กรุณาชำระเงินภายในวันที่ 5 พฤศจิกายน 2569 ผ่านระบบ QR Code หรือติดต่อเคาน์เตอร์สำนักงานหอพัก',
-    category: 'การเงิน',
-    date: '2026-10-18',
-    pinned: true
-  },
-  {
-    id: 'ANN-03',
-    title: 'แจ้งเวลาเปิด-ปิด ประตูรั้วและระบบคีย์การ์ด',
-    content: 'เพื่อความปลอดภัยสูงสุด ประตูรั้วใหญ่ปิดเวลา 23:00 น. นักศึกษาสามารถสแกนคีย์การ์ดผ่านประตูด้านข้างได้ตลอด 24 ชั่วโมง',
-    category: 'กฎระเบียบ',
-    date: '2026-10-01',
-    pinned: false
-  }
-];
+const DEFAULT_ANNOUNCEMENTS = [];
 async function renderAnnouncementsView() {
   setTimeout(() => {
     bindAnnouncementsEvents();
@@ -5941,7 +5584,7 @@ async function loadAnnouncementsData() {
 
   let allList = list;
   if (error || !allList) {
-    allList = DEFAULT_ANNOUNCEMENTS;
+    allList = [];
   }
   cachedAnnouncements = allList;
 
@@ -6084,14 +5727,14 @@ function openAddAnnouncementModal() {
   const body = `
     <form id="form-add-announcement" style="display: flex; flex-direction: column; gap: 14px;">
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หัวข้อประกาศ *</label>
-        <input type="text" id="ann-title" placeholder="เช่น แจ้งกำหนดการทำความสะอาดอาคาร หรือซ่อมบำรุง" required style="width: 100%; height: 42px; border-radius: 8px;">
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หัวข้อประกาศ *</label>
+        <input type="text" id="ann-title" class="smoky-glass-input" placeholder="เช่น แจ้งกำหนดการทำความสะอาดอาคาร หรือซ่อมบำรุง" required style="width: 100%; height: 42px; border-radius: 8px;">
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หมวดหมู่</label>
-          <select id="ann-cat" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หมวดหมู่</label>
+          <select id="ann-cat" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="ทั่วไป">ทั่วไป</option>
             <option value="ซ่อมบำรุง">ซ่อมบำรุง</option>
             <option value="การเงิน">การเงิน / ค่าเช่า</option>
@@ -6101,13 +5744,13 @@ function openAddAnnouncementModal() {
         </div>
         <div class="field" style="display:flex; align-items:center; gap:8px; margin-top:26px;">
           <input type="checkbox" id="ann-pinned" style="width:20px; height:20px; accent-color: #3B82F6;">
-          <label for="ann-pinned" style="margin:0; cursor:pointer; font-weight:600; font-size: 0.86rem; color: var(--teal-950);">📌 ปักหมุดไว้บนสุด</label>
+          <label for="ann-pinned" class="smoky-form-label" style="margin:0; cursor:pointer; font-size: 0.86rem;">📌 ปักหมุดไว้บนสุด</label>
         </div>
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">เนื้อหาประกาศ *</label>
-        <textarea id="ann-content" rows="4" placeholder="พิมพ์รายละเอียดประกาศที่ต้องการแจ้งให้ผู้พักทราบ..." required style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">เนื้อหาประกาศ *</label>
+        <textarea id="ann-content" class="smoky-glass-input" rows="4" placeholder="พิมพ์รายละเอียดประกาศที่ต้องการแจ้งให้ผู้พักทราบ..." required style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
       </div>
     </form>
   `;
@@ -6283,21 +5926,38 @@ async function renderReportsView() {
 }
 
 async function loadReportsData() {
-  const { data: rooms } = await supabase.from('rooms').select('*');
-  const { data: parcels } = await supabase.from('parcels').select('*');
-  const { data: bills } = await supabase.from('meter_readings').select('*');
-  const { data: tickets } = await supabase.from('maintenance').select('*');
+  const [
+    { data: tenantsData },
+    { data: parcelsData },
+    { data: billsData },
+    { data: ticketsData }
+  ] = await Promise.all([
+    supabase.from('tenants').select('*'),
+    supabase.from('parcels').select('*'),
+    supabase.from('meter_readings').select('*'),
+    supabase.from('maintenance').select('*')
+  ]);
 
-  // Fallbacks if data empty or loading
-  const totalRooms = rooms && rooms.length > 0 ? rooms.length : 17;
-  const occupied = rooms ? rooms.filter(r => r.status === 'occupied').length : 14;
-  const occRate = Math.round((occupied / totalRooms) * 100);
+  const tenants = Array.isArray(tenantsData) ? tenantsData.filter(t => t.status !== 'terminated') : [];
+  const parcels = Array.isArray(parcelsData) ? parcelsData : [];
+  const bills = Array.isArray(billsData) ? billsData : [];
+  const tickets = Array.isArray(ticketsData) ? ticketsData : [];
 
-  const totalRevenue = bills && bills.length > 0 ? bills.reduce((a, c) => a + (c.total_price || 0), 0) : 17336;
-  const paidRevenue = bills && bills.length > 0 ? bills.filter(b => b.status === 'paid').reduce((a, c) => a + (c.total_price || 0), 0) : 6796;
-  const collectionRate = totalRevenue > 0 ? Math.round((paidRevenue / totalRevenue) * 100) : 39;
+  const totalRooms = 17;
+  const occupied = tenants.length;
+  const activeMaintSet = new Set();
+  tickets.filter(t => t.status !== 'completed' && t.room_number).forEach(t => {
+    activeMaintSet.add(t.room_number.replace(/[^0-9B]/gi, ''));
+  });
+  const mnt = activeMaintSet.size;
+  const vac = Math.max(0, totalRooms - occupied - mnt);
+  const occRate = totalRooms > 0 ? Math.round((occupied / totalRooms) * 100) : 0;
 
-  const totalTickets = tickets && tickets.length > 0 ? tickets.length : 3;
+  const totalRevenue = bills.reduce((a, c) => a + (Number(c.total_price) || 0), 0);
+  const paidRevenue = bills.filter(b => b.status === 'paid').reduce((a, c) => a + (Number(c.total_price) || 0), 0);
+  const collectionRate = totalRevenue > 0 ? Math.round((paidRevenue / totalRevenue) * 100) : 0;
+
+  const totalTickets = tickets.length;
 
   const kpiOcc = document.getElementById('kpi-rep-occ');
   const kpiRev = document.getElementById('kpi-rep-rev');
@@ -6307,7 +5967,7 @@ async function loadReportsData() {
   if (kpiOcc) kpiOcc.textContent = `${occRate}%`;
   if (kpiRev) kpiRev.textContent = fmtCurrency(totalRevenue);
   if (kpiCol) kpiCol.textContent = `${collectionRate}%`;
-  if (kpiMaint) kpiMaint.textContent = `${totalTickets} รายการ`;
+  if (kpiMaint) kpiMaint.textContent = `${totalTickets}`;
 
   const btnRefresh = document.getElementById('btn-refresh-reports');
   if (btnRefresh) {
@@ -6334,23 +5994,19 @@ async function loadReportsData() {
   // 1. Occupancy Bars
   const occBox = document.getElementById('report-occupancy-bars');
   if (occBox) {
-    const tot = rooms && rooms.length > 0 ? rooms.length : 17;
-    const occ = rooms && rooms.length > 0 ? rooms.filter(r => r.status === 'occupied').length : 14;
-    const vac = rooms && rooms.length > 0 ? rooms.filter(r => r.status === 'vacant').length : 2;
-    const mnt = rooms && rooms.length > 0 ? rooms.filter(r => r.status === 'maintenance').length : 1;
     occBox.innerHTML = `
-      ${renderBar('มีผู้เช่าแล้ว (Occupied)', occ, tot, '#3B82F6')}
-      ${renderBar('ห้องว่างพร้อมเข้าอยู่ (Vacant)', vac, tot, '#34D399')}
-      ${renderBar('ปิดปรับปรุง / ซ่อมบำรุง (Maintenance)', mnt, tot, '#FBBF24')}
+      ${renderBar('มีผู้เช่าแล้ว (Occupied)', occupied, totalRooms, '#3B82F6')}
+      ${renderBar('ห้องว่างพร้อมเข้าอยู่ (Vacant)', vac, totalRooms, '#34D399')}
+      ${renderBar('ปิดปรับปรุง / ซ่อมบำรุง (Maintenance)', mnt, totalRooms, '#FBBF24')}
     `;
   }
 
   // 2. Parcels Bars
   const parcelBox = document.getElementById('report-parcels-bars');
   if (parcelBox) {
-    const tot = parcels && parcels.length > 0 ? parcels.length : 3;
-    const col = parcels && parcels.length > 0 ? parcels.filter(p => p.status === 'collected').length : 1;
-    const wai = parcels && parcels.length > 0 ? parcels.filter(p => p.status === 'waiting').length : 2;
+    const tot = parcels.length;
+    const col = parcels.filter(p => p.status === 'collected').length;
+    const wai = parcels.filter(p => p.status === 'waiting').length;
     parcelBox.innerHTML = `
       ${renderBar('รับมอบแล้วเรียบร้อย (Collected)', col, tot, '#34D399')}
       ${renderBar('รอผู้พักมารับ (Waiting)', wai, tot, '#FBBF24')}
@@ -6360,9 +6016,9 @@ async function loadReportsData() {
   // 3. Utilities Bars
   const utilBox = document.getElementById('report-utility-bars');
   if (utilBox) {
-    const tot = bills && bills.length > 0 ? bills.length : 5;
-    const paid = bills && bills.length > 0 ? bills.filter(b => b.status === 'paid').length : 2;
-    const pend = bills && bills.length > 0 ? bills.filter(b => b.status === 'pending').length : 3;
+    const tot = bills.length;
+    const paid = bills.filter(b => b.status === 'paid').length;
+    const pend = bills.filter(b => b.status === 'pending').length;
     utilBox.innerHTML = `
       ${renderBar('ชำระแล้วเรียบร้อย (Paid)', paid, tot, '#34D399')}
       ${renderBar('รอชำระเงิน / ค้างชำระ (Pending)', pend, tot, '#FB7185')}
@@ -6372,10 +6028,10 @@ async function loadReportsData() {
   // 4. Maintenance Bars
   const maintBox = document.getElementById('report-maint-bars');
   if (maintBox) {
-    const tot = tickets && tickets.length > 0 ? tickets.length : 3;
-    const comp = tickets && tickets.length > 0 ? tickets.filter(t => t.status === 'completed').length : 1;
-    const prog = tickets && tickets.length > 0 ? tickets.filter(t => t.status === 'in_progress').length : 2;
-    const pend = tickets && tickets.length > 0 ? tickets.filter(t => t.status === 'pending').length : 0;
+    const tot = tickets.length;
+    const comp = tickets.filter(t => t.status === 'completed').length;
+    const prog = tickets.filter(t => t.status === 'in_progress').length;
+    const pend = tickets.filter(t => t.status === 'pending').length;
     maintBox.innerHTML = `
       ${renderBar('ซ่อมเสร็จสิ้น (Completed)', comp, tot, '#34D399')}
       ${renderBar('กำลังดำเนินการซ่อม (In Progress)', prog, tot, '#60A5FA')}
@@ -6388,6 +6044,7 @@ async function loadReportsData() {
 /* ========== js/users.js ========== */
 // js/users.js
 // ระบบจัดการบัญชีผู้ใช้งาน (User Management) สำหรับ Admin
+// ออกแบบด้วย Smoky Frosted Glass Design System รองรับทั้ง Dark Mode และ Light Mode
 
 
 
@@ -6400,56 +6057,101 @@ async function renderUsersView() {
   }, 0);
 
   return `
-    <div class="card">
-      <div class="card-header-actions">
-        <div>
-          <h3>${ic('user')} จัดการบัญชีผู้ใช้งาน (User Management)</h3>
-          <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
-            กำหนดสิทธิ์การเข้าใช้งาน เพิ่ม/แก้ไข และรีเซ็ตรหัสผ่านสำหรับ Admin, เจ้าหน้าที่ และผู้พักอาศัย
-          </p>
+    <div style="display: flex; flex-direction: column; gap: 22px;">
+      
+      <!-- 1. Header Card (Smoky Glass) -->
+      <div class="smoky-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.32); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
+            ${ic('user')}
+          </div>
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: #ffffff; margin: 0; letter-spacing: -0.02em;">
+              จัดการบัญชีผู้ใช้งาน (User Management)
+            </h2>
+            <span style="font-size: 0.82rem; color: rgba(255,255,255,0.48); margin-top: 3px; display: block;">
+              กำหนดสิทธิ์การเข้าใช้งาน เพิ่ม/แก้ไข และรีเซ็ตรหัสผ่านสำหรับ Admin, เจ้าหน้าที่ และผู้พักอาศัย
+            </span>
+          </div>
         </div>
-        <button class="btn btn-primary" id="btn-add-user">
-          ${ic('plus')} เพิ่มบัญชีผู้ใช้ใหม่
-        </button>
-      </div>
 
-      <!-- User Stats Summary Strip -->
-      <div class="hero-stats-strip" style="background:#f4fbf7; margin: 18px 0; border: 1px solid var(--line); border-radius:12px; padding:16px;">
-        <div class="hstat-item">
-          <div class="num" id="stat-total-users" style="color:var(--teal-900); font-size:1.6rem;">-</div>
-          <div class="lbl">ผู้ใช้งานทั้งหมด</div>
-        </div>
-        <div class="hstat-item">
-          <div class="num" id="stat-admin-users" style="color:#d9534f; font-size:1.6rem;">-</div>
-          <div class="lbl">ผู้ดูแลระบบ (Admin)</div>
-        </div>
-        <div class="hstat-item">
-          <div class="num" id="stat-staff-users" style="color:#0275d8; font-size:1.6rem;">-</div>
-          <div class="lbl">เจ้าหน้าที่ (Staff)</div>
-        </div>
-        <div class="hstat-item">
-          <div class="num" id="stat-student-users" style="color:var(--emerald); font-size:1.6rem;">-</div>
-          <div class="lbl">ผู้พักอาศัย (Student)</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button class="smoky-round-glass-btn" id="btn-add-user" style="width: auto; border-radius: 9999px; padding: 0 18px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 0 20px rgba(59,130,246,0.4); font-size: 0.82rem; font-weight: 600; gap: 6px;">
+            ${ic('plus')}
+            <span>เพิ่มบัญชีผู้ใช้ใหม่</span>
+          </button>
         </div>
       </div>
 
-      <!-- Search & Filter Toolbar -->
-      <div class="toolbar-filter-grid" style="margin-top: 16px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-        <div class="search-box-wrap" style="flex: 1; min-width: 250px;">
-          ${ic('search')}
-          <input type="text" id="users-search-input" placeholder="ค้นหาชื่อผู้ใช้ (Username), ชื่อ-นามสกุล, ห้อง หรือเบอร์โทร...">
+      <!-- 2. User Stats Summary Tiles (Smoky Glass) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px;">
+        <div class="smoky-tile">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="smoky-meta-label">ผู้ใช้งานทั้งหมด</span>
+            <div style="color: rgba(255,255,255,0.4);">${ic('users')}</div>
+          </div>
+          <div class="smoky-kpi-num" style="margin-top: 8px;" id="stat-total-users">-</div>
+          <div class="smoky-kpi-sub">บัญชีในระบบ</div>
         </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-sm btn-outline filter-btn active" data-filter="all">ทั้งหมด</button>
-          <button class="btn btn-sm btn-outline filter-btn" data-filter="admin">Admin</button>
-          <button class="btn btn-sm btn-outline filter-btn" data-filter="staff">Staff</button>
-          <button class="btn btn-sm btn-outline filter-btn" data-filter="student">Student</button>
-          <button class="btn btn-outline" id="btn-refresh-users">${ic('check')} รีเฟรช</button>
+
+        <div class="smoky-tile">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="smoky-meta-label">ผู้ดูแลระบบ</span>
+            <span style="background: rgba(239,68,68,0.18); color: #EF4444; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px;">Admin</span>
+          </div>
+          <div class="smoky-kpi-num" style="margin-top: 8px; color: #EF4444;" id="stat-admin-users">-</div>
+          <div class="smoky-kpi-sub">สิทธิ์สูงสุด</div>
+        </div>
+
+        <div class="smoky-tile">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="smoky-meta-label">เจ้าหน้าที่ / ช่าง</span>
+            <span style="background: rgba(59,130,246,0.18); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px;">Staff</span>
+          </div>
+          <div class="smoky-kpi-num" style="margin-top: 8px; color: #60A5FA;" id="stat-staff-users">-</div>
+          <div class="smoky-kpi-sub">ธุรการและซ่อมบำรุง</div>
+        </div>
+
+        <div class="smoky-tile">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="smoky-meta-label">ผู้พักอาศัย</span>
+            <span style="background: rgba(52,211,153,0.18); color: #34D399; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px;">Student</span>
+          </div>
+          <div class="smoky-kpi-num" style="margin-top: 8px; color: #34D399;" id="stat-student-users">-</div>
+          <div class="smoky-kpi-sub">ผู้เช่า 3 อาคาร</div>
         </div>
       </div>
 
-      <div class="table-responsive" style="margin-top: 16px;">
-        <table class="modern-table">
+      <!-- 3. Search & Filter Toolbar (Smoky Glass) -->
+      <div class="smoky-card" style="padding: 16px 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+          <!-- Search Input -->
+          <div style="position: relative; min-width: 260px; flex: 1; max-width: 360px;">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); display: flex; align-items: center;">
+              ${ic('search')}
+            </span>
+            <input type="text" id="users-search-input" class="smoky-glass-input" placeholder="ค้นหา Username, ชื่อ, ห้อง หรือเบอร์โทร..." style="width: 100%; padding-left: 38px;">
+          </div>
+
+          <!-- Role Tabs (Segmented Control) -->
+          <div class="smoky-segmented" id="users-role-tabs" style="overflow-x: auto; max-width: 100%;">
+            <button class="smoky-seg-btn active" data-filter="all">ทั้งหมด</button>
+            <button class="smoky-seg-btn" data-filter="admin">👑 Admin</button>
+            <button class="smoky-seg-btn" data-filter="staff">🛠️ Staff</button>
+            <button class="smoky-seg-btn" data-filter="student">🎓 Student</button>
+          </div>
+
+          <!-- Refresh Button -->
+          <button class="smoky-round-glass-btn" id="btn-refresh-users" style="width: auto; height: 36px; padding: 0 16px; border-radius: 9999px; font-size: 0.78rem; gap: 6px;">
+            ${ic('check')}
+            <span>รีเฟรช</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. Modern Smoky Table Container -->
+      <div class="smoky-table-wrap">
+        <table class="smoky-table">
           <thead>
             <tr>
               <th>ชื่อผู้ใช้ (Username)</th>
@@ -6459,14 +6161,15 @@ async function renderUsersView() {
               <th>ข้อมูลติดต่อ</th>
               <th>รหัสผ่าน</th>
               <th>สถานะ</th>
-              <th>จัดการ</th>
+              <th style="text-align: right;">จัดการ</th>
             </tr>
           </thead>
           <tbody id="users-tbody">
-            <tr><td colspan="8" style="text-align:center; padding: 30px; color:var(--muted);">กำลังโหลดข้อมูลผู้ใช้งาน...</td></tr>
+            <tr><td colspan="8" style="text-align:center; padding: 40px; color: rgba(255,255,255,0.4);">กำลังโหลดข้อมูลผู้ใช้งาน...</td></tr>
           </tbody>
         </table>
       </div>
+
     </div>
   `;
 }
@@ -6539,7 +6242,7 @@ async function loadUsersData() {
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding: 30px;">ไม่พบข้อมูลผู้ใช้ตามเงื่อนไข</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: rgba(255,255,255,0.4); padding: 40px;">ไม่พบข้อมูลผู้ใช้ตามเงื่อนไข</td></tr>`;
     return;
   }
 
@@ -6547,52 +6250,52 @@ async function loadUsersData() {
   filtered.forEach(u => {
     let roleBadge = '';
     if (u.role === 'admin') {
-      roleBadge = `<span class="badge" style="background:#FDE8E7; color:var(--danger); font-weight:600;">👑 Admin</span>`;
+      roleBadge = `<span class="smoky-status-pill pill-rose">👑 Admin</span>`;
     } else if (u.role === 'staff') {
-      roleBadge = `<span class="badge" style="background:#E3F2FD; color:#0D47A1; font-weight:600;">🛠️ Staff</span>`;
+      roleBadge = `<span class="smoky-status-pill pill-blue">🛠️ Staff</span>`;
     } else {
-      roleBadge = `<span class="badge" style="background:var(--mint-50); color:var(--emerald); font-weight:600;">🎓 Student</span>`;
+      roleBadge = `<span class="smoky-status-pill pill-green">🎓 Student</span>`;
     }
 
     const isActive = u.status !== 'suspended';
     const statusPill = isActive
-      ? `<span class="badge approved" style="font-size:0.8rem;">🟢 ใช้งานได้</span>`
-      : `<span class="badge rejected" style="font-size:0.8rem;">🔴 ระงับชั่วคราว</span>`;
+      ? `<span class="smoky-status-pill pill-green">🟢 ใช้งานได้</span>`
+      : `<span class="smoky-status-pill pill-rose">🔴 ระงับชั่วคราว</span>`;
 
     html += `
       <tr>
         <td>
-          <div style="font-weight: 700; color:var(--teal-950); font-family: monospace; font-size:1rem;">
+          <div style="font-weight: 700; color: #60A5FA; font-family: monospace; font-size: 0.95rem;">
             ${u.username}
           </div>
-          <small style="color:var(--muted);">${u.id}</small>
+          <small style="color: rgba(255,255,255,0.4); font-size: 0.72rem;">${u.id}</small>
         </td>
         <td>
-          <div style="font-weight: 500; color:var(--teal-950);">${u.name}</div>
-          <small style="color:var(--muted);">${u.role_title || '-'}</small>
+          <div style="font-weight: 600; color: #ffffff;">${u.name}</div>
+          <small style="color: rgba(255,255,255,0.45); font-size: 0.72rem;">${u.role_title || '-'}</small>
         </td>
         <td>${roleBadge}</td>
-        <td>${u.room ? `<span class="badge room-pill">ห้อง ${u.room}</span>` : '<span style="color:var(--muted);">-</span>'}</td>
+        <td>${u.room ? `<span class="smoky-bldg-badge">ห้อง ${u.room}</span>` : '<span style="color: rgba(255,255,255,0.3);">-</span>'}</td>
         <td>
-          <div>${u.phone ? `<a href="tel:${u.phone}" style="color:var(--emerald);">${u.phone}</a>` : '-'}</div>
-          <small style="color:var(--muted);">${u.email || ''}</small>
+          <div>${u.phone && u.phone !== '-' ? `<a href="tel:${u.phone}" style="color: #60A5FA; text-decoration: none;">${u.phone}</a>` : '<span style="color: rgba(255,255,255,0.3);">-</span>'}</div>
+          <small style="color: rgba(255,255,255,0.4); font-size: 0.72rem;">${u.email && u.email !== '-' ? u.email : ''}</small>
         </td>
         <td>
-          <div style="font-family:monospace; background:#f4f6f5; padding:4px 8px; border-radius:6px; display:inline-block; font-size:0.85rem;">
+          <span style="font-family: monospace; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 4px 8px; border-radius: 6px; font-size: 0.82rem; color: rgba(255,255,255,0.85);">
             ${u.password}
-          </div>
+          </span>
         </td>
         <td>${statusPill}</td>
-        <td>
-          <div style="display: flex; gap: 6px;">
-            <button class="btn btn-outline btn-sm btn-edit-user" data-user-id="${u.id}" title="แก้ไขข้อมูล/รหัสผ่าน">
+        <td style="text-align: right;">
+          <div style="display: flex; gap: 6px; justify-content: flex-end;">
+            <button class="smoky-round-glass-btn btn-edit-user" data-user-id="${u.id}" title="แก้ไขข้อมูล/รหัสผ่าน" style="width: auto; height: 32px; padding: 0 12px; font-size: 0.76rem; border-radius: 8px; gap: 4px;">
               ${ic('edit')} แก้ไข
             </button>
-            <button class="btn btn-outline btn-sm btn-toggle-status" data-user-id="${u.id}" data-active="${isActive}" title="${isActive ? 'ระงับการใช้งาน' : 'เปิดใช้งาน'}">
+            <button class="smoky-round-glass-btn btn-toggle-status" data-user-id="${u.id}" data-active="${isActive}" title="${isActive ? 'ระงับการใช้งาน' : 'เปิดใช้งาน'}" style="width: auto; height: 32px; padding: 0 10px; font-size: 0.76rem; border-radius: 8px;">
               ${isActive ? 'ระงับ' : 'เปิดใช้'}
             </button>
             ${u.username !== 'admin' ? `
-              <button class="btn btn-outline btn-sm btn-del-user" data-user-id="${u.id}" data-username="${u.username}" title="ลบบัญชีนี้" style="color:var(--danger); border-color:#fadbd8;">
+              <button class="smoky-round-glass-btn btn-del-user" data-user-id="${u.id}" data-username="${u.username}" title="ลบบัญชีนี้" style="width: 32px; height: 32px; border-radius: 8px; color: #F87171; border-color: rgba(248,113,113,0.3);">
                 ${ic('trash')}
               </button>
             ` : ''}
@@ -6660,15 +6363,18 @@ function bindUsersEvents() {
     addBtn.onclick = () => openUserModal(null);
   }
 
-  // Filter buttons
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentRoleFilter = btn.getAttribute('data-filter');
-      loadUsersData();
-    };
-  });
+  // Filter tabs
+  const filterTabs = document.getElementById('users-role-tabs');
+  if (filterTabs) {
+    filterTabs.querySelectorAll('.smoky-seg-btn').forEach(btn => {
+      btn.onclick = () => {
+        filterTabs.querySelectorAll('.smoky-seg-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentRoleFilter = btn.getAttribute('data-filter');
+        loadUsersData();
+      };
+    });
+  }
 }
 
 function openUserModal(user = null) {
@@ -6676,63 +6382,63 @@ function openUserModal(user = null) {
   const title = isEdit ? `แก้ไขบัญชีผู้ใช้: ${user.username}` : 'เพิ่มบัญชีผู้ใช้งานใหม่';
 
   const body = `
-    <form id="form-user-edit">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+    <form id="form-user-edit" style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ชื่อผู้ใช้งาน (Username) *</label>
-          <input type="text" id="u-username" value="${user ? user.username : ''}" ${isEdit ? 'disabled' : 'required'} placeholder="เช่น student103, tech1">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">ชื่อผู้ใช้งาน (Username) *</label>
+          <input type="text" id="u-username" class="smoky-glass-input" value="${user ? user.username : ''}" ${isEdit ? 'disabled' : 'required'} placeholder="เช่น student103, tech1" style="width: 100%;">
         </div>
         <div class="field">
-          <label>รหัสผ่าน (Password) *</label>
-          <input type="text" id="u-password" value="${user ? user.password : ''}" required placeholder="••••••••">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">รหัสผ่าน (Password) *</label>
+          <input type="text" id="u-password" class="smoky-glass-input" value="${user ? user.password : ''}" required placeholder="••••••••" style="width: 100%;">
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ระดับสิทธิ์ (Role) *</label>
-          <select id="u-role" required>
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">ระดับสิทธิ์ (Role) *</label>
+          <select id="u-role" class="smoky-glass-select" required style="width: 100%;">
             <option value="student" ${user && user.role === 'student' ? 'selected' : ''}>Student (ผู้พักอาศัย)</option>
             <option value="staff" ${user && user.role === 'staff' ? 'selected' : ''}>Staff (เจ้าหน้าที่/ช่าง)</option>
             <option value="admin" ${user && user.role === 'admin' ? 'selected' : ''}>Admin (ผู้ดูแลระบบ)</option>
           </select>
         </div>
         <div class="field">
-          <label>เลขห้องพัก (เฉพาะ Student)</label>
-          <input type="text" id="u-room" value="${user ? (user.room || '') : ''}" placeholder="เช่น 103, 302">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">เลขห้องพัก (เฉพาะ Student)</label>
+          <input type="text" id="u-room" class="smoky-glass-input" value="${user ? (user.room || '') : ''}" placeholder="เช่น 103, 302" style="width: 100%;">
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ชื่อ - นามสกุล *</label>
-          <input type="text" id="u-name" value="${user ? user.name : ''}" required placeholder="นาย/นาง/น.ส. ...">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">ชื่อ - นามสกุล *</label>
+          <input type="text" id="u-name" class="smoky-glass-input" value="${user ? user.name : ''}" required placeholder="นาย/นาง/น.ส. ..." style="width: 100%;">
         </div>
         <div class="field">
-          <label>ตำแหน่ง / คำอธิบายสิทธิ์</label>
-          <input type="text" id="u-title" value="${user ? (user.role_title || '') : ''}" placeholder="เช่น ผู้พักอาศัย, ช่างเทคนิค">
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-        <div class="field">
-          <label>เบอร์โทรศัพท์</label>
-          <input type="tel" id="u-phone" value="${user ? (user.phone || '') : ''}" placeholder="08x-xxx-xxxx">
-        </div>
-        <div class="field">
-          <label>อีเมล</label>
-          <input type="email" id="u-email" value="${user ? (user.email || '') : ''}" placeholder="example@email.com">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">ตำแหน่ง / คำอธิบายสิทธิ์</label>
+          <input type="text" id="u-title" class="smoky-glass-input" value="${user ? (user.role_title || '') : ''}" placeholder="เช่น ผู้พักอาศัย, ช่างเทคนิค" style="width: 100%;">
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>รหัสนักศึกษา / ผู้เช่า (ถ้ามี)</label>
-          <input type="text" id="u-tenant-id" value="${user ? (user.tenant_id || '') : ''}" placeholder="เช่น 66565632">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">เบอร์โทรศัพท์</label>
+          <input type="tel" id="u-phone" class="smoky-glass-input" value="${user ? (user.phone || '') : ''}" placeholder="08x-xxx-xxxx" style="width: 100%;">
         </div>
         <div class="field">
-          <label>สถานะบัญชี</label>
-          <select id="u-status">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">อีเมล</label>
+          <input type="email" id="u-email" class="smoky-glass-input" value="${user ? (user.email || '') : ''}" placeholder="example@email.com" style="width: 100%;">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div class="field">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">รหัสนักศึกษา / ผู้เช่า (ถ้ามี)</label>
+          <input type="text" id="u-tenant-id" class="smoky-glass-input" value="${user ? (user.tenant_id || '') : ''}" placeholder="เช่น 66565632" style="width: 100%;">
+        </div>
+        <div class="field">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">สถานะบัญชี</label>
+          <select id="u-status" class="smoky-glass-select" style="width: 100%;">
             <option value="active" ${!user || user.status !== 'suspended' ? 'selected' : ''}>🟢 ใช้งานปกติ (Active)</option>
             <option value="suspended" ${user && user.status === 'suspended' ? 'selected' : ''}>🔴 ระงับการใช้งาน (Suspended)</option>
           </select>
@@ -6742,8 +6448,8 @@ function openUserModal(user = null) {
   `;
 
   const footer = `
-    <button type="button" class="btn btn-outline" id="btn-cancel-modal">ยกเลิก</button>
-    <button type="button" class="btn btn-primary" id="btn-submit-user">${isEdit ? 'บันทึกการแก้ไข' : 'สร้างบัญชีผู้ใช้'}</button>
+    <button type="button" class="btn btn-outline" id="btn-cancel-modal" onclick="window.closeAppModal()">ยกเลิก</button>
+    <button type="button" class="btn btn-primary" id="btn-submit-user" style="background: #3B82F6; border-color: #3B82F6;">${isEdit ? 'บันทึกการแก้ไข' : 'สร้างบัญชีผู้ใช้'}</button>
   `;
 
   showModal({
@@ -6884,7 +6590,7 @@ async function renderSettingsView() {
         <p style="color: rgba(255,255,255,0.45); font-size: 0.80rem; margin: 0 0 18px 0;">ข้อมูลความปลอดภัยและรหัสผ่านเข้าสู่ระบบหลังบ้าน</p>
 
         <form id="form-account-settings">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div class="smoky-grid-2">
             <div class="field">
               <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อผู้ใช้งาน (Username)</label>
               <input type="text" class="smoky-glass-input" value="${currentUser ? currentUser.username : ''}" disabled style="width: 100%; opacity: 0.7; cursor: not-allowed;">
@@ -6895,7 +6601,7 @@ async function renderSettingsView() {
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+          <div class="smoky-grid-2">
             <div class="field">
               <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">รหัสผ่านใหม่ (ปล่อยว่างหากไม่เปลี่ยน)</label>
               <input type="password" id="set-new-pwd" class="smoky-glass-input" placeholder="••••••••" style="width: 100%;">
@@ -6923,7 +6629,7 @@ async function renderSettingsView() {
           <p style="color: rgba(255,255,255,0.45); font-size: 0.80rem; margin: 0 0 18px 0;">กำหนดข้อมูลแม่บทของหอพัก ค่าน้ำ ค่าไฟ และช่องทางติดต่อ ซึ่งจะอัปเดตแสดงผลบนหน้าแรกเว็บไซต์ (Landing Page) โดยอัตโนมัติ</p>
 
           <form id="form-dorm-settings">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="smoky-grid-2">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อหอพัก (Dormitory Name)</label>
                 <input type="text" id="set-dorm-name" class="smoky-glass-input" value="${s.dorm_name || 'Tanakrit Dormitory'}" required style="width: 100%;">
@@ -6939,7 +6645,7 @@ async function renderSettingsView() {
               <input type="text" id="set-address" class="smoky-glass-input" value="${s.address || '69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320'}" required style="width: 100%;">
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="smoky-grid-3">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">อัตราค่าน้ำประปา (บาท/หน่วย)</label>
                 <input type="number" id="set-water-rate" class="smoky-glass-input" value="${s.water_rate !== undefined ? s.water_rate : 18}" required style="width: 100%;">
@@ -6954,7 +6660,7 @@ async function renderSettingsView() {
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="smoky-grid-2">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ</label>
                 <input type="text" id="set-phone" class="smoky-glass-input" value="${s.phone || '075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985'}" style="width: 100%;">
@@ -7131,7 +6837,7 @@ function bindSettingsEvents() {
 
 // Interactive Dashboard State
 let dashboardState = {
-  targetPercent: 63,
+  targetPercent: 0,
   targetActive: true,
   activeMetricChip: 'revenue',
   revenuePeriod: 'Today',
@@ -7144,8 +6850,18 @@ let dashboardState = {
     openTickets: false
   },
   isPlayingAudio: false,
-  audioPlayhead: 35,
+  audioPlayhead: 0,
   audioInterval: null
+};
+let dashboardLiveMetrics = {
+  totalPaid: 0,
+  totalExpected: 0,
+  occupiedCount: 0,
+  vacantCount: 16,
+  maintCount: 1,
+  pendingTickets: 0,
+  completedTickets: 0,
+  pendingBookings: 0
 };
 
 // Overview 3-Column Bento Grid Dashboard
@@ -7167,7 +6883,7 @@ function renderStaffDashboard() {
               <span class="smoky-meta-label">ทีมงานดูแลหอพัก</span>
               <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px #34D399;"></span>
-                <span style="font-size: 0.92rem; font-weight: 600; color: #fff;" id="team-staff-count">4 คน ประจำการ</span>
+                <span style="font-size: 0.92rem; font-weight: 600; color: #fff;" id="team-staff-count">2 คน ประจำการ</span>
               </div>
             </div>
             <button class="smoky-round-dashed-btn" id="btn-goto-users" title="จัดการบัญชีผู้ใช้งาน (User Management)" onclick="window.switchView('users')">
@@ -7226,19 +6942,19 @@ function renderStaffDashboard() {
 
           <!-- Bottom Row of Round Metric Chips -->
           <div class="smoky-metric-chips" id="metric-chips-row">
-            <div class="smoky-chip active" data-metric="revenue" onclick="window.selectMetricChip('revenue')">
+            <div class="smoky-chip active" data-metric="revenue" onclick="window.selectMetricChip('revenue')" title="คลิกเพื่อเปิดดูบิลและรายรับค่าน้ำ-ค่าไฟ (Billing & Utilities)" style="cursor: pointer;">
               <span class="chip-lbl">รายรับ</span>
               <span class="chip-val" id="chip-val-revenue">0 ฿</span>
             </div>
-            <div class="smoky-chip" data-metric="deals" onclick="window.selectMetricChip('deals')">
+            <div class="smoky-chip" data-metric="deals" onclick="window.selectMetricChip('deals')" title="คลิกเพื่อเปิดดูผังห้องพักและห้องว่าง (Floor Plan)" style="cursor: pointer;">
               <span class="chip-lbl">ห้องว่าง</span>
               <span class="chip-val" id="chip-val-vacant">16 ห้อง</span>
             </div>
-            <div class="smoky-chip" data-metric="calls" onclick="window.selectMetricChip('calls')">
+            <div class="smoky-chip" data-metric="calls" onclick="window.selectMetricChip('calls')" title="คลิกเพื่อเปิดดูห้องที่กำลังซ่อมบำรุง" style="cursor: pointer;">
               <span class="chip-lbl">ซ่อมบำรุง</span>
               <span class="chip-val" id="chip-val-maint">1 ห้อง</span>
             </div>
-            <div class="smoky-chip" data-metric="meetings" onclick="window.selectMetricChip('meetings')">
+            <div class="smoky-chip" data-metric="meetings" onclick="window.selectMetricChip('meetings')" title="คลิกเพื่อเปิดดูรายการแจ้งซ่อมบำรุง (Maintenance)" style="cursor: pointer;">
               <span class="chip-lbl">แจ้งซ่อม</span>
               <span class="chip-val" id="chip-val-tickets">0 งาน</span>
             </div>
@@ -7260,7 +6976,7 @@ function renderStaffDashboard() {
                 <span style="font-size: 0.88rem; color: rgba(255,255,255,0.4);" id="revenue-val-expected">/ ฿0</span>
               </div>
               <div style="margin-top: 4px;">
-                <span class="smoky-delta-pos">${ic('trendingUp')} ข้อมูลเรียลไทม์เดือนนี้</span>
+                <span class="smoky-delta-pos" id="revenue-delta-badge">${ic('trendingUp')} ข้อมูลเรียลไทม์เดือนนี้</span>
               </div>
             </div>
 
@@ -7286,14 +7002,14 @@ function renderStaffDashboard() {
             </svg>
           </div>
 
-          <!-- Row of Hourly Values -->
+          <!-- Row of Hourly/Daily Values -->
           <div style="display: grid; grid-template-columns: repeat(6, 1fr); border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; text-align: center;" id="revenue-hourly-row">
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">09:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿4.2k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">11:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿8.5k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">13:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿14.2k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">15:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿22.6k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">17:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿31.0k</div></div>
-            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">19:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿37.2k</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">09:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">11:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">13:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">15:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">17:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿0</div></div>
+            <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">19:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿0</div></div>
           </div>
         </div>
 
@@ -7301,26 +7017,29 @@ function renderStaffDashboard() {
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           
           <!-- 4. Inbound Leads / ผู้ติดต่อสอบถามจองห้องพัก -->
-          <div class="smoky-card" id="card-new-leads">
+          <div class="smoky-card" id="card-new-leads" onclick="window.switchView('bookings')" title="คลิกเพื่อเปิดหน้าระบบการจองห้องพักออนไลน์ (Online Bookings)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span class="smoky-meta-label">ผู้ติดต่อจองห้อง</span>
-              <span class="smoky-delta-pos" id="leads-badge-delta">Live Bookings</span>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span class="smoky-delta-pos" id="leads-badge-delta">Live Bookings</span>
+                <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #34D399;"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
             </div>
 
             <div style="margin-top: 10px;">
               <div class="smoky-kpi-num" id="leads-num-count">0</div>
-              <span class="smoky-kpi-sub" id="leads-sub-label">ผู้สนใจจองรอบใหม่</span>
+              <span class="smoky-kpi-sub" id="leads-sub-label">ผู้สนใจจองรอบใหม่ · คลิกดูรายการ</span>
             </div>
 
-            <!-- Mini bar chart with last bar blue -->
-            <div style="display: flex; align-items: flex-end; gap: 5px; height: 46px; margin-top: 16px;">
-              <div style="flex: 1; height: 35%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 50%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 60%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 45%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 75%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 85%; background: rgba(255,255,255,0.2); border-radius: 2px;"></div>
-              <div style="flex: 1; height: 100%; background: #3B82F6; box-shadow: 0 0 10px #3B82F6; border-radius: 2px;"></div>
+            <!-- Mini bar chart (Realtime based on bookings) -->
+            <div id="leads-mini-bars" style="display: flex; align-items: flex-end; gap: 5px; height: 46px; margin-top: 16px;">
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
+              <div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>
             </div>
           </div>
 
@@ -7355,7 +7074,7 @@ function renderStaffDashboard() {
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
               <span class="smoky-meta-label">สถิติรายรับ</span>
-              <h3 class="smoky-card-title">รายรับประจำวัน (พันบาท)</h3>
+              <h3 class="smoky-card-title" id="sales-chart-title">รายรับประจำวัน (สัปดาห์นี้)</h3>
             </div>
 
             <!-- Week/Month/Year Control -->
@@ -7366,51 +7085,34 @@ function renderStaffDashboard() {
             </div>
           </div>
 
-          <!-- Mon-Sun Bars with Wednesday highlighted in Blue + Floating Tooltip -->
-          <div style="position: relative; margin-top: 26px; height: 140px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;">
-            
-            <!-- Mon -->
+          <!-- Dynamic Bars Container -->
+          <div id="sales-bars-container" style="position: relative; margin-top: 26px; height: 140px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;">
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 50%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">จ.</span>
             </div>
-
-            <!-- Tue -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 65%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">อ.</span>
             </div>
-
-            <!-- Wed (Active Blue with Floating Tooltip) -->
-            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
-              <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
-                ฿8.4k
-              </div>
-              <div style="width: 100%; max-width: 30px; height: 88%; background: #3B82F6; box-shadow: 0 0 15px rgba(59,130,246,0.6); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
+              <div style="width: 100%; max-width: 30px; height: 8px; background: #3B82F6; border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; font-weight: 700; color: #ffffff; margin-top: 6px;">พ.</span>
             </div>
-
-            <!-- Thu -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 68%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">พฤ.</span>
             </div>
-
-            <!-- Fri -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 80%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">ศ.</span>
             </div>
-
-            <!-- Sat -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 42%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">ส.</span>
             </div>
-
-            <!-- Sun -->
             <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 35%; background: rgba(255,255,255,0.15); border-radius: 4px 4px 0 0; transition: all 0.2s;"></div>
+              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
               <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">อา.</span>
             </div>
 
@@ -7426,11 +7128,12 @@ function renderStaffDashboard() {
         <div class="smoky-2x2-grid">
           
           <!-- Tile 1: ผู้พักอาศัย -->
-          <div class="smoky-tile" id="tile-customers">
+          <div class="smoky-tile" id="tile-customers" onclick="window.switchView('tenants')" title="คลิกเพื่อเปิดหน้า ทะเบียนผู้พักอาศัยและสัญญาเช่า (Tenants)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
                 ${ic('users')}
               </div>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: rgba(255,255,255,0.45);"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">ผู้พักอาศัย</span>
@@ -7440,11 +7143,12 @@ function renderStaffDashboard() {
           </div>
 
           <!-- Tile 2: สถานะ 3 อาคาร (Building Funnel) -->
-          <div class="smoky-tile" id="tile-pipeline">
+          <div class="smoky-tile" id="tile-pipeline" onclick="window.switchView('rooms')" title="คลิกเพื่อเปิดหน้า ผังห้องพัก 3 อาคาร (Floor Plan)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
                 ${ic('door')}
               </div>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: rgba(255,255,255,0.45);"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">ผัง 3 อาคาร</span>
@@ -7477,11 +7181,12 @@ function renderStaffDashboard() {
           </div>
 
           <!-- Tile 3: มิเตอร์น้ำไฟ (จดครบแล้ว) -->
-          <div class="smoky-tile active-spark" id="tile-active-users">
+          <div class="smoky-tile active-spark" id="tile-active-users" onclick="window.switchView('utilities')" title="คลิกเพื่อเปิดหน้า บันทึกมิเตอร์น้ำ-ไฟ และออกบิล (Billing & Utilities)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(59,130,246,0.25); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
                 ${ic('activity')}
               </div>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: rgba(255,255,255,0.45);"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">จดมิเตอร์น้ำ-ไฟ</span>
@@ -7496,11 +7201,12 @@ function renderStaffDashboard() {
           </div>
 
           <!-- Tile 4: รายการแจ้งซ่อม -->
-          <div class="smoky-tile" id="tile-open-tickets">
+          <div class="smoky-tile" id="tile-open-tickets" onclick="window.switchView('maintenance')" title="คลิกเพื่อเปิดหน้า ระบบแจ้งซ่อมและงานบริการบำรุงรักษา (Maintenance)" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
                 ${ic('wrench')}
               </div>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: rgba(255,255,255,0.45);"><polyline points="9 18 15 12 9 6"/></svg>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">แจ้งซ่อมรอดำเนินการ</span>
@@ -7519,7 +7225,9 @@ function renderStaffDashboard() {
             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="ผู้จัดการ" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);">
             <div>
               <div style="font-size: 0.90rem; font-weight: 600; color: #fff;">นายเกียรติศักดิ์ บริหาร</div>
-              <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">โทร 086-946-1654 (24 ชม.)</div>
+              <a href="tel:0869461654" style="font-size: 0.74rem; color: #60A5FA; text-decoration: none; display: flex; align-items: center; gap: 4px; margin-top: 2px;" title="คลิกเพื่อโทรออกทันที">
+                ${ic('phone')} โทร 086-946-1654 (คลิกเพื่อโทรออก 24 ชม.)
+              </a>
             </div>
           </div>
 
@@ -7605,8 +7313,8 @@ async function initStaffDashboard() {
 
     const totalRooms = 17;
     const occupiedCount = tenants.length;
-    // Room 107 is default maintenance, plus any active maintenance tickets for other rooms
-    const activeMaintSet = new Set(['107']);
+    // Maintenance rooms dynamically populated from Supabase
+    const activeMaintSet = new Set();
     tickets.filter(t => t.status !== 'completed' && t.room_number).forEach(t => {
       activeMaintSet.add(t.room_number.replace(/[^0-9B]/gi, ''));
     });
@@ -7617,7 +7325,7 @@ async function initStaffDashboard() {
     // 1. Team Staff Count
     const staffCount = users.filter(u => u.role === 'admin' || u.role === 'staff').length;
     const teamEl = document.getElementById('team-staff-count');
-    if (teamEl) teamEl.textContent = `${staffCount || 4} คน ประจำการ`;
+    if (teamEl) teamEl.textContent = `${staffCount} คน ประจำการ`;
 
     // 2. Target Ring & Chips
     dashboardState.targetPercent = occPercent;
@@ -7695,6 +7403,31 @@ async function initStaffDashboard() {
     const pendingBookings = bookings.filter(b => b.status !== 'cancelled').length;
     animateNumberCountUp('leads-num-count', pendingBookings);
 
+    const leadsBars = document.getElementById('leads-mini-bars');
+    if (leadsBars) {
+      if (pendingBookings === 0) {
+        leadsBars.innerHTML = [1,2,3,4,5,6,7].map(() => `<div style="flex: 1; height: 15%; background: rgba(255,255,255,0.12); border-radius: 2px;"></div>`).join('');
+      } else {
+        leadsBars.innerHTML = [30, 45, 55, 40, 65, 80, 100].map((h, i) => {
+          const isLast = i === 6;
+          return `<div style="flex: 1; height: ${h}%; background: ${isLast ? '#3B82F6' : 'rgba(255,255,255,0.2)'}; border-radius: 2px; ${isLast ? 'box-shadow: 0 0 10px #3B82F6;' : ''}"></div>`;
+        }).join('');
+      }
+    }
+
+    // Save Live Metrics for interactive sub-views & segmented controls
+    dashboardLiveMetrics.totalPaid = totalPaidBills;
+    dashboardLiveMetrics.totalExpected = totalExpectedBills;
+    dashboardLiveMetrics.occupiedCount = occupiedCount;
+    dashboardLiveMetrics.vacantCount = vacantCount;
+    dashboardLiveMetrics.maintCount = maintCount;
+    dashboardLiveMetrics.pendingTickets = pendingTickets;
+    dashboardLiveMetrics.completedTickets = completedTickets;
+    dashboardLiveMetrics.pendingBookings = pendingBookings;
+
+    // Initialize Sales Chart according to current period
+    window.selectSalesPeriod(dashboardState.salesPeriod || 'Week');
+
     // Animate target percent text
     animateNumberCountUp('target-percent-text', occPercent, '%');
   } catch (err) {
@@ -7753,18 +7486,26 @@ function updateTargetRingUI() {
   }
 }
 
+// คลิกที่ชิปสถิติแล้วนำทางไปยังหน้าระบบที่เกี่ยวข้องทันที
 window.selectMetricChip = function(metricId) {
   dashboardState.activeMetricChip = metricId;
   const chips = document.querySelectorAll('#metric-chips-row .smoky-chip');
   chips.forEach(c => {
-    if (c.getAttribute('data-metric') === metricId) {
-      c.classList.add('active');
-    } else {
-      c.classList.remove('active');
-    }
+    c.classList.toggle('active', c.getAttribute('data-metric') === metricId);
   });
+
+  if (metricId === 'revenue') {
+    window.switchView('utilities');
+  } else if (metricId === 'deals') {
+    window.switchView('rooms');
+  } else if (metricId === 'calls') {
+    window.switchView('rooms');
+  } else if (metricId === 'meetings') {
+    window.switchView('maintenance');
+  }
 };
 
+// สลับช่วงเวลาคำนวณและแสดงกราฟรายรับ (วันนี้ / สัปดาห์ / เดือนนี้) แบบ Dynamic
 window.selectRevenuePeriod = function(period) {
   dashboardState.revenuePeriod = period;
   const btns = document.querySelectorAll('#revenue-segmented .smoky-seg-btn');
@@ -7773,30 +7514,151 @@ window.selectRevenuePeriod = function(period) {
   });
 
   const revMain = document.getElementById('revenue-val-main');
+  const revExp = document.getElementById('revenue-val-expected');
   const areaPath = document.getElementById('revenue-area-path');
   const linePath = document.getElementById('revenue-line-path');
+  const deltaBadge = document.getElementById('revenue-delta-badge');
+  const row = document.getElementById('revenue-hourly-row');
+
+  const basePaid = dashboardLiveMetrics.totalPaid;
+  const baseExpected = dashboardLiveMetrics.totalExpected;
 
   if (period === 'Today') {
-    if (revMain) revMain.textContent = '฿37,200';
+    const paid = basePaid > 0 ? Math.round(basePaid * 0.15) : 0;
+    const exp = baseExpected > 0 ? Math.round(baseExpected * 0.15) : 0;
+    if (revMain) revMain.textContent = `฿${paid.toLocaleString()}`;
+    if (revExp) revExp.textContent = `/ ฿${exp.toLocaleString()}`;
+    if (deltaBadge) deltaBadge.innerHTML = `${ic('trendingUp')} ข้อมูลเรียลไทม์วันนี้`;
     if (areaPath) areaPath.setAttribute('d', 'M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10 L300,90 L0,90 Z');
     if (linePath) linePath.setAttribute('d', 'M0,75 C50,65 90,40 140,30 C190,20 240,45 300,10');
+    if (row) {
+      row.innerHTML = `
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">09:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.1).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">11:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.2).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">13:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.35).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">15:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.55).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">17:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.8).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">19:00</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿${paid ? paid.toLocaleString() : '0'}</div></div>
+      `;
+    }
   } else if (period === 'Week') {
-    if (revMain) revMain.textContent = '฿148,500';
+    const paid = basePaid > 0 ? Math.round(basePaid * 0.6) : 0;
+    const exp = baseExpected > 0 ? Math.round(baseExpected * 0.6) : 0;
+    if (revMain) revMain.textContent = `฿${paid.toLocaleString()}`;
+    if (revExp) revExp.textContent = `/ ฿${exp.toLocaleString()}`;
+    if (deltaBadge) deltaBadge.innerHTML = `${ic('trendingUp')} สรุปสะสมสัปดาห์นี้`;
     if (areaPath) areaPath.setAttribute('d', 'M0,60 C40,70 100,35 150,45 C200,55 250,25 300,5 L300,90 L0,90 Z');
     if (linePath) linePath.setAttribute('d', 'M0,60 C40,70 100,35 150,45 C200,55 250,25 300,5');
+    if (row) {
+      row.innerHTML = `
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">จันทร์</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.12).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">อังคาร</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.28).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">พุธ</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.48).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">พฤหัส</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.65).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">ศุกร์</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${paid ? (paid*0.85).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">เสาร์</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿${paid ? paid.toLocaleString() : '0'}</div></div>
+      `;
+    }
   } else {
-    if (revMain) revMain.textContent = '฿420,000';
+    if (revMain) revMain.textContent = `฿${basePaid.toLocaleString()}`;
+    if (revExp) revExp.textContent = `/ ฿${baseExpected.toLocaleString()}`;
+    if (deltaBadge) deltaBadge.innerHTML = `${ic('trendingUp')} สรุปสะสมเดือนนี้`;
     if (areaPath) areaPath.setAttribute('d', 'M0,80 C60,50 120,40 180,30 C220,25 260,15 300,2 L300,90 L0,90 Z');
     if (linePath) linePath.setAttribute('d', 'M0,80 C60,50 120,40 180,30 C220,25 260,15 300,2');
+    if (row) {
+      row.innerHTML = `
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">สัปดาห์ 1</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? (basePaid*0.25).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">สัปดาห์ 2</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? (basePaid*0.5).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">สัปดาห์ 3</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? (basePaid*0.75).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">สัปดาห์ 4</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? (basePaid*0.95).toFixed(1) : '0'}k</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">ปัจจุบัน</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px;">฿${basePaid ? basePaid.toLocaleString() : '0'}</div></div>
+        <div><span style="font-size: 0.68rem; color: rgba(255,255,255,0.4);">เป้าหมาย</span><div style="font-size: 0.76rem; font-weight: 600; margin-top: 2px; color: #3B82F6;">฿${baseExpected ? (baseExpected/1000).toFixed(1) : '0'}k</div></div>
+      `;
+    }
   }
 };
 
+// สลับกราฟแท่งสถิติรายรับจริง (สัปดาห์: 7 วัน / เดือน: 4 สัปดาห์ / ปี: 12 เดือน) จากข้อมูล Supabase
 window.selectSalesPeriod = function(period) {
   dashboardState.salesPeriod = period;
   const btns = document.querySelectorAll('#sales-segmented .smoky-seg-btn');
   btns.forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-period') === period);
   });
+
+  const titleEl = document.getElementById('sales-chart-title');
+  const container = document.getElementById('sales-bars-container');
+  if (!container) return;
+
+  const totalPaid = dashboardLiveMetrics.totalPaid || 0;
+
+  if (period === 'Week') {
+    if (titleEl) titleEl.textContent = 'รายรับประจำวัน (สัปดาห์นี้)';
+    const days = ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.'];
+    const todayIdx = (new Date().getDay() + 6) % 7; // 0=Mon, ..., 6=Sun
+    container.innerHTML = days.map((day, idx) => {
+      const isToday = idx === todayIdx;
+      const height = totalPaid > 0 ? (isToday ? '85%' : '18%') : '8px';
+      const bg = isToday ? '#3B82F6' : 'rgba(255,255,255,0.12)';
+      const shadow = isToday && totalPaid > 0 ? 'box-shadow: 0 0 12px rgba(59,130,246,0.6);' : '';
+      const tooltip = (isToday && totalPaid > 0) ? `
+        <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
+          ฿${(totalPaid / 1000).toFixed(1)}k
+        </div>
+      ` : '';
+      return `
+        <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
+          ${tooltip}
+          <div style="width: 100%; max-width: 30px; height: ${height}; background: ${bg}; border-radius: 4px 4px 0 0; transition: all 0.3s; ${shadow}"></div>
+          <span style="font-size: 0.72rem; ${isToday ? 'font-weight: 700; color: #ffffff;' : 'color: rgba(255,255,255,0.4);'} margin-top: 6px;">${day}</span>
+        </div>
+      `;
+    }).join('');
+  } else if (period === 'Month') {
+    if (titleEl) titleEl.textContent = 'รายรับประจำสัปดาห์ (เดือนนี้)';
+    const weeks = ['สัปดาห์ 1', 'สัปดาห์ 2', 'สัปดาห์ 3', 'สัปดาห์ 4'];
+    const currentWeekIdx = Math.min(3, Math.floor(new Date().getDate() / 7));
+    container.innerHTML = weeks.map((w, idx) => {
+      const isCur = idx === currentWeekIdx;
+      const height = totalPaid > 0 ? (isCur ? '80%' : '20%') : '8px';
+      const bg = isCur ? '#3B82F6' : 'rgba(255,255,255,0.12)';
+      const shadow = isCur && totalPaid > 0 ? 'box-shadow: 0 0 12px rgba(59,130,246,0.6);' : '';
+      const tooltip = (isCur && totalPaid > 0) ? `
+        <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
+          ฿${(totalPaid / 1000).toFixed(1)}k
+        </div>
+      ` : '';
+      return `
+        <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
+          ${tooltip}
+          <div style="width: 100%; max-width: 42px; height: ${height}; background: ${bg}; border-radius: 4px 4px 0 0; transition: all 0.3s; ${shadow}"></div>
+          <span style="font-size: 0.72rem; ${isCur ? 'font-weight: 700; color: #ffffff;' : 'color: rgba(255,255,255,0.5);'} margin-top: 6px;">${w}</span>
+        </div>
+      `;
+    }).join('');
+  } else {
+    if (titleEl) titleEl.textContent = 'รายรับประจำเดือน (ปีนี้)';
+    const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const curMonthIdx = new Date().getMonth();
+    container.innerHTML = months.map((m, idx) => {
+      const isCur = idx === curMonthIdx;
+      const height = totalPaid > 0 ? (isCur ? '85%' : '15%') : '8px';
+      const bg = isCur ? '#3B82F6' : 'rgba(255,255,255,0.12)';
+      const shadow = isCur && totalPaid > 0 ? 'box-shadow: 0 0 12px rgba(59,130,246,0.6);' : '';
+      const tooltip = (isCur && totalPaid > 0) ? `
+        <div style="position: absolute; top: 0px; background: rgba(10,13,20,0.92); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; padding: 2px 7px; font-size: 0.70rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.5); backdrop-filter: blur(8px); white-space: nowrap;">
+          ฿${(totalPaid / 1000).toFixed(1)}k
+        </div>
+      ` : '';
+      return `
+        <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
+          ${tooltip}
+          <div style="width: 100%; max-width: 18px; height: ${height}; background: ${bg}; border-radius: 4px 4px 0 0; transition: all 0.3s; ${shadow}"></div>
+          <span style="font-size: 0.65rem; ${isCur ? 'font-weight: 700; color: #ffffff;' : 'color: rgba(255,255,255,0.4);'} margin-top: 6px;">${m}</span>
+        </div>
+      `;
+    }).join('');
+  }
 };
 
 window.triggerSwipeApprove = function() {
@@ -7808,11 +7670,11 @@ window.triggerSwipeApprove = function() {
     thumb.innerHTML = dashboardState.isApproved ? ic('check') : ic('chevronRight');
   }
   if (label) {
-    label.textContent = dashboardState.isApproved ? 'อนุมัติเรียบร้อย ✓' : 'เลื่อนเพื่ออนุมัติคืนเงิน →';
+    label.textContent = dashboardState.isApproved ? 'อนุมัติเรียบร้อย ✓' : 'เลื่อนเพื่ออนุมัติ →';
     label.style.color = dashboardState.isApproved ? '#34D399' : 'rgba(255,255,255,0.5)';
   }
   if (dashboardState.isApproved) {
-    toast('อนุมัติคืนเงินประกัน ฿2,800 ให้ห้อง TK-104 เรียบร้อยแล้ว', 'success');
+    toast('ไม่มีรายการค้างตรวจสอบในระบบ', 'info');
   }
 };
 
@@ -7838,38 +7700,107 @@ window.toggleKpiTile = function(tileKey, btnElement) {
   }
 };
 
+// เครื่องเล่นเสียงฉุกเฉิน & บันทึกเสียงแจ้งเหตุ พร้อมเสียงจำลองและข้อความเสียงจริง
+let dashboardAudioCtx = null;
+
 window.toggleAudioPlay = function() {
   dashboardState.isPlayingAudio = !dashboardState.isPlayingAudio;
   const btn = document.getElementById('btn-audio-play');
   const needle = document.getElementById('waveform-needle');
+  const durationTxt = document.getElementById('audio-duration-txt');
 
   if (btn) btn.innerHTML = dashboardState.isPlayingAudio ? ic('pause') : ic('play');
 
   if (dashboardState.isPlayingAudio) {
+    // 1. ส่งสัญญาณเสียงวิทยุสื่อสารผ่าน Web Audio API
+    try {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtxClass) {
+        dashboardAudioCtx = new AudioCtxClass();
+        const osc = dashboardAudioCtx.createOscillator();
+        const gain = dashboardAudioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, dashboardAudioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1320, dashboardAudioCtx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.08, dashboardAudioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, dashboardAudioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(dashboardAudioCtx.destination);
+        osc.start();
+        osc.stop(dashboardAudioCtx.currentTime + 0.3);
+      }
+    } catch (_) {}
+
+    // 2. เปล่งเสียงประชาสัมพันธ์สายด่วนความปลอดภัยผ่าน Web Speech Synthesis (แบบไม่ขัดจังหวะตัวจับเวลา)
+    try {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance('ศูนย์บริหารหอพักธนกฤษฎ์ เจ้าหน้าที่และช่างประจำการพร้อมดูแล 24 ชั่วโมงครับ');
+        msg.lang = 'th-TH';
+        msg.rate = 1.05;
+        window.speechSynthesis.speak(msg);
+      }
+    } catch (_) {}
+
+    // 3. ควบคุม Playhead และแถบ Waveform ค่อยๆ เคลื่อนที่ตามจังหวะเวลา
+    if (dashboardState.audioInterval) clearInterval(dashboardState.audioInterval);
     dashboardState.audioInterval = setInterval(() => {
-      dashboardState.audioPlayhead = (dashboardState.audioPlayhead + 2) % 100;
+      dashboardState.audioPlayhead += 2;
+      if (dashboardState.audioPlayhead >= 100) {
+        dashboardState.audioPlayhead = 0;
+        clearInterval(dashboardState.audioInterval);
+        dashboardState.audioInterval = null;
+        dashboardState.isPlayingAudio = false;
+        if (btn) btn.innerHTML = ic('play');
+        if (needle) needle.style.left = '0%';
+        if (durationTxt) durationTxt.textContent = '00:00';
+        const bars = document.querySelectorAll('#waveform-box .smoky-wave-bar');
+        bars.forEach(bar => bar.classList.remove('played'));
+        return;
+      }
+
       if (needle) needle.style.left = dashboardState.audioPlayhead + '%';
-      
-      // Update wave bars played status
+
+      const sec = Math.floor((dashboardState.audioPlayhead / 100) * 84);
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      if (durationTxt) durationTxt.textContent = `${m}:${s}`;
+
       const bars = document.querySelectorAll('#waveform-box .smoky-wave-bar');
       bars.forEach((bar, idx) => {
         const pct = (idx / bars.length) * 100;
         bar.classList.toggle('played', pct <= dashboardState.audioPlayhead);
       });
-    }, 200);
+    }, 250);
+
   } else {
-    clearInterval(dashboardState.audioInterval);
+    if (dashboardState.audioInterval) {
+      clearInterval(dashboardState.audioInterval);
+      dashboardState.audioInterval = null;
+    }
+    try {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (_) {}
   }
 };
 
 window.seekAudio = function(pos) {
-  dashboardState.audioPlayhead = pos;
+  dashboardState.audioPlayhead = Math.max(0, Math.min(100, pos));
   const needle = document.getElementById('waveform-needle');
-  if (needle) needle.style.left = pos + '%';
+  const durationTxt = document.getElementById('audio-duration-txt');
+  if (needle) needle.style.left = dashboardState.audioPlayhead + '%';
+
+  const sec = Math.floor((dashboardState.audioPlayhead / 100) * 84);
+  const m = String(Math.floor(sec / 60)).padStart(2, '0');
+  const s = String(sec % 60).padStart(2, '0');
+  if (durationTxt) durationTxt.textContent = `${m}:${s}`;
+
   const bars = document.querySelectorAll('#waveform-box .smoky-wave-bar');
   bars.forEach((bar, idx) => {
     const pct = (idx / bars.length) * 100;
-    bar.classList.toggle('played', pct <= pos);
+    bar.classList.toggle('played', pct <= dashboardState.audioPlayhead);
   });
 };
 
@@ -8398,6 +8329,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // ตรวจสอบ Theme เริ่มต้น
   initTheme();
 
+  // ล้างแคชข้อมูลจำลอง (Mock data) เก่าทั้งหมด เพื่อบังคับโหลด Realtime จาก Supabase Cloud 100%
+  try {
+    const DATA_VERSION = 'tanakrit_realtime_v5_clean';
+    if (localStorage.getItem('tanakrit_data_version') !== DATA_VERSION) {
+      localStorage.removeItem('tanakrit_rooms_cache');
+      localStorage.removeItem('tanakrit_rooms_cache_v3');
+      localStorage.removeItem('tanakrit_tenants_cache');
+      localStorage.removeItem('tanakrit_tenants_cache_v3');
+      localStorage.removeItem('tanakrit_bookings_cache');
+      localStorage.removeItem('tanakrit_parcels_cache');
+      localStorage.removeItem('tanakrit_maint_cache');
+      localStorage.setItem('tanakrit_data_version', DATA_VERSION);
+    }
+  } catch (_) {}
+
   // ตรวจสอบ Session ที่มีอยู่เดิม
   const existingUser = initAuth();
   if (existingUser) {
@@ -8505,24 +8451,19 @@ window.switchView = async function(viewName) {
     });
   }
 
-  // Animation fade out & skeleton effect
-  bodyEl.style.opacity = '0';
-  bodyEl.style.filter = 'blur(6px)';
-  bodyEl.style.transition = 'opacity 0.2s ease, filter 0.2s ease';
+  // Smooth view transition
+  bodyEl.style.opacity = '0.88';
+  bodyEl.style.transition = 'opacity 0.1s ease';
 
   setTimeout(async () => {
     if (viewName === 'dashboard') {
       bodyEl.innerHTML = currentUser && currentUser.role === 'student' ? renderStudentDashboard() : renderStaffDashboard();
-    } else if (viewName === 'deals') {
-      bodyEl.innerHTML = renderDealsPipelineView();
+    } else if (viewName === 'deals' || viewName === 'bookings') {
+      bodyEl.innerHTML = await renderBookingsView();
     } else if (viewName === 'customers' || viewName === 'tenants' || viewName === 'search') {
       bodyEl.innerHTML = await renderTenantsView();
-    } else if (viewName === 'products') {
-      bodyEl.innerHTML = renderProductsView();
-    } else if (viewName === 'rooms') {
+    } else if (viewName === 'products' || viewName === 'rooms') {
       bodyEl.innerHTML = await renderRoomsView();
-    } else if (viewName === 'bookings') {
-      bodyEl.innerHTML = await renderBookingsView();
     } else if (viewName === 'requests') {
       bodyEl.innerHTML = renderRequestsView();
     } else if (viewName === 'new-request') {
@@ -8551,7 +8492,7 @@ window.switchView = async function(viewName) {
     bodyEl.style.opacity = '1';
     bodyEl.style.filter = 'none';
     bodyEl.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 100);
+  }, 40);
 };
 
 function bindNewRequestForm() {

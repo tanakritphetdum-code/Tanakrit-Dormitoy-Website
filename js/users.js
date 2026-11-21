@@ -1,5 +1,6 @@
 // js/users.js
 // ระบบจัดการบัญชีผู้ใช้งาน (User Management) สำหรับ Admin
+// ออกแบบด้วย Smoky Frosted Glass Design System รองรับทั้ง Dark Mode และ Light Mode
 import { supabase } from './supabase.js';
 import { ic, showModal, closeModal, toast } from './api.js';
 import { USERS, currentUser } from './auth.js';
@@ -14,56 +15,101 @@ export async function renderUsersView() {
   }, 0);
 
   return `
-    <div class="card">
-      <div class="card-header-actions">
-        <div>
-          <h3>${ic('user')} จัดการบัญชีผู้ใช้งาน (User Management)</h3>
-          <p style="color: var(--muted); margin-top: 4px; font-size: 0.9rem;">
-            กำหนดสิทธิ์การเข้าใช้งาน เพิ่ม/แก้ไข และรีเซ็ตรหัสผ่านสำหรับ Admin, เจ้าหน้าที่ และผู้พักอาศัย
-          </p>
+    <div style="display: flex; flex-direction: column; gap: 22px;">
+      
+      <!-- 1. Header Card (Smoky Glass) -->
+      <div class="smoky-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.32); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
+            ${ic('user')}
+          </div>
+          <div>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: #ffffff; margin: 0; letter-spacing: -0.02em;">
+              จัดการบัญชีผู้ใช้งาน (User Management)
+            </h2>
+            <span style="font-size: 0.82rem; color: rgba(255,255,255,0.48); margin-top: 3px; display: block;">
+              กำหนดสิทธิ์การเข้าใช้งาน เพิ่ม/แก้ไข และรีเซ็ตรหัสผ่านสำหรับ Admin, เจ้าหน้าที่ และผู้พักอาศัย
+            </span>
+          </div>
         </div>
-        <button class="btn btn-primary" id="btn-add-user">
-          ${ic('plus')} เพิ่มบัญชีผู้ใช้ใหม่
-        </button>
-      </div>
 
-      <!-- User Stats Summary Strip -->
-      <div class="hero-stats-strip" style="background:#f4fbf7; margin: 18px 0; border: 1px solid var(--line); border-radius:12px; padding:16px;">
-        <div class="hstat-item">
-          <div class="num" id="stat-total-users" style="color:var(--teal-900); font-size:1.6rem;">-</div>
-          <div class="lbl">ผู้ใช้งานทั้งหมด</div>
-        </div>
-        <div class="hstat-item">
-          <div class="num" id="stat-admin-users" style="color:#d9534f; font-size:1.6rem;">-</div>
-          <div class="lbl">ผู้ดูแลระบบ (Admin)</div>
-        </div>
-        <div class="hstat-item">
-          <div class="num" id="stat-staff-users" style="color:#0275d8; font-size:1.6rem;">-</div>
-          <div class="lbl">เจ้าหน้าที่ (Staff)</div>
-        </div>
-        <div class="hstat-item">
-          <div class="num" id="stat-student-users" style="color:var(--emerald); font-size:1.6rem;">-</div>
-          <div class="lbl">ผู้พักอาศัย (Student)</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button class="smoky-round-glass-btn" id="btn-add-user" style="width: auto; border-radius: 9999px; padding: 0 18px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 0 20px rgba(59,130,246,0.4); font-size: 0.82rem; font-weight: 600; gap: 6px;">
+            ${ic('plus')}
+            <span>เพิ่มบัญชีผู้ใช้ใหม่</span>
+          </button>
         </div>
       </div>
 
-      <!-- Search & Filter Toolbar -->
-      <div class="toolbar-filter-grid" style="margin-top: 16px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-        <div class="search-box-wrap" style="flex: 1; min-width: 250px;">
-          ${ic('search')}
-          <input type="text" id="users-search-input" placeholder="ค้นหาชื่อผู้ใช้ (Username), ชื่อ-นามสกุล, ห้อง หรือเบอร์โทร...">
+      <!-- 2. User Stats Summary Tiles (Smoky Glass) -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px;">
+        <div class="smoky-tile">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="smoky-meta-label">ผู้ใช้งานทั้งหมด</span>
+            <div style="color: rgba(255,255,255,0.4);">${ic('users')}</div>
+          </div>
+          <div class="smoky-kpi-num" style="margin-top: 8px;" id="stat-total-users">-</div>
+          <div class="smoky-kpi-sub">บัญชีในระบบ</div>
         </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-sm btn-outline filter-btn active" data-filter="all">ทั้งหมด</button>
-          <button class="btn btn-sm btn-outline filter-btn" data-filter="admin">Admin</button>
-          <button class="btn btn-sm btn-outline filter-btn" data-filter="staff">Staff</button>
-          <button class="btn btn-sm btn-outline filter-btn" data-filter="student">Student</button>
-          <button class="btn btn-outline" id="btn-refresh-users">${ic('check')} รีเฟรช</button>
+
+        <div class="smoky-tile">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="smoky-meta-label">ผู้ดูแลระบบ</span>
+            <span style="background: rgba(239,68,68,0.18); color: #EF4444; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px;">Admin</span>
+          </div>
+          <div class="smoky-kpi-num" style="margin-top: 8px; color: #EF4444;" id="stat-admin-users">-</div>
+          <div class="smoky-kpi-sub">สิทธิ์สูงสุด</div>
+        </div>
+
+        <div class="smoky-tile">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="smoky-meta-label">เจ้าหน้าที่ / ช่าง</span>
+            <span style="background: rgba(59,130,246,0.18); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px;">Staff</span>
+          </div>
+          <div class="smoky-kpi-num" style="margin-top: 8px; color: #60A5FA;" id="stat-staff-users">-</div>
+          <div class="smoky-kpi-sub">ธุรการและซ่อมบำรุง</div>
+        </div>
+
+        <div class="smoky-tile">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span class="smoky-meta-label">ผู้พักอาศัย</span>
+            <span style="background: rgba(52,211,153,0.18); color: #34D399; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 9999px;">Student</span>
+          </div>
+          <div class="smoky-kpi-num" style="margin-top: 8px; color: #34D399;" id="stat-student-users">-</div>
+          <div class="smoky-kpi-sub">ผู้เช่า 3 อาคาร</div>
         </div>
       </div>
 
-      <div class="table-responsive" style="margin-top: 16px;">
-        <table class="modern-table">
+      <!-- 3. Search & Filter Toolbar (Smoky Glass) -->
+      <div class="smoky-card" style="padding: 16px 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+          <!-- Search Input -->
+          <div style="position: relative; min-width: 260px; flex: 1; max-width: 360px;">
+            <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); display: flex; align-items: center;">
+              ${ic('search')}
+            </span>
+            <input type="text" id="users-search-input" class="smoky-glass-input" placeholder="ค้นหา Username, ชื่อ, ห้อง หรือเบอร์โทร..." style="width: 100%; padding-left: 38px;">
+          </div>
+
+          <!-- Role Tabs (Segmented Control) -->
+          <div class="smoky-segmented" id="users-role-tabs" style="overflow-x: auto; max-width: 100%;">
+            <button class="smoky-seg-btn active" data-filter="all">ทั้งหมด</button>
+            <button class="smoky-seg-btn" data-filter="admin">👑 Admin</button>
+            <button class="smoky-seg-btn" data-filter="staff">🛠️ Staff</button>
+            <button class="smoky-seg-btn" data-filter="student">🎓 Student</button>
+          </div>
+
+          <!-- Refresh Button -->
+          <button class="smoky-round-glass-btn" id="btn-refresh-users" style="width: auto; height: 36px; padding: 0 16px; border-radius: 9999px; font-size: 0.78rem; gap: 6px;">
+            ${ic('check')}
+            <span>รีเฟรช</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. Modern Smoky Table Container -->
+      <div class="smoky-table-wrap">
+        <table class="smoky-table">
           <thead>
             <tr>
               <th>ชื่อผู้ใช้ (Username)</th>
@@ -73,14 +119,15 @@ export async function renderUsersView() {
               <th>ข้อมูลติดต่อ</th>
               <th>รหัสผ่าน</th>
               <th>สถานะ</th>
-              <th>จัดการ</th>
+              <th style="text-align: right;">จัดการ</th>
             </tr>
           </thead>
           <tbody id="users-tbody">
-            <tr><td colspan="8" style="text-align:center; padding: 30px; color:var(--muted);">กำลังโหลดข้อมูลผู้ใช้งาน...</td></tr>
+            <tr><td colspan="8" style="text-align:center; padding: 40px; color: rgba(255,255,255,0.4);">กำลังโหลดข้อมูลผู้ใช้งาน...</td></tr>
           </tbody>
         </table>
       </div>
+
     </div>
   `;
 }
@@ -153,7 +200,7 @@ async function loadUsersData() {
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--muted); padding: 30px;">ไม่พบข้อมูลผู้ใช้ตามเงื่อนไข</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: rgba(255,255,255,0.4); padding: 40px;">ไม่พบข้อมูลผู้ใช้ตามเงื่อนไข</td></tr>`;
     return;
   }
 
@@ -161,52 +208,52 @@ async function loadUsersData() {
   filtered.forEach(u => {
     let roleBadge = '';
     if (u.role === 'admin') {
-      roleBadge = `<span class="badge" style="background:#FDE8E7; color:var(--danger); font-weight:600;">👑 Admin</span>`;
+      roleBadge = `<span class="smoky-status-pill pill-rose">👑 Admin</span>`;
     } else if (u.role === 'staff') {
-      roleBadge = `<span class="badge" style="background:#E3F2FD; color:#0D47A1; font-weight:600;">🛠️ Staff</span>`;
+      roleBadge = `<span class="smoky-status-pill pill-blue">🛠️ Staff</span>`;
     } else {
-      roleBadge = `<span class="badge" style="background:var(--mint-50); color:var(--emerald); font-weight:600;">🎓 Student</span>`;
+      roleBadge = `<span class="smoky-status-pill pill-green">🎓 Student</span>`;
     }
 
     const isActive = u.status !== 'suspended';
     const statusPill = isActive
-      ? `<span class="badge approved" style="font-size:0.8rem;">🟢 ใช้งานได้</span>`
-      : `<span class="badge rejected" style="font-size:0.8rem;">🔴 ระงับชั่วคราว</span>`;
+      ? `<span class="smoky-status-pill pill-green">🟢 ใช้งานได้</span>`
+      : `<span class="smoky-status-pill pill-rose">🔴 ระงับชั่วคราว</span>`;
 
     html += `
       <tr>
         <td>
-          <div style="font-weight: 700; color:var(--teal-950); font-family: monospace; font-size:1rem;">
+          <div style="font-weight: 700; color: #60A5FA; font-family: monospace; font-size: 0.95rem;">
             ${u.username}
           </div>
-          <small style="color:var(--muted);">${u.id}</small>
+          <small style="color: rgba(255,255,255,0.4); font-size: 0.72rem;">${u.id}</small>
         </td>
         <td>
-          <div style="font-weight: 500; color:var(--teal-950);">${u.name}</div>
-          <small style="color:var(--muted);">${u.role_title || '-'}</small>
+          <div style="font-weight: 600; color: #ffffff;">${u.name}</div>
+          <small style="color: rgba(255,255,255,0.45); font-size: 0.72rem;">${u.role_title || '-'}</small>
         </td>
         <td>${roleBadge}</td>
-        <td>${u.room ? `<span class="badge room-pill">ห้อง ${u.room}</span>` : '<span style="color:var(--muted);">-</span>'}</td>
+        <td>${u.room ? `<span class="smoky-bldg-badge">ห้อง ${u.room}</span>` : '<span style="color: rgba(255,255,255,0.3);">-</span>'}</td>
         <td>
-          <div>${u.phone ? `<a href="tel:${u.phone}" style="color:var(--emerald);">${u.phone}</a>` : '-'}</div>
-          <small style="color:var(--muted);">${u.email || ''}</small>
+          <div>${u.phone && u.phone !== '-' ? `<a href="tel:${u.phone}" style="color: #60A5FA; text-decoration: none;">${u.phone}</a>` : '<span style="color: rgba(255,255,255,0.3);">-</span>'}</div>
+          <small style="color: rgba(255,255,255,0.4); font-size: 0.72rem;">${u.email && u.email !== '-' ? u.email : ''}</small>
         </td>
         <td>
-          <div style="font-family:monospace; background:#f4f6f5; padding:4px 8px; border-radius:6px; display:inline-block; font-size:0.85rem;">
+          <span style="font-family: monospace; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 4px 8px; border-radius: 6px; font-size: 0.82rem; color: rgba(255,255,255,0.85);">
             ${u.password}
-          </div>
+          </span>
         </td>
         <td>${statusPill}</td>
-        <td>
-          <div style="display: flex; gap: 6px;">
-            <button class="btn btn-outline btn-sm btn-edit-user" data-user-id="${u.id}" title="แก้ไขข้อมูล/รหัสผ่าน">
+        <td style="text-align: right;">
+          <div style="display: flex; gap: 6px; justify-content: flex-end;">
+            <button class="smoky-round-glass-btn btn-edit-user" data-user-id="${u.id}" title="แก้ไขข้อมูล/รหัสผ่าน" style="width: auto; height: 32px; padding: 0 12px; font-size: 0.76rem; border-radius: 8px; gap: 4px;">
               ${ic('edit')} แก้ไข
             </button>
-            <button class="btn btn-outline btn-sm btn-toggle-status" data-user-id="${u.id}" data-active="${isActive}" title="${isActive ? 'ระงับการใช้งาน' : 'เปิดใช้งาน'}">
+            <button class="smoky-round-glass-btn btn-toggle-status" data-user-id="${u.id}" data-active="${isActive}" title="${isActive ? 'ระงับการใช้งาน' : 'เปิดใช้งาน'}" style="width: auto; height: 32px; padding: 0 10px; font-size: 0.76rem; border-radius: 8px;">
               ${isActive ? 'ระงับ' : 'เปิดใช้'}
             </button>
             ${u.username !== 'admin' ? `
-              <button class="btn btn-outline btn-sm btn-del-user" data-user-id="${u.id}" data-username="${u.username}" title="ลบบัญชีนี้" style="color:var(--danger); border-color:#fadbd8;">
+              <button class="smoky-round-glass-btn btn-del-user" data-user-id="${u.id}" data-username="${u.username}" title="ลบบัญชีนี้" style="width: 32px; height: 32px; border-radius: 8px; color: #F87171; border-color: rgba(248,113,113,0.3);">
                 ${ic('trash')}
               </button>
             ` : ''}
@@ -274,15 +321,18 @@ function bindUsersEvents() {
     addBtn.onclick = () => openUserModal(null);
   }
 
-  // Filter buttons
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentRoleFilter = btn.getAttribute('data-filter');
-      loadUsersData();
-    };
-  });
+  // Filter tabs
+  const filterTabs = document.getElementById('users-role-tabs');
+  if (filterTabs) {
+    filterTabs.querySelectorAll('.smoky-seg-btn').forEach(btn => {
+      btn.onclick = () => {
+        filterTabs.querySelectorAll('.smoky-seg-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentRoleFilter = btn.getAttribute('data-filter');
+        loadUsersData();
+      };
+    });
+  }
 }
 
 function openUserModal(user = null) {
@@ -290,63 +340,63 @@ function openUserModal(user = null) {
   const title = isEdit ? `แก้ไขบัญชีผู้ใช้: ${user.username}` : 'เพิ่มบัญชีผู้ใช้งานใหม่';
 
   const body = `
-    <form id="form-user-edit">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+    <form id="form-user-edit" style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ชื่อผู้ใช้งาน (Username) *</label>
-          <input type="text" id="u-username" value="${user ? user.username : ''}" ${isEdit ? 'disabled' : 'required'} placeholder="เช่น student103, tech1">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">ชื่อผู้ใช้งาน (Username) *</label>
+          <input type="text" id="u-username" class="smoky-glass-input" value="${user ? user.username : ''}" ${isEdit ? 'disabled' : 'required'} placeholder="เช่น student103, tech1" style="width: 100%;">
         </div>
         <div class="field">
-          <label>รหัสผ่าน (Password) *</label>
-          <input type="text" id="u-password" value="${user ? user.password : ''}" required placeholder="••••••••">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">รหัสผ่าน (Password) *</label>
+          <input type="text" id="u-password" class="smoky-glass-input" value="${user ? user.password : ''}" required placeholder="••••••••" style="width: 100%;">
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ระดับสิทธิ์ (Role) *</label>
-          <select id="u-role" required>
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">ระดับสิทธิ์ (Role) *</label>
+          <select id="u-role" class="smoky-glass-select" required style="width: 100%;">
             <option value="student" ${user && user.role === 'student' ? 'selected' : ''}>Student (ผู้พักอาศัย)</option>
             <option value="staff" ${user && user.role === 'staff' ? 'selected' : ''}>Staff (เจ้าหน้าที่/ช่าง)</option>
             <option value="admin" ${user && user.role === 'admin' ? 'selected' : ''}>Admin (ผู้ดูแลระบบ)</option>
           </select>
         </div>
         <div class="field">
-          <label>เลขห้องพัก (เฉพาะ Student)</label>
-          <input type="text" id="u-room" value="${user ? (user.room || '') : ''}" placeholder="เช่น 103, 302">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">เลขห้องพัก (เฉพาะ Student)</label>
+          <input type="text" id="u-room" class="smoky-glass-input" value="${user ? (user.room || '') : ''}" placeholder="เช่น 103, 302" style="width: 100%;">
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>ชื่อ - นามสกุล *</label>
-          <input type="text" id="u-name" value="${user ? user.name : ''}" required placeholder="นาย/นาง/น.ส. ...">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">ชื่อ - นามสกุล *</label>
+          <input type="text" id="u-name" class="smoky-glass-input" value="${user ? user.name : ''}" required placeholder="นาย/นาง/น.ส. ..." style="width: 100%;">
         </div>
         <div class="field">
-          <label>ตำแหน่ง / คำอธิบายสิทธิ์</label>
-          <input type="text" id="u-title" value="${user ? (user.role_title || '') : ''}" placeholder="เช่น ผู้พักอาศัย, ช่างเทคนิค">
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-        <div class="field">
-          <label>เบอร์โทรศัพท์</label>
-          <input type="tel" id="u-phone" value="${user ? (user.phone || '') : ''}" placeholder="08x-xxx-xxxx">
-        </div>
-        <div class="field">
-          <label>อีเมล</label>
-          <input type="email" id="u-email" value="${user ? (user.email || '') : ''}" placeholder="example@email.com">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">ตำแหน่ง / คำอธิบายสิทธิ์</label>
+          <input type="text" id="u-title" class="smoky-glass-input" value="${user ? (user.role_title || '') : ''}" placeholder="เช่น ผู้พักอาศัย, ช่างเทคนิค" style="width: 100%;">
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label>รหัสนักศึกษา / ผู้เช่า (ถ้ามี)</label>
-          <input type="text" id="u-tenant-id" value="${user ? (user.tenant_id || '') : ''}" placeholder="เช่น 66565632">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">เบอร์โทรศัพท์</label>
+          <input type="tel" id="u-phone" class="smoky-glass-input" value="${user ? (user.phone || '') : ''}" placeholder="08x-xxx-xxxx" style="width: 100%;">
         </div>
         <div class="field">
-          <label>สถานะบัญชี</label>
-          <select id="u-status">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">อีเมล</label>
+          <input type="email" id="u-email" class="smoky-glass-input" value="${user ? (user.email || '') : ''}" placeholder="example@email.com" style="width: 100%;">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <div class="field">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">รหัสนักศึกษา / ผู้เช่า (ถ้ามี)</label>
+          <input type="text" id="u-tenant-id" class="smoky-glass-input" value="${user ? (user.tenant_id || '') : ''}" placeholder="เช่น 66565632" style="width: 100%;">
+        </div>
+        <div class="field">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 6px;">สถานะบัญชี</label>
+          <select id="u-status" class="smoky-glass-select" style="width: 100%;">
             <option value="active" ${!user || user.status !== 'suspended' ? 'selected' : ''}>🟢 ใช้งานปกติ (Active)</option>
             <option value="suspended" ${user && user.status === 'suspended' ? 'selected' : ''}>🔴 ระงับการใช้งาน (Suspended)</option>
           </select>
@@ -356,8 +406,8 @@ function openUserModal(user = null) {
   `;
 
   const footer = `
-    <button type="button" class="btn btn-outline" id="btn-cancel-modal">ยกเลิก</button>
-    <button type="button" class="btn btn-primary" id="btn-submit-user">${isEdit ? 'บันทึกการแก้ไข' : 'สร้างบัญชีผู้ใช้'}</button>
+    <button type="button" class="btn btn-outline" id="btn-cancel-modal" onclick="window.closeAppModal()">ยกเลิก</button>
+    <button type="button" class="btn btn-primary" id="btn-submit-user" style="background: #3B82F6; border-color: #3B82F6;">${isEdit ? 'บันทึกการแก้ไข' : 'สร้างบัญชีผู้ใช้'}</button>
   `;
 
   showModal({

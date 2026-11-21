@@ -8,62 +8,37 @@ let bookingFilterStatus = 'all';
 let bookingSearchTerm = '';
 let cachedBookings = [];
 
-export const DEFAULT_BOOKINGS = [
-  {
-    id: 'BK-101',
-    full_name: 'นายศุภกฤต สิทธิชัย',
-    phone: '081-999-1234',
-    line_id: 'supakrit.s',
-    room_type: 'อาคาร ธนกฤษฎ์ (2,800 ฿)',
-    preferred_floor: null,
-    expected_check_in: '2026-11-06',
-    notes: 'สนใจห้องพักอาคารธนกฤษฎ์ สะอาด โปร่งสบาย เข้าพักต้นเดือนหน้าครับ',
-    status: 'pending',
-    created_at: '2026-10-30T02:18:43.160152+00:00'
-  },
-  {
-    id: 'BK-102',
-    full_name: 'น.ส.กัญญาณัฐ บุญมี',
-    phone: '089-888-5678',
-    line_id: 'kanyanat_b',
-    room_type: 'อาคาร กิ่งเพชร (2,600 ฿)',
-    preferred_floor: null,
-    expected_check_in: '2026-11-09',
-    notes: 'ต้องการห้องมุม อาคารกิ่งเพชร เพื่อความเงียบสงบในการอ่านหนังสือ',
-    status: 'contacted',
-    created_at: '2026-10-30T02:18:43.160152+00:00'
-  }
-];
+export const DEFAULT_BOOKINGS = [];
 
 // ฟังก์ชันเปิด Modal จองห้องพักจากหน้า Landing Page (เรียกใช้งานได้แบบ Public)
 export function openBookingModal(preselectedType = '') {
   const body = `
     <form id="form-public-booking" style="display: flex; flex-direction: column; gap: 14px;">
-      <div style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; padding: 12px;">
-        <div style="font-size: 0.86rem; color: #1E3A8A; line-height: 1.5;">
+      <div class="smoky-modal-notes" style="background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3); border-radius: 10px; padding: 12px; margin-bottom: 2px;">
+        <div style="font-size: 0.86rem; color: #3B82F6; line-height: 1.5; font-weight: 500;">
           ✨ กรอกข้อมูลเพื่อแจ้งความประสงค์จองหรือสอบถามห้องพักว่าง 3 อาคาร (ธนกฤษฎ์, กิ่งเพชร, ใต้บ้าน) เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันห้องพักและรายละเอียดเงินมัดจำครับ
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ชื่อ - นามสกุล ผู้จอง *</label>
-          <input type="text" id="bk-name" required placeholder="นาย/นางสาว ..." style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ชื่อ - นามสกุล ผู้จอง *</label>
+          <input type="text" id="bk-name" class="smoky-glass-input" required placeholder="นาย/นางสาว ..." style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ *</label>
-          <input type="tel" id="bk-phone" required placeholder="08x-xxx-xxxx" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ *</label>
+          <input type="tel" id="bk-phone" class="smoky-glass-input" required placeholder="08x-xxx-xxxx" style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">Line ID (สำหรับส่งรูป/สัญญา)</label>
-          <input type="text" id="bk-line" placeholder="เช่น @line_id หรือเบอร์โทร" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">Line ID (สำหรับส่งรูป/สัญญา)</label>
+          <input type="text" id="bk-line" class="smoky-glass-input" placeholder="เช่น @line_id หรือเบอร์โทร" style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">อาคารและห้องพักที่สนใจ *</label>
-          <select id="bk-type" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">อาคารและห้องพักที่สนใจ *</label>
+          <select id="bk-type" class="smoky-glass-select" required style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="อาคาร ธนกฤษฎ์ (2,800 ฿)" ${preselectedType.includes('Tanakrit') || preselectedType.includes('ธนกฤษฎ์') ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 2,800 ฿/เดือน</option>
             <option value="อาคาร กิ่งเพชร (2,600 ฿)" ${preselectedType.includes('KingPhetch') || preselectedType.includes('กิ่งเพชร') ? 'selected' : ''}>อาคาร กิ่งเพชร (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 2,600 ฿/เดือน</option>
             <option value="อาคาร ใต้บ้าน (1,500 ฿)" ${preselectedType.includes('UnderGround') || preselectedType.includes('ใต้บ้าน') ? 'selected' : ''}>อาคาร ใต้บ้าน (ห้องพัดลม 12 ตร.ม. ห้องน้ำรวม) 1,500 ฿/เดือน</option>
@@ -73,8 +48,8 @@ export function openBookingModal(preselectedType = '') {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">เลือกอาคารที่ต้องการ</label>
-          <select id="bk-floor" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">เลือกอาคารที่ต้องการ</label>
+          <select id="bk-floor" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="">เลือกอาคารใดก็ได้ (ตามห้องว่าง)</option>
             <option value="ธนกฤษฎ์">เฉพาะอาคาร ธนกฤษฎ์ (9 ห้อง)</option>
             <option value="กิ่งเพชร">เฉพาะอาคาร กิ่งเพชร (5 ห้อง)</option>
@@ -82,14 +57,14 @@ export function openBookingModal(preselectedType = '') {
           </select>
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">วันที่คาดว่าจะเข้าพัก *</label>
-          <input type="date" id="bk-date" required value="${new Date().toISOString().split('T')[0]}" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">วันที่คาดว่าจะเข้าพัก *</label>
+          <input type="date" id="bk-date" class="smoky-glass-input" required value="${new Date().toISOString().split('T')[0]}" style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ข้อความเพิ่มเติม / ความต้องการพิเศษ</label>
-        <textarea id="bk-notes" rows="3" placeholder="เช่น มีรถจักรยานยนต์ 1 คัน, ขอนัดดูห้องตัวอย่างวันเสาร์นี้" style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ข้อความเพิ่มเติม / ความต้องการพิเศษ</label>
+        <textarea id="bk-notes" class="smoky-glass-input" rows="3" placeholder="เช่น มีรถจักรยานยนต์ 1 คัน, ขอนัดดูห้องตัวอย่างวันเสาร์นี้" style="width: 100%; border-radius: 8px; padding: 10px;"></textarea>
       </div>
     </form>
   `;
@@ -308,7 +283,7 @@ async function loadBookingsData() {
 
   let allBookings = bookings;
   if (error || !allBookings) {
-    allBookings = DEFAULT_BOOKINGS;
+    allBookings = [];
   }
   cachedBookings = allBookings;
 

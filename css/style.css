@@ -2430,6 +2430,20 @@ img, svg { display: block; max-width: 100%; }
   border-color: rgba(255, 255, 255, 0.22);
 }
 
+.smoky-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.smoky-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
 /* Typography on Glass */
 .smoky-meta-label {
   font-size: 0.72rem;
@@ -2873,27 +2887,44 @@ img, svg { display: block; max-width: 100%; }
     flex-direction: column;
     padding-bottom: 74px;
   }
+
+  /* Mobile Bottom Navigation Capsule */
   .smoky-sidebar {
     position: fixed;
     bottom: 10px;
-    left: 12px;
-    right: 12px;
+    left: 8px;
+    right: 8px;
     width: auto;
-    height: 58px;
-    padding: 4px 12px;
+    height: 54px;
+    padding: 4px 6px 4px 10px;
     flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     border-radius: 9999px;
-    background: rgba(14, 18, 28, 0.90);
+    background: rgba(14, 18, 28, 0.92);
     backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.65);
     z-index: 1000;
-    justify-content: space-around;
+  }
+  .theme-light .smoky-sidebar {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.05) !important;
   }
   .smoky-sidebar-top {
+    flex: 1;
+    min-width: 0;
     flex-direction: row;
-    gap: 8px;
+    gap: 4px;
     width: auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .smoky-sidebar-top::-webkit-scrollbar {
+    display: none;
   }
   .smoky-brand-icon {
     display: none;
@@ -2904,27 +2935,277 @@ img, svg { display: block; max-width: 100%; }
     background: transparent;
     border: none;
     padding: 0;
+    gap: 6px;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
   }
   .smoky-sidebar-bottom {
+    display: flex;
     flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.14);
+    padding-left: 6px;
+    margin-left: 4px;
+  }
+  .theme-light .smoky-sidebar-bottom {
+    border-left: 1px solid rgba(0, 0, 0, 0.10) !important;
+  }
+  .smoky-nav-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+  .smoky-nav-btn svg {
+    width: 18px !important;
+    height: 18px !important;
   }
   .smoky-tooltip {
     display: none !important;
   }
+
+  /* Mobile Topbar */
   .smoky-topbar {
-    padding: 0 16px;
+    padding: 0 10px;
+    height: 56px;
+    gap: 8px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
-  .smoky-content {
-    padding: 16px;
+  .smoky-topbar > div:first-child {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 110px) !important;
+    display: flex !important;
+    align-items: center !important;
   }
   .smoky-tabs {
-    gap: 14px;
+    gap: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 6px;
+  }
+  .smoky-tabs::-webkit-scrollbar {
+    display: none;
   }
   .smoky-tab {
-    font-size: 0.82rem;
+    font-size: 0.80rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 6px 4px;
+  }
+  .smoky-topbar-right {
+    gap: 6px;
+    flex-shrink: 0;
+    display: flex !important;
+    align-items: center !important;
+  }
+  /* In mobile topbar, make "กลับหน้าแรก" an icon button to save space */
+  .smoky-topbar-right button[onclick*="returnToLandingPage"] span,
+  .smoky-topbar-right button[title*="หน้าแรก"] span {
+    display: none !important;
+  }
+  .smoky-topbar-right button[onclick*="returnToLandingPage"],
+  .smoky-topbar-right button[title*="หน้าแรก"] {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .smoky-topbar-right .smoky-round-glass-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+  }
+  /* In mobile topbar, hide user name & role to keep the layout compact & symmetrical */
+  .smoky-user-meta,
+  .smoky-profile-capsule .smoky-user-text {
+    display: none !important;
+  }
+  .smoky-user-profile,
+  .smoky-profile-capsule {
+    padding: 0 !important;
+    gap: 0 !important;
+    border-radius: 50% !important;
+    cursor: pointer;
+  }
+  .smoky-avatar-wrap,
+  .smoky-avatar-img,
+  .smoky-avatar {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    border-radius: 50% !important;
+  }
+
+  .smoky-content {
+    padding: 12px;
   }
   .smoky-2x2-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Filter bars, segmented pills, tabs scroll cleanly without page overflow */
+  .smoky-segmented,
+  .filter-bar,
+  .filter-pills,
+  .rooms-filter-container,
+  [style*="overflow-x: auto"] {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    max-width: 100% !important;
+  }
+  .smoky-segmented::-webkit-scrollbar,
+  .filter-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Table responsive wrap */
+  .smoky-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100% !important;
+    border-radius: 14px !important;
+    margin-bottom: 12px !important;
+  }
+  .smoky-table-wrap table {
+    min-width: 580px;
+  }
+
+  /* Modals on mobile */
+  .modal-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 8px auto !important;
+    max-height: 92vh !important;
+    padding: 16px 14px !important;
+    border-radius: 18px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+  .modal-header {
+    padding-bottom: 10px !important;
+    margin-bottom: 10px !important;
+    flex-shrink: 0 !important;
+  }
+  .modal-header h3 {
+    font-size: 1.05rem !important;
+  }
+  .modal-body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-height: calc(90vh - 120px) !important;
+    padding-right: 4px !important;
+  }
+  .modal-footer {
+    flex-shrink: 0 !important;
+    padding-top: 10px !important;
+    margin-top: 10px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .modal-footer button {
+    flex: 1 1 auto;
+    min-width: 110px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Form grids: 2-col and 3-col rows collapse to 1-col on mobile for maximum legibility */
+  .modal-dialog [style*="grid-template-columns: 1fr 1fr"],
+  .modal-dialog [style*="grid-template-columns: 1fr 1fr 1fr"],
+  .modal-dialog [style*="grid-template-columns:1fr 1fr"],
+  .modal-dialog [style*="grid-template-columns:1fr 1fr 1fr"],
+  .smoky-card [style*="grid-template-columns: 1fr 1fr"],
+  .smoky-card [style*="grid-template-columns: 1fr 1fr 1fr"],
+  .smoky-card [style*="grid-template-columns:1fr 1fr"],
+  .smoky-card [style*="grid-template-columns:1fr 1fr 1fr"],
+  form [style*="grid-template-columns: 1fr 1fr"],
+  form [style*="grid-template-columns: 1fr 1fr 1fr"],
+  form [style*="grid-template-columns:1fr 1fr"],
+  form [style*="grid-template-columns:1fr 1fr 1fr"],
+  .smoky-grid-2,
+  .smoky-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* KPI Summaries: 2x2 grid on mobile for symmetry & balance */
+  #room-stats-summary,
+  #tenants-kpi-grid,
+  #utility-summary-stats,
+  #booking-summary-stats,
+  #ann-summary-stats,
+  .smoky-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .smoky-tile {
+    padding: 12px 14px !important;
+  }
+  .smoky-tile .stat-value {
+    font-size: 1.35rem !important;
+  }
+  .smoky-kpi-num {
+    font-size: 1.35rem !important;
+  }
+
+  /* Room Cards in Floor Plan */
+  #rooms-container {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  .smoky-room-card {
+    padding: 16px !important;
+    border-radius: 16px !important;
+  }
+
+  /* Top Section Headers in CRM views */
+  .smoky-card > div[style*="display: flex"][style*="justify-content: space-between"] {
+    gap: 10px !important;
+  }
+
+  /* Landing Page Mobile Sections */
+  .section {
+    padding: 40px 16px !important;
+  }
+  .room-catalog-grid {
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+  }
+  .feature-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .mrf-cols {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+}
+
+@media (max-width: 1024px), (hover: none) {
+  .smoky-tooltip {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
 }
 
@@ -3655,25 +3936,24 @@ body:not(.theme-light) #app-modal-backdrop label {
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
-/* Light Mode Modals (App Backdrop) - Frosted Glass */
+/* Light Mode Modals (App Backdrop) - Solid White Backdrop for Zero Clashing */
 .theme-light #app-modal-backdrop {
-  background: rgba(15, 23, 42, 0.35) !important;
-  backdrop-filter: blur(16px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+  background: rgba(15, 23, 42, 0.50) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
 }
 .theme-light #app-modal-backdrop .modal-dialog {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(32px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(32px) saturate(190%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.95) !important;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.16), 
-              inset 0 1px 1px rgba(255, 255, 255, 1) !important;
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.06) !important;
   color: #0F172A !important;
 }
 .theme-light #app-modal-backdrop .modal-header {
-  border-bottom: 1px solid rgba(226, 232, 240, 0.7) !important;
-  background: rgba(248, 250, 252, 0.65) !important;
-  backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  background: #F8FAFC !important;
+  backdrop-filter: none !important;
 }
 .theme-light #app-modal-backdrop .modal-title {
   color: #0F172A !important;
@@ -3687,21 +3967,27 @@ body:not(.theme-light) #app-modal-backdrop label {
   color: #0F172A !important;
 }
 .theme-light #app-modal-backdrop .modal-body {
+  background: #FFFFFF !important;
   color: #0F172A !important;
 }
 .theme-light #app-modal-backdrop .modal-footer {
-  border-top: 1px solid rgba(226, 232, 240, 0.7) !important;
-  background: rgba(248, 250, 252, 0.65) !important;
-  backdrop-filter: blur(16px) !important;
+  border-top: 1px solid #E2E8F0 !important;
+  background: #F8FAFC !important;
+  backdrop-filter: none !important;
 }
 .theme-light #app-modal-backdrop input,
 .theme-light #app-modal-backdrop select,
 .theme-light #app-modal-backdrop textarea {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
   color: #0F172A !important;
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+.theme-light #app-modal-backdrop input:focus,
+.theme-light #app-modal-backdrop select:focus,
+.theme-light #app-modal-backdrop textarea:focus {
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
 }
 .theme-light #app-modal-backdrop label,
 .theme-light #app-modal-backdrop .smoky-form-label {
@@ -3709,13 +3995,11 @@ body:not(.theme-light) #app-modal-backdrop label {
   font-weight: 600 !important;
 }
 
-/* Modal Inner Components - Light Mode Frosted Glass */
+/* Modal Inner Components - Light Mode Clean Cards */
 .theme-light #app-modal-backdrop .smoky-modal-card-header {
-  background: rgba(255, 255, 255, 0.65) !important;
-  backdrop-filter: blur(16px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.9) !important;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03), inset 0 1px 1px rgba(255, 255, 255, 1) !important;
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 .theme-light #app-modal-backdrop .smoky-modal-card-title {
   color: #0F172A !important;
@@ -3727,11 +4011,9 @@ body:not(.theme-light) #app-modal-backdrop label {
   color: #0F172A !important;
 }
 .theme-light #app-modal-backdrop .smoky-modal-block {
-  background: rgba(255, 255, 255, 0.65) !important;
-  backdrop-filter: blur(16px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.9) !important;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03), inset 0 1px 1px rgba(255, 255, 255, 1) !important;
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
 }
 .theme-light #app-modal-backdrop .smoky-modal-label {
   color: #475569 !important;
@@ -3747,9 +4029,8 @@ body:not(.theme-light) #app-modal-backdrop label {
   color: #64748B !important;
 }
 .theme-light #app-modal-backdrop .smoky-modal-notes {
-  background: rgba(241, 245, 249, 0.75) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px dashed rgba(203, 213, 225, 0.9) !important;
+  background: #F1F5F9 !important;
+  border: 1px dashed #CBD5E1 !important;
   color: #334155 !important;
 }
 .theme-light #app-modal-backdrop .btn-modal-phone {
@@ -3790,13 +4071,13 @@ body:not(.theme-light) #app-modal-backdrop label {
 
 .theme-light #app-modal-backdrop div[style*="background: rgba(255"],
 .theme-light #app-modal-backdrop div[style*="background:rgba(255"] {
-  background: rgba(255, 255, 255, 0.65) !important;
-  border-color: rgba(255, 255, 255, 0.9) !important;
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
 }
 
 .theme-light #app-modal-backdrop div[style*="border: 1px dashed"],
 .theme-light #app-modal-backdrop div[style*="border:1px dashed"] {
-  background: rgba(248, 250, 252, 0.75) !important;
+  background: #F8FAFC !important;
   border-color: #CBD5E1 !important;
   color: #334155 !important;
 }
@@ -3827,14 +4108,13 @@ body:not(.theme-light) #app-modal-backdrop label {
 
 /* Buttons in Modal Light Mode */
 .theme-light #app-modal-backdrop .smoky-round-glass-btn:not(.btn-modal-phone):not(.btn-primary):not([style*="background: #2563EB"]):not([style*="background: #3B82F6"]) {
-  background: rgba(255, 255, 255, 0.75) !important;
-  backdrop-filter: blur(12px) !important;
+  background: #FFFFFF !important;
   color: #334155 !important;
-  border: 1px solid rgba(255, 255, 255, 0.9) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #CBD5E1 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 .theme-light #app-modal-backdrop .smoky-round-glass-btn:not(.btn-modal-phone):not(.btn-primary):hover {
-  background: rgba(255, 255, 255, 0.95) !important;
+  background: #F1F5F9 !important;
   color: #0F172A !important;
 }
 
@@ -3875,6 +4155,136 @@ body:not(.theme-light) #app-modal-backdrop label {
 .theme-light #app-modal-backdrop button.btn-primary * {
   color: #FFFFFF !important;
 }
+
+/* ==================== GLOBAL FORM INPUT & TEXT CONTRAST GUARDS ==================== */
+
+/* Dark Mode Inputs (Settings, Forms, Modals) */
+body:not(.theme-light) .field input,
+body:not(.theme-light) .field textarea,
+body:not(.theme-light) .field select,
+body:not(.theme-light) .form-select,
+body:not(.theme-light) input.smoky-glass-input,
+body:not(.theme-light) .smoky-glass-input,
+body:not(.theme-light) #form-dorm-settings input,
+body:not(.theme-light) #form-account-settings input {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #FFFFFF !important;
+  border-radius: 10px !important;
+}
+
+body:not(.theme-light) .field input:focus,
+body:not(.theme-light) .field textarea:focus,
+body:not(.theme-light) .field select:focus,
+body:not(.theme-light) .form-select:focus,
+body:not(.theme-light) .smoky-glass-input:focus,
+body:not(.theme-light) #form-dorm-settings input:focus,
+body:not(.theme-light) #form-account-settings input:focus {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.3) !important;
+  color: #FFFFFF !important;
+}
+
+body:not(.theme-light) .field input:disabled,
+body:not(.theme-light) .field textarea:disabled,
+body:not(.theme-light) .field select:disabled,
+body:not(.theme-light) input[disabled] {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+  cursor: not-allowed !important;
+}
+
+body:not(.theme-light) .field label,
+body:not(.theme-light) label.smoky-form-label,
+body:not(.theme-light) .smoky-form-label {
+  color: rgba(255, 255, 255, 0.90) !important;
+  font-weight: 500 !important;
+}
+
+/* Dark Mode Text Clarity Overrides for Hardcoded Dark Colors */
+body:not(.theme-light) [style*="color: var(--teal-950)"],
+body:not(.theme-light) [style*="color:var(--teal-950)"],
+body:not(.theme-light) [style*="color: #1E3A8A"],
+body:not(.theme-light) [style*="color:#1E3A8A"],
+body:not(.theme-light) [style*="color: #0A2E26"],
+body:not(.theme-light) [style*="color:#0A2E26"] {
+  color: #F8FAFC !important;
+}
+
+body:not(.theme-light) #app-modal-backdrop [style*="color: var(--teal-950)"],
+body:not(.theme-light) #app-modal-backdrop [style*="color:var(--teal-950)"],
+body:not(.theme-light) #app-modal-backdrop [style*="color: #1E3A8A"],
+body:not(.theme-light) #app-modal-backdrop [style*="color:#1E3A8A"],
+body:not(.theme-light) #app-modal-backdrop [style*="color: #0A2E26"],
+body:not(.theme-light) #app-modal-backdrop [style*="color:#0A2E26"] {
+  color: #F8FAFC !important;
+}
+
+body:not(.theme-light) #app-modal-backdrop div[style*="background: rgba(59,130,246,0.08)"] div,
+body:not(.theme-light) #app-modal-backdrop div[style*="background:rgba(59,130,246,0.08)"] div,
+body:not(.theme-light) #app-modal-backdrop .smoky-modal-notes div[style*="color: #3B82F6"] {
+  color: #93C5FD !important;
+}
+
+body:not(.theme-light) #app-modal-backdrop .upload-dropzone,
+body:not(.theme-light) #app-modal-backdrop [style*="background: #F8FAFC"],
+body:not(.theme-light) #app-modal-backdrop [style*="background:#F8FAFC"] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+body:not(.theme-light) #app-modal-backdrop .upload-dropzone * {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Light Mode Inputs (Settings, Forms, Modals) */
+.theme-light .field input,
+.theme-light .field textarea,
+.theme-light .field select,
+.theme-light .form-select,
+.theme-light input.smoky-glass-input,
+.theme-light .smoky-glass-input,
+.theme-light #form-dorm-settings input,
+.theme-light #form-account-settings input {
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #0F172A !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+  border-radius: 10px !important;
+}
+
+.theme-light .field input:focus,
+.theme-light .field textarea:focus,
+.theme-light .field select:focus,
+.theme-light .form-select:focus,
+.theme-light .smoky-glass-input:focus,
+.theme-light #form-dorm-settings input:focus,
+.theme-light #form-account-settings input:focus {
+  background: #FFFFFF !important;
+  border-color: #2563EB !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+  color: #0F172A !important;
+}
+
+.theme-light .field input:disabled,
+.theme-light .field textarea:disabled,
+.theme-light .field select:disabled,
+.theme-light input[disabled] {
+  background: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+  color: #64748B !important;
+  cursor: not-allowed !important;
+}
+
+.theme-light .field label,
+.theme-light label.smoky-form-label,
+.theme-light .smoky-form-label {
+  color: #1E293B !important;
+  font-weight: 600 !important;
+}
+
 
 
 

@@ -9,41 +9,7 @@ let parcelFilter = 'all';
 let parcelSearch = '';
 let cachedParcels = [];
 
-export const DEFAULT_PARCELS = [
-  {
-    id: 'PKG-101',
-    tracking_number: 'TH0129384756',
-    courier: 'Flash Express',
-    recipient_name: 'นายสมชาย ธนกฤษฎ์',
-    room_number: '101',
-    description: 'กล่องพัสดุขนาดกลาง (อุปกรณ์วาดรูป)',
-    status: 'waiting',
-    arrived_at: '2026-10-22',
-    collected_at: null
-  },
-  {
-    id: 'PKG-102',
-    tracking_number: 'KERRY9948271',
-    courier: 'Kerry Express',
-    recipient_name: 'ณัฐพล ใจดี',
-    room_number: '201',
-    description: 'ซองเอกสารสำคัญ',
-    status: 'waiting',
-    arrived_at: '2026-10-21',
-    collected_at: null
-  },
-  {
-    id: 'PKG-103',
-    tracking_number: 'ED182947192TH',
-    courier: 'ไปรษณีย์ไทย (EMS)',
-    recipient_name: 'น.ส.วิภาดา สมบูรณ์',
-    room_number: '102',
-    description: 'กล่องพัสดุมาตรฐาน',
-    status: 'collected',
-    arrived_at: '2026-10-18',
-    collected_at: '2026-10-19'
-  }
-];
+export const DEFAULT_PARCELS = [];
 
 export function getBuildingName(roomNum) {
   const r = String(roomNum || '').trim();
@@ -190,7 +156,7 @@ async function loadParcelsData() {
 
   let allParcels = parcels;
   if (error || !allParcels) {
-    allParcels = DEFAULT_PARCELS;
+    allParcels = [];
   }
   cachedParcels = allParcels;
 
@@ -409,8 +375,8 @@ function openAddParcelModal() {
     <form id="form-add-parcel" style="display: flex; flex-direction: column; gap: 14px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">บริษัทขนส่ง *</label>
-          <select id="pk-courier" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">บริษัทขนส่ง *</label>
+          <select id="pk-courier" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             <option value="Flash Express">Flash Express</option>
             <option value="Kerry Express">Kerry Express</option>
             <option value="ไปรษณีย์ไทย (EMS)">ไปรษณีย์ไทย (EMS / ลงทะเบียน)</option>
@@ -421,27 +387,27 @@ function openAddParcelModal() {
           </select>
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">หมายเลขพัสดุ (Tracking No.) *</label>
-          <input type="text" id="pk-tracking" placeholder="เช่น TH0129384756" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หมายเลขพัสดุ (Tracking No.) *</label>
+          <input type="text" id="pk-tracking" class="smoky-glass-input" placeholder="เช่น TH0129384756" required style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ห้องพักผู้รับ *</label>
-          <select id="pk-room" class="form-select" style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ห้องพักผู้รับ *</label>
+          <select id="pk-room" class="smoky-glass-select" style="width: 100%; height: 42px; border-radius: 8px;">
             ${roomOptions}
           </select>
         </div>
         <div class="field">
-          <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ชื่อผู้รับตามจ่าหน้า *</label>
-          <input type="text" id="pk-name" value="${defaultName}" placeholder="เช่น นายสมชาย ธนกฤษฎ์" required style="width: 100%; height: 42px; border-radius: 8px;">
+          <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ชื่อผู้รับตามจ่าหน้า *</label>
+          <input type="text" id="pk-name" class="smoky-glass-input" value="${defaultName}" placeholder="เช่น นายสมชาย ธนกฤษฎ์" required style="width: 100%; height: 42px; border-radius: 8px;">
         </div>
       </div>
 
       <div class="field">
-        <label style="font-size: 0.84rem; font-weight: 600; color: var(--teal-950); display: block; margin-bottom: 6px;">ลักษณะพัสดุ / หมายเหตุ</label>
-        <input type="text" id="pk-desc" placeholder="เช่น กล่องใหญ่, ซองเอกสาร, กล่องพัสดุขนาดกลาง" style="width: 100%; height: 42px; border-radius: 8px;">
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ลักษณะพัสดุ / หมายเหตุ</label>
+        <input type="text" id="pk-desc" class="smoky-glass-input" placeholder="เช่น กล่องใหญ่, ซองเอกสาร, กล่องพัสดุขนาดกลาง" style="width: 100%; height: 42px; border-radius: 8px;">
       </div>
     </form>
   `;

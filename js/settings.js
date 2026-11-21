@@ -42,7 +42,7 @@ export async function renderSettingsView() {
         <p style="color: rgba(255,255,255,0.45); font-size: 0.80rem; margin: 0 0 18px 0;">ข้อมูลความปลอดภัยและรหัสผ่านเข้าสู่ระบบหลังบ้าน</p>
 
         <form id="form-account-settings">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div class="smoky-grid-2">
             <div class="field">
               <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อผู้ใช้งาน (Username)</label>
               <input type="text" class="smoky-glass-input" value="${currentUser ? currentUser.username : ''}" disabled style="width: 100%; opacity: 0.7; cursor: not-allowed;">
@@ -53,7 +53,7 @@ export async function renderSettingsView() {
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+          <div class="smoky-grid-2">
             <div class="field">
               <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">รหัสผ่านใหม่ (ปล่อยว่างหากไม่เปลี่ยน)</label>
               <input type="password" id="set-new-pwd" class="smoky-glass-input" placeholder="••••••••" style="width: 100%;">
@@ -81,7 +81,7 @@ export async function renderSettingsView() {
           <p style="color: rgba(255,255,255,0.45); font-size: 0.80rem; margin: 0 0 18px 0;">กำหนดข้อมูลแม่บทของหอพัก ค่าน้ำ ค่าไฟ และช่องทางติดต่อ ซึ่งจะอัปเดตแสดงผลบนหน้าแรกเว็บไซต์ (Landing Page) โดยอัตโนมัติ</p>
 
           <form id="form-dorm-settings">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="smoky-grid-2">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อหอพัก (Dormitory Name)</label>
                 <input type="text" id="set-dorm-name" class="smoky-glass-input" value="${s.dorm_name || 'Tanakrit Dormitory'}" required style="width: 100%;">
@@ -97,7 +97,7 @@ export async function renderSettingsView() {
               <input type="text" id="set-address" class="smoky-glass-input" value="${s.address || '69/4 หมู่ที่ 2 ต.ทอนหงส์ อ.พรหมคีรี จ.นครศรีธรรมราช 80320'}" required style="width: 100%;">
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="smoky-grid-3">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">อัตราค่าน้ำประปา (บาท/หน่วย)</label>
                 <input type="number" id="set-water-rate" class="smoky-glass-input" value="${s.water_rate !== undefined ? s.water_rate : 18}" required style="width: 100%;">
@@ -112,7 +112,7 @@ export async function renderSettingsView() {
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="smoky-grid-2">
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">เบอร์โทรศัพท์ติดต่อ</label>
                 <input type="text" id="set-phone" class="smoky-glass-input" value="${s.phone || '075-355-289, 089-590-0478 , 087-280-0478 , 084-191-9985'}" style="width: 100%;">

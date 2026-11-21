@@ -228,20 +228,17 @@ async function loadRoomsData() {
   // 1. นำโครงสร้างห้องพักมาตรฐาน 17 ห้องเป็นตัวตั้ง
   let rooms = JSON.parse(JSON.stringify(DEFAULT_ROOMS));
 
-  // 2. ซิงค์กับข้อมูลผู้พักอาศัยล่าสุดจาก Supabase Cloud หรือ Cache
+  // 2. ซิงค์กับข้อมูลผู้พักอาศัยล่าสุดจาก Supabase Cloud Realtime
   let dbTenants = [];
   try {
     const { data, error } = await supabase.from('tenants').select('*');
     if (!error && Array.isArray(data)) {
       dbTenants = data;
-    } else {
-      const local = localStorage.getItem('tanakrit_tenants_cache');
-      if (local) dbTenants = JSON.parse(local);
     }
   } catch (_) {}
 
-  // 3. ซิงค์กับรายการแจ้งซ่อมบำรุง (Maintenance) ที่กำลังดำเนินการ
-  const activeMaintRooms = new Set(['107']);
+  // 3. ซิงค์กับรายการแจ้งซ่อมบำรุง (Maintenance) ที่กำลังดำเนินการจาก Supabase Realtime
+  const activeMaintRooms = new Set();
   try {
     const { data: tickets } = await supabase.from('maintenance').select('room_number, status');
     if (tickets && Array.isArray(tickets)) {
@@ -564,23 +561,23 @@ function openManageRoomModal(room, allRooms) {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้องพัก</label>
-          <input type="text" id="m-type" value="${room.type || 'ห้องพัดลม'}" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ประเภทห้องพัก</label>
+          <input type="text" id="m-type" value="${room.type || 'ห้องพัดลม'}" class="smoky-glass-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
-          <input type="number" id="m-price" value="${room.price}" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
+          <input type="number" id="m-price" value="${room.price}" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ขนาดห้องพัก</label>
-          <input type="text" id="m-size" value="${room.size || (room.building === 'UnderGround' ? 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)' : 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)')}" class="form-input" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ขนาดห้องพัก</label>
+          <input type="text" id="m-size" value="${room.size || (room.building === 'UnderGround' ? 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)' : 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)')}" class="smoky-glass-input" style="width: 100%;">
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
-          <select id="m-bathroom" class="form-select" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
+          <select id="m-bathroom" class="smoky-glass-select" style="width: 100%;">
             <option value="ห้องน้ำในตัว" ${room.bathroom !== 'ห้องน้ำรวม' ? 'selected' : ''}>ห้องน้ำในตัว</option>
             <option value="ห้องน้ำรวม" ${room.bathroom === 'ห้องน้ำรวม' ? 'selected' : ''}>ห้องน้ำรวม</option>
           </select>
@@ -588,8 +585,8 @@ function openManageRoomModal(room, allRooms) {
       </div>
 
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">สถานะห้องพัก</label>
-        <select id="m-status" class="form-select" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">สถานะห้องพัก</label>
+        <select id="m-status" class="smoky-glass-select" style="width: 100%;">
           <option value="vacant" ${room.status === 'vacant' ? 'selected' : ''}>ห้องว่างพร้อมอยู่ (พร้อมทำสัญญา)</option>
           <option value="occupied" ${room.status === 'occupied' ? 'selected' : ''}>มีผู้พักอาศัยแล้ว</option>
           <option value="maintenance" ${room.status === 'maintenance' ? 'selected' : ''}>ปิดปรับปรุง / ซ่อมบำรุง</option>
@@ -597,13 +594,13 @@ function openManageRoomModal(room, allRooms) {
       </div>
 
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ชื่อผู้พักอาศัยปัจจุบัน</label>
-        <input type="text" id="m-tenant-name" value="${room.tenant_name || ''}" placeholder="ระบุชื่อผู้พักอาศัย (ถ้ามี)" class="form-input" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ชื่อผู้พักอาศัยปัจจุบัน</label>
+        <input type="text" id="m-tenant-name" value="${room.tenant_name || ''}" placeholder="ระบุชื่อผู้พักอาศัย (ถ้ามี)" class="smoky-glass-input" style="width: 100%;">
       </div>
 
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">เบอร์โทรศัพท์ผู้เช่า</label>
-        <input type="text" id="m-tenant-phone" value="${room.tenant_phone || ''}" placeholder="08x-xxx-xxxx" class="form-input" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">เบอร์โทรศัพท์ผู้เช่า</label>
+        <input type="text" id="m-tenant-phone" value="${room.tenant_phone || ''}" placeholder="08x-xxx-xxxx" class="smoky-glass-input" style="width: 100%;">
       </div>
     </form>
   `;
@@ -704,12 +701,12 @@ function openAddRoomModal() {
     <form id="form-add-room" style="display: flex; flex-direction: column; gap: 14px;">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">หมายเลขห้อง (เช่น 110, 206, B04)</label>
-          <input type="text" id="add-room-number" placeholder="เช่น 110" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">หมายเลขห้อง (เช่น 110, 206, B04)</label>
+          <input type="text" id="add-room-number" placeholder="เช่น 110" class="smoky-glass-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">อาคาร</label>
-          <select id="add-building" class="form-select" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">อาคาร</label>
+          <select id="add-building" class="smoky-glass-select" style="width: 100%;">
             <option value="Tanakrit">อาคาร ธนกฤษฎ์ (2,800 ฿ / เดือน)</option>
             <option value="KingPhetch">อาคาร กิ่งเพชร (2,600 ฿ / เดือน)</option>
             <option value="UnderGround">อาคาร ใต้บ้าน (1,500 ฿ / เดือน)</option>
@@ -719,23 +716,23 @@ function openAddRoomModal() {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้อง</label>
-          <input type="text" id="add-type" value="ห้องพัดลม" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ประเภทห้อง</label>
+          <input type="text" id="add-type" value="ห้องพัดลม" class="smoky-glass-input" style="width: 100%;" required>
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
-          <input type="number" id="add-price" value="2800" class="form-input" style="width: 100%;" required>
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
+          <input type="number" id="add-price" value="2800" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ขนาดห้อง</label>
-          <input type="text" id="add-size" value="กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)" class="form-input" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ขนาดห้อง</label>
+          <input type="text" id="add-size" value="กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)" class="smoky-glass-input" style="width: 100%;">
         </div>
         <div class="field">
-          <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
-          <select id="add-bathroom" class="form-select" style="width: 100%;">
+          <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ประเภทห้องน้ำ</label>
+          <select id="add-bathroom" class="smoky-glass-select" style="width: 100%;">
             <option value="ห้องน้ำในตัว">ห้องน้ำในตัว</option>
             <option value="ห้องน้ำรวม">ห้องน้ำรวม</option>
           </select>
@@ -743,8 +740,8 @@ function openAddRoomModal() {
       </div>
 
       <div class="field">
-        <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">สถานะเริ่มต้น</label>
-        <select id="add-status" class="form-select" style="width: 100%;">
+        <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">สถานะเริ่มต้น</label>
+        <select id="add-status" class="smoky-glass-select" style="width: 100%;">
           <option value="vacant">ห้องว่าง (พร้อมเปิดให้เช่า)</option>
           <option value="occupied">มีผู้เช่าแล้ว</option>
           <option value="maintenance">ปิดปรับปรุง</option>
