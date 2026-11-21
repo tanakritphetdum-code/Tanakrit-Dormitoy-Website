@@ -160,7 +160,7 @@ async function loadAnnouncementsData() {
   const { data: list, error } = await supabase.from('announcements').select('*').order('date', { ascending: false });
 
   let allList = list;
-  if (error || !allList || allList.length === 0) {
+  if (error || !allList) {
     allList = DEFAULT_ANNOUNCEMENTS;
   }
   cachedAnnouncements = allList;

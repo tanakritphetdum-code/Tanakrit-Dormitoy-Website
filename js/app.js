@@ -120,6 +120,7 @@ export function setupSidebarMenu(user) {
     { view: 'bookings', icon: 'calendar', label: 'การจองห้องพัก (Bookings)' },
     { view: 'announcements', icon: 'bell', label: 'ประกาศข่าวสาร (Announcements)', badge: 3 },
     { view: 'reports', icon: 'chart', label: 'รายงานและสถิติ (Reports)' },
+    { view: 'users', icon: 'userCheck', label: 'จัดการบัญชีผู้ใช้งาน (User Management)' },
     { view: 'settings', icon: 'gear', label: 'ตั้งค่าระบบ (Settings)' },
   ] : [
     { view: 'dashboard', icon: 'home', label: 'หน้าหลักห้องพัก' },

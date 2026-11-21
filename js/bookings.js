@@ -307,7 +307,7 @@ async function loadBookingsData() {
   const { data: bookings, error } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
 
   let allBookings = bookings;
-  if (error || !allBookings || allBookings.length === 0) {
+  if (error || !allBookings) {
     allBookings = DEFAULT_BOOKINGS;
   }
   cachedBookings = allBookings;
@@ -431,7 +431,10 @@ async function loadBookingsData() {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
       if (confirm(`คุณต้องการลบรายการจอง ${id} หรือไม่?`)) {
-        await supabase.from('bookings').eq('id', id).delete();
+        try {
+          await supabase.from('bookings').eq('id', id).delete();
+        } catch (_) {}
+        cachedBookings = cachedBookings.filter(b => b.id !== id);
         toast('ลบรายการจองเรียบร้อยแล้ว', 'info');
         loadBookingsData();
       }

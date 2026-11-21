@@ -10,6 +10,7 @@ export const ICONS = {
   gear: '<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.2-1.6l2-1.4-1.6-2.8-2.3.8a7 7 0 0 0-2.7-1.6L14 3h-4l-.2 2.4a7 7 0 0 0-2.7 1.6l-2.3-.8-1.6 2.8 2 1.4A7 7 0 0 0 5 12c0 .5 0 1.1.2 1.6l-2 1.4 1.6 2.8 2.3-.8a7 7 0 0 0 2.7 1.6L10 21h4l.2-2.4a7 7 0 0 0 2.7-1.6l2.3.8 1.6-2.8-2-1.4c.2-.5.2-1.1.2-1.6z"/>',
   list: '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/>',
+  userCheck: '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/>',
   check: '<path d="M4 12l5 5 11-11"/>',
   x: '<path d="M5 5l14 14"/><path d="M19 5L5 19"/>',
   plus: '<path d="M12 4v16"/><path d="M4 12h16"/>',

@@ -338,6 +338,7 @@ const ICONS = {
   gear: '<circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.2-1.6l2-1.4-1.6-2.8-2.3.8a7 7 0 0 0-2.7-1.6L14 3h-4l-.2 2.4a7 7 0 0 0-2.7 1.6l-2.3-.8-1.6 2.8 2 1.4A7 7 0 0 0 5 12c0 .5 0 1.1.2 1.6l-2 1.4 1.6 2.8 2.3-.8a7 7 0 0 0 2.7 1.6L10 21h4l.2-2.4a7 7 0 0 0 2.7-1.6l2.3.8 1.6-2.8-2-1.4c.2-.5.2-1.1.2-1.6z"/>',
   list: '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>',
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/>',
+  userCheck: '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/>',
   check: '<path d="M4 12l5 5 11-11"/>',
   x: '<path d="M5 5l14 14"/><path d="M19 5L5 19"/>',
   plus: '<path d="M12 4v16"/><path d="M4 12h16"/>',
@@ -1629,15 +1630,15 @@ const DEFAULT_ROOMS = [
   // 1. อาคาร ธนกฤษฎ์ (9 ห้อง: 101 - 109) — 2,800 บาท/เดือน
   { 
     id: 'RM-T101', room_number: '101', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายสมชาย ธนกฤษฎ์', tenant_phone: '089-123-4567', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
     id: 'RM-T102', room_number: '102', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายเกียรติภูมิ ภักดี', tenant_phone: '081-222-3344', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
@@ -1650,22 +1651,22 @@ const DEFAULT_ROOMS = [
   },
   { 
     id: 'RM-T104', room_number: '104', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายวรเมธ แก้วมณี', tenant_phone: '086-555-7788', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
     id: 'RM-T105', room_number: '105', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายภานุเดช ชัยโรจน์', tenant_phone: '084-333-1122', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
     id: 'RM-T106', room_number: '106', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายพงศธร ใจซื่อ', tenant_phone: '082-777-8899', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
@@ -1678,15 +1679,15 @@ const DEFAULT_ROOMS = [
   },
   { 
     id: 'RM-T108', room_number: '108', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายกมลวรรธน์ สดใส', tenant_phone: '085-444-9900', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
     id: 'RM-T109', room_number: '109', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายธีรศักดิ์ ศรีสุข', tenant_phone: '087-111-4455', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
@@ -1694,22 +1695,22 @@ const DEFAULT_ROOMS = [
   // 2. อาคาร กิ่งเพชร (5 ห้อง: 201 - 205) — 2,600 บาท/เดือน
   { 
     id: 'RM-K201', room_number: '201', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายชินวัตร ประเสริฐ', tenant_phone: '083-444-1122', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
     id: 'RM-K202', room_number: '202', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายธีรพัฒน์ สุขใจ', tenant_phone: '082-888-9900', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
     id: 'RM-K203', room_number: '203', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายณัฐพล เจริญผล', tenant_phone: '089-666-5544', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
@@ -1722,8 +1723,8 @@ const DEFAULT_ROOMS = [
   },
   { 
     id: 'RM-K205', room_number: '205', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายจิรวัฒน์ พิพัฒน์', tenant_phone: '088-222-3311', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
@@ -1731,15 +1732,15 @@ const DEFAULT_ROOMS = [
   // 3. อาคาร ใต้บ้าน (3 ห้อง: B01 - B03) — 1,500 บาท/เดือน
   { 
     id: 'RM-UG01', room_number: 'B01', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
-    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'occupied', 
-    tenant_name: 'นายปกรณ์ รัตนพันธุ์', tenant_phone: '087-333-2211', 
+    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
   },
   { 
     id: 'RM-UG02', room_number: 'B02', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
-    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'occupied', 
-    tenant_name: 'นายศุภกฤต บุญเกิด', tenant_phone: '081-777-6655', 
+    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
   },
@@ -1813,9 +1814,9 @@ async function renderRoomsView() {
           <div>
             <select id="rooms-status-select" class="smoky-glass-select">
               <option value="all">สถานะทั้งหมด</option>
-              <option value="occupied">เฉพาะห้องที่มีผู้เช่า (14 ห้อง)</option>
-              <option value="vacant">เฉพาะห้องว่างพร้อมอยู่ (3 ห้อง)</option>
-              <option value="maintenance">เฉพาะห้องที่กำลังซ่อมบำรุง (1 ห้อง)</option>
+              <option value="occupied">เฉพาะห้องที่มีผู้เช่า</option>
+              <option value="vacant">เฉพาะห้องว่างพร้อมอยู่</option>
+              <option value="maintenance">เฉพาะห้องที่ปิดปรับปรุง / ซ่อมบำรุง</option>
             </select>
           </div>
 
@@ -1838,31 +1839,54 @@ async function loadRoomsData() {
   const summary = document.getElementById('room-stats-summary');
   if (!container) return;
 
-  let rooms = null;
+  // 1. นำโครงสร้างห้องพักมาตรฐาน 17 ห้องเป็นตัวตั้ง
+  let rooms = JSON.parse(JSON.stringify(DEFAULT_ROOMS));
 
-  // 1. ดึงจาก Cache รุ่นล่าสุด (v3) หรือ Supabase
+  // 2. ซิงค์กับข้อมูลผู้พักอาศัยล่าสุดจาก Supabase Cloud หรือ Cache
+  let dbTenants = [];
   try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      if (parsed && parsed.length === 17) {
-        // ตรวจสอบว่าราคาถูกต้อง (ธนกฤษฎ์ 2,800)
-        const t1 = parsed.find(x => x.room_number === '101');
-        if (t1 && t1.price === 2800) {
-          rooms = parsed;
-        }
-      }
+    const { data, error } = await supabase.from('tenants').select('*');
+    if (!error && Array.isArray(data)) {
+      dbTenants = data;
+    } else {
+      const local = localStorage.getItem('tanakrit_tenants_cache');
+      if (local) dbTenants = JSON.parse(local);
     }
   } catch (_) {}
 
-  // 2. ถ้ายังไม่มี หรือเป็นแคชเก่า ให้ใช้ DEFAULT_ROOMS 17 ห้องมาตรฐาน
-  if (!rooms) {
-    rooms = DEFAULT_ROOMS;
-    try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(rooms));
-      localStorage.removeItem('tanakrit_rooms_cache'); // ลบแคชรุ่นเก่าที่ราคาผิด
-    } catch (_) {}
-  }
+  // 3. ซิงค์กับรายการแจ้งซ่อมบำรุง (Maintenance) ที่กำลังดำเนินการ
+  const activeMaintRooms = new Set(['107']);
+  try {
+    const { data: tickets } = await supabase.from('maintenance').select('room_number, status');
+    if (tickets && Array.isArray(tickets)) {
+      tickets.filter(t => t.status !== 'completed').forEach(t => {
+        if (t.room_number) activeMaintRooms.add(t.room_number.replace(/[^0-9B]/gi, ''));
+      });
+    }
+  } catch (_) {}
+
+  // 4. แมปสถานะห้องพักและผู้เช่าของแต่ละห้อง
+  rooms.forEach(r => {
+    const cleanNum = String(r.room_number).trim();
+    const tenant = dbTenants.find(t => String(t.room).trim() === cleanNum && t.status !== 'terminated');
+    if (tenant) {
+      r.status = 'occupied';
+      r.tenant_name = tenant.name || '';
+      r.tenant_phone = tenant.phone || '';
+    } else if (activeMaintRooms.has(cleanNum) || r.status === 'maintenance') {
+      r.status = 'maintenance';
+      r.tenant_name = '';
+      r.tenant_phone = '';
+    } else {
+      r.status = 'vacant';
+      r.tenant_name = '';
+      r.tenant_phone = '';
+    }
+  });
+
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(rooms));
+  } catch (_) {}
 
   // Update Summary Stats
   const total = rooms.length;
@@ -3724,6 +3748,7 @@ async function deleteTenant(id) {
       tenant_name: '',
       tenant_phone: ''
     });
+    localStorage.removeItem('tanakrit_rooms_cache_v3');
   } catch (err) {
     console.warn('Sync delete tenant error:', err);
   }
@@ -4103,7 +4128,7 @@ async function loadBookingsData() {
   const { data: bookings, error } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
 
   let allBookings = bookings;
-  if (error || !allBookings || allBookings.length === 0) {
+  if (error || !allBookings) {
     allBookings = DEFAULT_BOOKINGS;
   }
   cachedBookings = allBookings;
@@ -4227,7 +4252,10 @@ async function loadBookingsData() {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
       if (confirm(`คุณต้องการลบรายการจอง ${id} หรือไม่?`)) {
-        await supabase.from('bookings').eq('id', id).delete();
+        try {
+          await supabase.from('bookings').eq('id', id).delete();
+        } catch (_) {}
+        cachedBookings = cachedBookings.filter(b => b.id !== id);
         toast('ลบรายการจองเรียบร้อยแล้ว', 'info');
         loadBookingsData();
       }
@@ -5912,7 +5940,7 @@ async function loadAnnouncementsData() {
   const { data: list, error } = await supabase.from('announcements').select('*').order('date', { ascending: false });
 
   let allList = list;
-  if (error || !allList || allList.length === 0) {
+  if (error || !allList) {
     allList = DEFAULT_ANNOUNCEMENTS;
   }
   cachedAnnouncements = allList;
@@ -7139,10 +7167,10 @@ function renderStaffDashboard() {
               <span class="smoky-meta-label">ทีมงานดูแลหอพัก</span>
               <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px #34D399;"></span>
-                <span style="font-size: 0.92rem; font-weight: 600; color: #fff;">4 คน ประจำการ</span>
+                <span style="font-size: 0.92rem; font-weight: 600; color: #fff;" id="team-staff-count">4 คน ประจำการ</span>
               </div>
             </div>
-            <button class="smoky-round-dashed-btn" title="จัดการเจ้าหน้าที่" onclick="window.switchView('users')">
+            <button class="smoky-round-dashed-btn" id="btn-goto-users" title="จัดการบัญชีผู้ใช้งาน (User Management)" onclick="window.switchView('users')">
               ${ic('plus')}
             </button>
           </div>
@@ -7171,9 +7199,6 @@ function renderStaffDashboard() {
               <span class="smoky-meta-label">เป้าหมายอัตราการเข้าพัก</span>
               <h3 class="smoky-card-title">Occupancy Target (3 อาคาร)</h3>
             </div>
-            <button class="smoky-toggle checked" id="btn-toggle-target" onclick="window.toggleTargetGoal()">
-              <span class="smoky-toggle-knob"></span>
-            </button>
           </div>
 
           <!-- Circular Progress Ring with Draggable / Interactive Knob -->
@@ -7182,20 +7207,20 @@ function renderStaffDashboard() {
               <!-- Dashed Background Track -->
               <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7" stroke-dasharray="2 3"></circle>
               <!-- Glowing Blue Progress Circle -->
-              <circle id="target-progress-ring" cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" stroke-dasharray="251.32" stroke-dashoffset="30.1" style="filter: drop-shadow(0 0 10px rgba(59,130,246,0.7)); transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></circle>
+              <circle id="target-progress-ring" cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" stroke-dasharray="251.32" stroke-dashoffset="251.32" style="filter: drop-shadow(0 0 10px rgba(59,130,246,0.7)); transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></circle>
             </svg>
 
             <!-- Center KPI Label -->
             <div class="smoky-ring-center">
-              <span class="smoky-kpi-num" id="target-percent-text">88%</span>
-              <span class="smoky-meta-label" style="margin-top: 2px;">เข้าพักแล้ว 14/17 ห้อง</span>
+              <span class="smoky-kpi-num" id="target-percent-text">0%</span>
+              <span class="smoky-meta-label" style="margin-top: 2px;" id="target-rooms-label">เข้าพักแล้ว 0/17 ห้อง</span>
             </div>
           </div>
 
           <!-- - / + Buttons to Adjust Target -->
           <div class="smoky-ring-btn-group">
             <button class="smoky-pill-btn" onclick="window.adjustTargetPercent(-5)" title="ลด 5%">−</button>
-            <span style="font-size: 0.78rem; font-family: monospace; color: rgba(255,255,255,0.6);" id="target-sub-label">เป้าหมาย: 88%</span>
+            <span style="font-size: 0.78rem; font-family: monospace; color: rgba(255,255,255,0.6);" id="target-sub-label">เป้าหมาย: 0%</span>
             <button class="smoky-pill-btn" onclick="window.adjustTargetPercent(5)" title="เพิ่ม 5%">+</button>
           </div>
 
@@ -7203,19 +7228,19 @@ function renderStaffDashboard() {
           <div class="smoky-metric-chips" id="metric-chips-row">
             <div class="smoky-chip active" data-metric="revenue" onclick="window.selectMetricChip('revenue')">
               <span class="chip-lbl">รายรับ</span>
-              <span class="chip-val">23,100 ฿</span>
+              <span class="chip-val" id="chip-val-revenue">0 ฿</span>
             </div>
             <div class="smoky-chip" data-metric="deals" onclick="window.selectMetricChip('deals')">
               <span class="chip-lbl">ห้องว่าง</span>
-              <span class="chip-val">3 ห้อง</span>
+              <span class="chip-val" id="chip-val-vacant">16 ห้อง</span>
             </div>
             <div class="smoky-chip" data-metric="calls" onclick="window.selectMetricChip('calls')">
-              <span class="chip-lbl">สัญญา</span>
-              <span class="chip-val">12 เดือน</span>
+              <span class="chip-lbl">ซ่อมบำรุง</span>
+              <span class="chip-val" id="chip-val-maint">1 ห้อง</span>
             </div>
             <div class="smoky-chip" data-metric="meetings" onclick="window.selectMetricChip('meetings')">
               <span class="chip-lbl">แจ้งซ่อม</span>
-              <span class="chip-val">2 งาน</span>
+              <span class="chip-val" id="chip-val-tickets">0 งาน</span>
             </div>
           </div>
         </div>
@@ -7231,11 +7256,11 @@ function renderStaffDashboard() {
             <div>
               <span class="smoky-meta-label">รายรับค่าเช่า & มิเตอร์น้ำไฟ</span>
               <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
-                <span class="smoky-kpi-num" id="revenue-val-main">฿37,200</span>
-                <span style="font-size: 0.88rem; color: rgba(255,255,255,0.4);">/ ฿42,500</span>
+                <span class="smoky-kpi-num" id="revenue-val-main">฿0</span>
+                <span style="font-size: 0.88rem; color: rgba(255,255,255,0.4);" id="revenue-val-expected">/ ฿0</span>
               </div>
               <div style="margin-top: 4px;">
-                <span class="smoky-delta-pos">${ic('trendingUp')} +12.4% จากงวดก่อน</span>
+                <span class="smoky-delta-pos">${ic('trendingUp')} ข้อมูลเรียลไทม์เดือนนี้</span>
               </div>
             </div>
 
@@ -7279,12 +7304,12 @@ function renderStaffDashboard() {
           <div class="smoky-card" id="card-new-leads">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span class="smoky-meta-label">ผู้ติดต่อจองห้อง</span>
-              <span class="smoky-delta-pos">+18.2%</span>
+              <span class="smoky-delta-pos" id="leads-badge-delta">Live Bookings</span>
             </div>
 
             <div style="margin-top: 10px;">
-              <div class="smoky-kpi-num" id="leads-num-count">28</div>
-              <span class="smoky-kpi-sub">ผู้สนใจจองรอบใหม่</span>
+              <div class="smoky-kpi-num" id="leads-num-count">0</div>
+              <span class="smoky-kpi-sub" id="leads-sub-label">ผู้สนใจจองรอบใหม่</span>
             </div>
 
             <!-- Mini bar chart with last bar blue -->
@@ -7299,19 +7324,19 @@ function renderStaffDashboard() {
             </div>
           </div>
 
-          <!-- 5. รายการรออนุมัติ: 2 รายการรอตรวจ, คืนเงินประกัน ฿2,800 -->
+          <!-- 5. รายการรออนุมัติ: รายการรอตรวจ, คืนเงินประกัน -->
           <div class="smoky-card" id="card-approvals" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.5);">2 รายการรอตรวจ</span>
-                <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.05em;">คืนเงินประกัน</span>
+                <span style="font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.5);" id="approval-title-lbl">0 รายการรอตรวจ</span>
+                <span style="background: rgba(59,130,246,0.2); color: #3B82F6; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.05em;" id="approval-badge-lbl">คืนเงินประกัน</span>
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px;">
-                <div class="smoky-kpi-num" style="font-size: 1.65rem;">฿2,800</div>
+                <div class="smoky-kpi-num" style="font-size: 1.65rem;" id="approval-val-main">฿0</div>
                 <button style="background: none; border: none; color: rgba(255,255,255,0.4); cursor: pointer; padding: 2px;" onclick="window.dismissApproval()" title="ปิด">✕</button>
               </div>
-              <span class="smoky-kpi-sub" style="font-size: 0.74rem;">ห้อง TK-104 · ตรวจเช็คห้องผ่าน</span>
+              <span class="smoky-kpi-sub" style="font-size: 0.74rem;" id="approval-sub-lbl">ไม่มีรายการค้างตรวจสอบ</span>
             </div>
 
             <!-- Swipe to Approve Slider Pill -->
@@ -7406,14 +7431,11 @@ function renderStaffDashboard() {
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
                 ${ic('users')}
               </div>
-              <button class="smoky-toggle checked" onclick="window.toggleKpiTile('customers', this)">
-                <span class="smoky-toggle-knob"></span>
-              </button>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">ผู้พักอาศัย</span>
-              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-customers-count">19 คน</div>
-              <span class="smoky-delta-pos" style="margin-top: 4px;">14 ห้องเช่า</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-customers-count">0 คน</div>
+              <span class="smoky-delta-pos" style="margin-top: 4px;" id="kpi-customers-sub">0 ห้องเช่า</span>
             </div>
           </div>
 
@@ -7423,35 +7445,32 @@ function renderStaffDashboard() {
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
                 ${ic('door')}
               </div>
-              <button class="smoky-toggle checked" onclick="window.toggleKpiTile('pipeline', this)">
-                <span class="smoky-toggle-knob"></span>
-              </button>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">ผัง 3 อาคาร</span>
-              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;">14/17 ห้อง</div>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-pipeline-ratio">0/17 ห้อง</div>
               <!-- Mini horizontal funnel bars -->
               <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px;">
                 <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
                   <span style="width: 44px;">ธนกฤษฎ์</span>
                   <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                    <div style="width: 89%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
+                    <div id="bar-tanakrit" style="width: 0%; height: 100%; background: #3B82F6; border-radius: 9999px; transition: width 0.5s;"></div>
                   </div>
-                  <span style="font-size: 0.62rem; color: #fff;">8/9</span>
+                  <span style="font-size: 0.62rem; color: #fff;" id="label-tanakrit-occ">0/9</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
                   <span style="width: 44px;">กิ่งเพชร</span>
                   <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                    <div style="width: 80%; height: 100%; background: #3B82F6; border-radius: 9999px;"></div>
+                    <div id="bar-kingphetch" style="width: 0%; height: 100%; background: #3B82F6; border-radius: 9999px; transition: width 0.5s;"></div>
                   </div>
-                  <span style="font-size: 0.62rem; color: #fff;">4/5</span>
+                  <span style="font-size: 0.62rem; color: #fff;" id="label-kingphetch-occ">0/5</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 4px; font-size: 0.65rem; color: rgba(255,255,255,0.5);">
                   <span style="width: 44px;">ใต้บ้าน</span>
                   <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                    <div style="width: 67%; height: 100%; background: #34D399; border-radius: 9999px;"></div>
+                    <div id="bar-underground" style="width: 0%; height: 100%; background: #34D399; border-radius: 9999px; transition: width 0.5s;"></div>
                   </div>
-                  <span style="font-size: 0.62rem; color: #fff;">2/3</span>
+                  <span style="font-size: 0.62rem; color: #fff;" id="label-underground-occ">0/3</span>
                 </div>
               </div>
             </div>
@@ -7463,13 +7482,10 @@ function renderStaffDashboard() {
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(59,130,246,0.25); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
                 ${ic('activity')}
               </div>
-              <button class="smoky-toggle checked" onclick="window.toggleKpiTile('activeUsers', this)">
-                <span class="smoky-toggle-knob"></span>
-              </button>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">จดมิเตอร์น้ำ-ไฟ</span>
-              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;">17 ห้อง</div>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-meter-count">0/17 ห้อง</div>
               <!-- Blue Sparkline -->
               <div style="height: 24px; width: 100%; margin-top: 6px;">
                 <svg viewBox="0 0 100 25" style="width: 100%; height: 100%; overflow: visible;">
@@ -7485,14 +7501,11 @@ function renderStaffDashboard() {
               <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #fff;">
                 ${ic('wrench')}
               </div>
-              <button class="smoky-toggle" onclick="window.toggleKpiTile('openTickets', this)">
-                <span class="smoky-toggle-knob"></span>
-              </button>
             </div>
             <div style="margin-top: 12px;">
               <span class="smoky-meta-label">แจ้งซ่อมรอดำเนินการ</span>
-              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-tickets-count">2 งาน</div>
-              <span class="smoky-delta-neg" style="margin-top: 4px;">−3 งานเสร็จวันนี้</span>
+              <div class="smoky-kpi-num" style="font-size: 1.55rem; margin-top: 2px;" id="kpi-tickets-count">0 งาน</div>
+              <span class="smoky-delta-neg" style="margin-top: 4px;" id="kpi-tickets-sub">−0 งานเสร็จสิ้น</span>
             </div>
           </div>
 
@@ -7570,42 +7583,125 @@ function renderStaffDashboard() {
 async function initStaffDashboard() {
   // 1. Fetch real dormitory data from supabase to augment CRM cards
   try {
-    const { data: rooms } = await supabase.from('rooms').select('*');
-    const { data: tickets } = await supabase.from('maintenance').select('*');
-    const { data: bills } = await supabase.from('meter_readings').select('*');
+    const [
+      { data: tenantsData },
+      { data: ticketsData },
+      { data: billsData },
+      { data: bookingsData },
+      { data: usersData }
+    ] = await Promise.all([
+      supabase.from('tenants').select('*'),
+      supabase.from('maintenance').select('*'),
+      supabase.from('meter_readings').select('*'),
+      supabase.from('bookings').select('*'),
+      supabase.from('users').select('*')
+    ]);
 
-    if (rooms && rooms.length > 0) {
-      const occupied = rooms.filter(r => r.status === 'occupied').length;
-      const occPercent = Math.round((occupied / rooms.length) * 100);
-      
-      // Update target ring with real occupancy percent
-      dashboardState.targetPercent = occPercent || 63;
-      updateTargetRingUI();
+    const tenants = Array.isArray(tenantsData) ? tenantsData.filter(t => t.status !== 'terminated') : [];
+    const tickets = Array.isArray(ticketsData) ? ticketsData : [];
+    const bills = Array.isArray(billsData) ? billsData : [];
+    const bookings = Array.isArray(bookingsData) ? bookingsData : [];
+    const users = Array.isArray(usersData) ? usersData : [];
 
-      const custEl = document.getElementById('kpi-customers-count');
-      if (custEl) custEl.textContent = `${occupied} / ${rooms.length} ห้อง`;
-    }
+    const totalRooms = 17;
+    const occupiedCount = tenants.length;
+    // Room 107 is default maintenance, plus any active maintenance tickets for other rooms
+    const activeMaintSet = new Set(['107']);
+    tickets.filter(t => t.status !== 'completed' && t.room_number).forEach(t => {
+      activeMaintSet.add(t.room_number.replace(/[^0-9B]/gi, ''));
+    });
+    const maintCount = activeMaintSet.size;
+    const vacantCount = Math.max(0, totalRooms - occupiedCount - maintCount);
+    const occPercent = totalRooms > 0 ? Math.round((occupiedCount / totalRooms) * 100) : 0;
 
-    if (tickets) {
-      const pendingT = tickets.filter(t => t.status !== 'completed').length;
-      const ticketEl = document.getElementById('kpi-tickets-count');
-      if (ticketEl) ticketEl.textContent = pendingT.toString();
-    }
+    // 1. Team Staff Count
+    const staffCount = users.filter(u => u.role === 'admin' || u.role === 'staff').length;
+    const teamEl = document.getElementById('team-staff-count');
+    if (teamEl) teamEl.textContent = `${staffCount || 4} คน ประจำการ`;
 
-    if (bills) {
-      const totalPendingBills = bills.filter(b => b.status === 'pending').reduce((acc, curr) => acc + (curr.total_price || 0), 0);
-      if (totalPendingBills > 0) {
-        const revEl = document.getElementById('revenue-val-main');
-        if (revEl) revEl.textContent = fmtCurrency(totalPendingBills);
-      }
-    }
+    // 2. Target Ring & Chips
+    dashboardState.targetPercent = occPercent;
+    updateTargetRingUI();
+    const targetRoomsLabel = document.getElementById('target-rooms-label');
+    if (targetRoomsLabel) targetRoomsLabel.textContent = `เข้าพักแล้ว ${occupiedCount}/${totalRooms} ห้อง`;
+
+    const chipRev = document.getElementById('chip-val-revenue');
+    const chipVac = document.getElementById('chip-val-vacant');
+    const chipMaint = document.getElementById('chip-val-maint');
+    const chipTix = document.getElementById('chip-val-tickets');
+
+    const totalPaidBills = bills.filter(b => b.status === 'paid').reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0);
+    const totalExpectedBills = bills.reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0) || (occupiedCount * 2800);
+
+    if (chipRev) chipRev.textContent = `฿${totalPaidBills.toLocaleString()}`;
+    if (chipVac) chipVac.textContent = `${vacantCount} ห้อง`;
+    if (chipMaint) chipMaint.textContent = `${maintCount} ห้อง`;
+    const pendingTickets = tickets.filter(t => t.status !== 'completed').length;
+    const completedTickets = tickets.filter(t => t.status === 'completed').length;
+    if (chipTix) chipTix.textContent = `${pendingTickets} งาน`;
+
+    // 3. Tile 1: ผู้พักอาศัย
+    const custEl = document.getElementById('kpi-customers-count');
+    if (custEl) custEl.textContent = `${occupiedCount} คน`;
+    const custSubEl = document.getElementById('kpi-customers-sub');
+    if (custSubEl) custSubEl.textContent = `${occupiedCount} ห้องเช่า`;
+
+    // 4. Tile 2: สถานะ 3 อาคาร (Building Funnel)
+    const pipelineEl = document.getElementById('kpi-pipeline-ratio');
+    if (pipelineEl) pipelineEl.textContent = `${occupiedCount}/${totalRooms} ห้อง`;
+
+    let occTanakrit = 0;
+    let occKing = 0;
+    let occUG = 0;
+    tenants.forEach(t => {
+      const rm = String(t.room || '').trim();
+      if (rm.startsWith('B')) occUG++;
+      else if (Number(rm) >= 200) occKing++;
+      else if (rm) occTanakrit++;
+    });
+
+    const barTanakrit = document.getElementById('bar-tanakrit');
+    const lblTanakrit = document.getElementById('label-tanakrit-occ');
+    if (barTanakrit) barTanakrit.style.width = `${Math.round((occTanakrit / 9) * 100)}%`;
+    if (lblTanakrit) lblTanakrit.textContent = `${occTanakrit}/9`;
+
+    const barKing = document.getElementById('bar-kingphetch');
+    const lblKing = document.getElementById('label-kingphetch-occ');
+    if (barKing) barKing.style.width = `${Math.round((occKing / 5) * 100)}%`;
+    if (lblKing) lblKing.textContent = `${occKing}/5`;
+
+    const barUG = document.getElementById('bar-underground');
+    const lblUG = document.getElementById('label-underground-occ');
+    if (barUG) barUG.style.width = `${Math.round((occUG / 3) * 100)}%`;
+    if (lblUG) lblUG.textContent = `${occUG}/3`;
+
+    // 5. Tile 3: มิเตอร์น้ำ-ไฟ
+    const meterEl = document.getElementById('kpi-meter-count');
+    if (meterEl) meterEl.textContent = `${bills.length}/${totalRooms} ห้อง`;
+
+    // 6. Tile 4: แจ้งซ่อมรอดำเนินการ
+    const ticketEl = document.getElementById('kpi-tickets-count');
+    if (ticketEl) ticketEl.textContent = `${pendingTickets} งาน`;
+    const ticketSub = document.getElementById('kpi-tickets-sub');
+    if (ticketSub) ticketSub.textContent = `−${completedTickets} งานเสร็จสิ้น`;
+
+    // 7. Revenue Card
+    const revMain = document.getElementById('revenue-val-main');
+    if (revMain) revMain.textContent = `฿${totalPaidBills.toLocaleString()}`;
+    const revExp = document.getElementById('revenue-val-expected');
+    if (revExp) revExp.textContent = `/ ฿${totalExpectedBills.toLocaleString()}`;
+
+    // 8. Leads / Bookings
+    const pendingBookings = bookings.filter(b => b.status !== 'cancelled').length;
+    animateNumberCountUp('leads-num-count', pendingBookings);
+
+    // Animate target percent text
+    animateNumberCountUp('target-percent-text', occPercent, '%');
   } catch (err) {
-    console.warn('Using default mock CRM data:', err);
+    console.warn('Realtime dashboard sync error:', err);
+    animateNumberCountUp('target-percent-text', dashboardState.targetPercent, '%');
+    animateNumberCountUp('leads-num-count', 0);
   }
-
-  // 2. Animate KPI numbers count-up from 0
-  animateNumberCountUp('target-percent-text', dashboardState.targetPercent, '%');
-  animateNumberCountUp('leads-num-count', 28);
 }
 
 // Animated Counter Utility
@@ -8344,6 +8440,7 @@ function setupSidebarMenu(user) {
     { view: 'bookings', icon: 'calendar', label: 'การจองห้องพัก (Bookings)' },
     { view: 'announcements', icon: 'bell', label: 'ประกาศข่าวสาร (Announcements)', badge: 3 },
     { view: 'reports', icon: 'chart', label: 'รายงานและสถิติ (Reports)' },
+    { view: 'users', icon: 'userCheck', label: 'จัดการบัญชีผู้ใช้งาน (User Management)' },
     { view: 'settings', icon: 'gear', label: 'ตั้งค่าระบบ (Settings)' },
   ] : [
     { view: 'dashboard', icon: 'home', label: 'หน้าหลักห้องพัก' },

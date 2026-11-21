@@ -1288,6 +1288,7 @@ export async function deleteTenant(id) {
       tenant_name: '',
       tenant_phone: ''
     });
+    localStorage.removeItem('tanakrit_rooms_cache_v3');
   } catch (err) {
     console.warn('Sync delete tenant error:', err);
   }

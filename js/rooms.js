@@ -15,15 +15,15 @@ export const DEFAULT_ROOMS = [
   // 1. อาคาร ธนกฤษฎ์ (9 ห้อง: 101 - 109) — 2,800 บาท/เดือน
   { 
     id: 'RM-T101', room_number: '101', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายสมชาย ธนกฤษฎ์', tenant_phone: '089-123-4567', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
     id: 'RM-T102', room_number: '102', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายเกียรติภูมิ ภักดี', tenant_phone: '081-222-3344', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
@@ -36,22 +36,22 @@ export const DEFAULT_ROOMS = [
   },
   { 
     id: 'RM-T104', room_number: '104', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายวรเมธ แก้วมณี', tenant_phone: '086-555-7788', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
     id: 'RM-T105', room_number: '105', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายภานุเดช ชัยโรจน์', tenant_phone: '084-333-1122', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
     id: 'RM-T106', room_number: '106', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายพงศธร ใจซื่อ', tenant_phone: '082-777-8899', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
@@ -64,15 +64,15 @@ export const DEFAULT_ROOMS = [
   },
   { 
     id: 'RM-T108', room_number: '108', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายกมลวรรธน์ สดใส', tenant_phone: '085-444-9900', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
     id: 'RM-T109', room_number: '109', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายธีรศักดิ์ ศรีสุข', tenant_phone: '087-111-4455', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
@@ -80,22 +80,22 @@ export const DEFAULT_ROOMS = [
   // 2. อาคาร กิ่งเพชร (5 ห้อง: 201 - 205) — 2,600 บาท/เดือน
   { 
     id: 'RM-K201', room_number: '201', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายชินวัตร ประเสริฐ', tenant_phone: '083-444-1122', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
     id: 'RM-K202', room_number: '202', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายธีรพัฒน์ สุขใจ', tenant_phone: '082-888-9900', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
     id: 'RM-K203', room_number: '203', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายณัฐพล เจริญผล', tenant_phone: '089-666-5544', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
@@ -108,8 +108,8 @@ export const DEFAULT_ROOMS = [
   },
   { 
     id: 'RM-K205', room_number: '205', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'occupied', 
-    tenant_name: 'นายจิรวัฒน์ พิพัฒน์', tenant_phone: '088-222-3311', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
@@ -117,15 +117,15 @@ export const DEFAULT_ROOMS = [
   // 3. อาคาร ใต้บ้าน (3 ห้อง: B01 - B03) — 1,500 บาท/เดือน
   { 
     id: 'RM-UG01', room_number: 'B01', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
-    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'occupied', 
-    tenant_name: 'นายปกรณ์ รัตนพันธุ์', tenant_phone: '087-333-2211', 
+    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
   },
   { 
     id: 'RM-UG02', room_number: 'B02', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
-    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'occupied', 
-    tenant_name: 'นายศุภกฤต บุญเกิด', tenant_phone: '081-777-6655', 
+    size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
+    tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
   },
@@ -200,9 +200,9 @@ export async function renderRoomsView() {
           <div>
             <select id="rooms-status-select" class="smoky-glass-select">
               <option value="all">สถานะทั้งหมด</option>
-              <option value="occupied">เฉพาะห้องที่มีผู้เช่า (14 ห้อง)</option>
-              <option value="vacant">เฉพาะห้องว่างพร้อมอยู่ (3 ห้อง)</option>
-              <option value="maintenance">เฉพาะห้องที่กำลังซ่อมบำรุง (1 ห้อง)</option>
+              <option value="occupied">เฉพาะห้องที่มีผู้เช่า</option>
+              <option value="vacant">เฉพาะห้องว่างพร้อมอยู่</option>
+              <option value="maintenance">เฉพาะห้องที่ปิดปรับปรุง / ซ่อมบำรุง</option>
             </select>
           </div>
 
@@ -225,31 +225,54 @@ async function loadRoomsData() {
   const summary = document.getElementById('room-stats-summary');
   if (!container) return;
 
-  let rooms = null;
+  // 1. นำโครงสร้างห้องพักมาตรฐาน 17 ห้องเป็นตัวตั้ง
+  let rooms = JSON.parse(JSON.stringify(DEFAULT_ROOMS));
 
-  // 1. ดึงจาก Cache รุ่นล่าสุด (v3) หรือ Supabase
+  // 2. ซิงค์กับข้อมูลผู้พักอาศัยล่าสุดจาก Supabase Cloud หรือ Cache
+  let dbTenants = [];
   try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      if (parsed && parsed.length === 17) {
-        // ตรวจสอบว่าราคาถูกต้อง (ธนกฤษฎ์ 2,800)
-        const t1 = parsed.find(x => x.room_number === '101');
-        if (t1 && t1.price === 2800) {
-          rooms = parsed;
-        }
-      }
+    const { data, error } = await supabase.from('tenants').select('*');
+    if (!error && Array.isArray(data)) {
+      dbTenants = data;
+    } else {
+      const local = localStorage.getItem('tanakrit_tenants_cache');
+      if (local) dbTenants = JSON.parse(local);
     }
   } catch (_) {}
 
-  // 2. ถ้ายังไม่มี หรือเป็นแคชเก่า ให้ใช้ DEFAULT_ROOMS 17 ห้องมาตรฐาน
-  if (!rooms) {
-    rooms = DEFAULT_ROOMS;
-    try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(rooms));
-      localStorage.removeItem('tanakrit_rooms_cache'); // ลบแคชรุ่นเก่าที่ราคาผิด
-    } catch (_) {}
-  }
+  // 3. ซิงค์กับรายการแจ้งซ่อมบำรุง (Maintenance) ที่กำลังดำเนินการ
+  const activeMaintRooms = new Set(['107']);
+  try {
+    const { data: tickets } = await supabase.from('maintenance').select('room_number, status');
+    if (tickets && Array.isArray(tickets)) {
+      tickets.filter(t => t.status !== 'completed').forEach(t => {
+        if (t.room_number) activeMaintRooms.add(t.room_number.replace(/[^0-9B]/gi, ''));
+      });
+    }
+  } catch (_) {}
+
+  // 4. แมปสถานะห้องพักและผู้เช่าของแต่ละห้อง
+  rooms.forEach(r => {
+    const cleanNum = String(r.room_number).trim();
+    const tenant = dbTenants.find(t => String(t.room).trim() === cleanNum && t.status !== 'terminated');
+    if (tenant) {
+      r.status = 'occupied';
+      r.tenant_name = tenant.name || '';
+      r.tenant_phone = tenant.phone || '';
+    } else if (activeMaintRooms.has(cleanNum) || r.status === 'maintenance') {
+      r.status = 'maintenance';
+      r.tenant_name = '';
+      r.tenant_phone = '';
+    } else {
+      r.status = 'vacant';
+      r.tenant_name = '';
+      r.tenant_phone = '';
+    }
+  });
+
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(rooms));
+  } catch (_) {}
 
   // Update Summary Stats
   const total = rooms.length;
