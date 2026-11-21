@@ -47,7 +47,7 @@ export function renderStaffDashboard() {
       <!-- ==================== COLUMN 1 ==================== -->
       <div class="smoky-col">
         
-        <!-- 1. Team Card -->
+        <!-- 1. Team Card (รายชื่อทีมงานพร้อมเบอร์ติดต่อ) -->
         <div class="smoky-card" id="card-team">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -62,73 +62,68 @@ export function renderStaffDashboard() {
             </button>
           </div>
 
-          <!-- Overlapping Avatars + 3 -->
-          <div style="margin-top: 18px; display: flex; align-items: center;">
-            <div style="display: flex; margin-left: 6px;">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="ผู้จัดการ" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -6px;" title="นายเกียรติศักดิ์ (ผู้จัดการหอพัก)">
-              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80" alt="ธุรการ" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="นางสาวสมหญิง (เจ้าหน้าที่ธุรการ)">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="ช่างซ่อม" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="นายสมศักดิ์ (ช่างเทคนิคอาคาร)">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="บริการ" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; object-fit: cover; margin-left: -8px;" title="เจ้าหน้าที่ดูแลผู้พักอาศัย">
-              <div style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #0e121a; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-left: -8px;">
-                +3
-              </div>
-            </div>
-            <div style="margin-left: 14px; font-size: 0.76rem; color: rgba(255,255,255,0.5);">
-              หอพักชายธนกฤษฎ์ ทีมบริหาร
-            </div>
+          <!-- Staff Team Member Contact List (แสดงเป็นรายชื่อพร้อมเบอร์ติดต่อ) -->
+          <div id="team-staff-list" style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 0.78rem; color: rgba(255,255,255,0.45); padding: 8px 0;">กำลังโหลดรายชื่อเจ้าหน้าที่...</div>
           </div>
         </div>
 
-        <!-- 2. Quarterly Target (TALL CARD) -->
-        <div class="smoky-card" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;" id="card-quarterly-target">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <span class="smoky-meta-label">เป้าหมายอัตราการเข้าพัก</span>
-              <h3 class="smoky-card-title">Occupancy Target (3 อาคาร)</h3>
+        <!-- 2. กล่องจัดการบัญชีผู้ใช้งาน (User Management Widget) -->
+        <div class="smoky-card" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;" id="card-users-widget">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span class="smoky-meta-label">ระบบความปลอดภัย & สิทธิ์</span>
+                <h3 class="smoky-card-title" style="margin-top: 2px;">จัดการบัญชีผู้ใช้งาน (Users)</h3>
+              </div>
+              <button class="smoky-round-glass-btn" style="width: auto; height: 32px; padding: 0 12px; border-radius: 9999px; font-size: 0.76rem; font-weight: 600; color: #60A5FA; gap: 4px;" onclick="window.switchView('users')" title="เปิดหน้าจัดการบัญชีผู้ใช้งานทั้งหมด">
+                <span>จัดการทั้งหมด</span>
+                <svg class="icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+
+            <!-- Role Summary Badges (3 columns) -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px;">
+              <div class="user-role-stat-tile" style="padding: 10px 8px; border-radius: 10px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.22); text-align: center;">
+                <span style="font-size: 0.68rem; color: #F87171; font-weight: 600; display: block;">ผู้ดูแล (Admin)</span>
+                <span style="font-size: 1.25rem; font-weight: 700; color: #EF4444; margin-top: 2px; display: block;" id="widget-admin-count">-</span>
+                <span style="font-size: 0.65rem; color: rgba(255,255,255,0.45);">บัญชี</span>
+              </div>
+              <div class="user-role-stat-tile" style="padding: 10px 8px; border-radius: 10px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.22); text-align: center;">
+                <span style="font-size: 0.68rem; color: #60A5FA; font-weight: 600; display: block;">เจ้าหน้าที่ (Staff)</span>
+                <span style="font-size: 1.25rem; font-weight: 700; color: #3B82F6; margin-top: 2px; display: block;" id="widget-staff-count">-</span>
+                <span style="font-size: 0.65rem; color: rgba(255,255,255,0.45);">บัญชี</span>
+              </div>
+              <div class="user-role-stat-tile" style="padding: 10px 8px; border-radius: 10px; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.22); text-align: center;">
+                <span style="font-size: 0.68rem; color: #34D399; font-weight: 600; display: block;">ผู้พัก (Student)</span>
+                <span style="font-size: 1.25rem; font-weight: 700; color: #10B981; margin-top: 2px; display: block;" id="widget-student-count">-</span>
+                <span style="font-size: 0.65rem; color: rgba(255,255,255,0.45);">บัญชี</span>
+              </div>
+            </div>
+
+            <!-- Total Users Banner -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 8px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px;">
+              <span style="font-size: 0.78rem; color: rgba(255,255,255,0.65);">รวมบัญชีผู้ใช้งานทั้งหมด</span>
+              <span style="font-size: 0.88rem; font-weight: 700; color: #60A5FA;" id="widget-total-users">-</span>
+            </div>
+
+            <!-- Mini List of Users (Top Accounts) -->
+            <div style="margin-top: 14px;">
+              <span class="smoky-meta-label" style="margin-bottom: 6px; display: block;">รายชื่อบัญชีในระบบ</span>
+              <div id="widget-users-list" style="display: flex; flex-direction: column; gap: 6px;">
+                <!-- Dynamically rendered rows -->
+              </div>
             </div>
           </div>
 
-          <!-- Circular Progress Ring with Draggable / Interactive Knob -->
-          <div class="smoky-ring-box">
-            <svg class="smoky-ring-svg" viewBox="0 0 100 100">
-              <!-- Dashed Background Track -->
-              <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7" stroke-dasharray="2 3"></circle>
-              <!-- Glowing Blue Progress Circle -->
-              <circle id="target-progress-ring" cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" stroke-dasharray="251.32" stroke-dashoffset="251.32" style="filter: drop-shadow(0 0 10px rgba(59,130,246,0.7)); transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></circle>
-            </svg>
-
-            <!-- Center KPI Label -->
-            <div class="smoky-ring-center">
-              <span class="smoky-kpi-num" id="target-percent-text">0%</span>
-              <span class="smoky-meta-label" style="margin-top: 2px;" id="target-rooms-label">เข้าพักแล้ว 0/17 ห้อง</span>
-            </div>
-          </div>
-
-          <!-- - / + Buttons to Adjust Target -->
-          <div class="smoky-ring-btn-group">
-            <button class="smoky-pill-btn" onclick="window.adjustTargetPercent(-5)" title="ลด 5%">−</button>
-            <span style="font-size: 0.78rem; font-family: monospace; color: rgba(255,255,255,0.6);" id="target-sub-label">เป้าหมาย: 0%</span>
-            <button class="smoky-pill-btn" onclick="window.adjustTargetPercent(5)" title="เพิ่ม 5%">+</button>
-          </div>
-
-          <!-- Bottom Row of Round Metric Chips -->
-          <div class="smoky-metric-chips" id="metric-chips-row">
-            <div class="smoky-chip active" data-metric="revenue" onclick="window.selectMetricChip('revenue')" title="คลิกเพื่อเปิดดูบิลและรายรับค่าน้ำ-ค่าไฟ (Billing & Utilities)" style="cursor: pointer;">
-              <span class="chip-lbl">รายรับ</span>
-              <span class="chip-val" id="chip-val-revenue">0 ฿</span>
-            </div>
-            <div class="smoky-chip" data-metric="deals" onclick="window.selectMetricChip('deals')" title="คลิกเพื่อเปิดดูผังห้องพักและห้องว่าง (Floor Plan)" style="cursor: pointer;">
-              <span class="chip-lbl">ห้องว่าง</span>
-              <span class="chip-val" id="chip-val-vacant">16 ห้อง</span>
-            </div>
-            <div class="smoky-chip" data-metric="calls" onclick="window.selectMetricChip('calls')" title="คลิกเพื่อเปิดดูห้องที่กำลังซ่อมบำรุง" style="cursor: pointer;">
-              <span class="chip-lbl">ซ่อมบำรุง</span>
-              <span class="chip-val" id="chip-val-maint">1 ห้อง</span>
-            </div>
-            <div class="smoky-chip" data-metric="meetings" onclick="window.selectMetricChip('meetings')" title="คลิกเพื่อเปิดดูรายการแจ้งซ่อมบำรุง (Maintenance)" style="cursor: pointer;">
-              <span class="chip-lbl">แจ้งซ่อม</span>
-              <span class="chip-val" id="chip-val-tickets">0 งาน</span>
-            </div>
+          <!-- Bottom Action Buttons -->
+          <div style="margin-top: 16px; display: flex; gap: 8px;">
+            <button class="smoky-pill-btn" onclick="window.switchView('users')" style="flex: 1; justify-content: center; background: rgba(59,130,246,0.18); border-color: rgba(59,130,246,0.35); color: #60A5FA; font-weight: 600; font-size: 0.80rem;">
+              ${ic('users')} จัดการบัญชีผู้ใช้ทั้งหมด
+            </button>
+            <button class="smoky-pill-btn" onclick="window.switchView('users'); setTimeout(() => document.getElementById('btn-add-user')?.click(), 150);" style="justify-content: center; background: #3B82F6; color: #fff; font-weight: 600; font-size: 0.80rem; padding: 0 14px;" title="เพิ่มบัญชีผู้ใช้ใหม่">
+              ${ic('plus')}
+            </button>
           </div>
         </div>
 
@@ -240,53 +235,28 @@ export function renderStaffDashboard() {
 
         </div>
 
-        <!-- 7. สรุปรายรับ 7 วันล่าสุด -->
-        <div class="smoky-card" id="card-sales-weekly">
+        <!-- 7. กล่องกระดานข่าวสารและประกาศหอพัก (Announcements Widget) -->
+        <div class="smoky-card" id="card-announcements-widget">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <span class="smoky-meta-label">สถิติรายรับ</span>
-              <h3 class="smoky-card-title" id="sales-chart-title">รายรับประจำวัน (สัปดาห์นี้)</h3>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 34px; height: 34px; border-radius: 9px; background: rgba(59,130,246,0.18); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
+                ${ic('bell')}
+              </div>
+              <div>
+                <span class="smoky-meta-label">กระดานข่าวสารและประกาศหอพัก</span>
+                <h3 class="smoky-card-title" style="margin-top: 1px;">ประกาศสำคัญล่าสุด (Announcements)</h3>
+              </div>
             </div>
 
-            <!-- Week/Month/Year Control -->
-            <div class="smoky-segmented" id="sales-segmented">
-              <button class="smoky-seg-btn active" data-period="Week" onclick="window.selectSalesPeriod('Week')">สัปดาห์</button>
-              <button class="smoky-seg-btn" data-period="Month" onclick="window.selectSalesPeriod('Month')">เดือน</button>
-              <button class="smoky-seg-btn" data-period="Year" onclick="window.selectSalesPeriod('Year')">ปี</button>
-            </div>
+            <button class="smoky-round-glass-btn" style="width: auto; height: 32px; padding: 0 14px; border-radius: 9999px; font-size: 0.76rem; font-weight: 600; color: #60A5FA; gap: 4px;" onclick="window.switchView('announcements')" title="เปิดดูกระดานข่าวสารทั้งหมด">
+              <span>ดูกระดานข่าวสารทั้งหมด</span>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </div>
 
-          <!-- Dynamic Bars Container -->
-          <div id="sales-bars-container" style="position: relative; margin-top: 26px; height: 140px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;">
-            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">จ.</span>
-            </div>
-            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">อ.</span>
-            </div>
-            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 8px; background: #3B82F6; border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.72rem; font-weight: 700; color: #ffffff; margin-top: 6px;">พ.</span>
-            </div>
-            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">พฤ.</span>
-            </div>
-            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">ศ.</span>
-            </div>
-            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">ส.</span>
-            </div>
-            <div class="smoky-bar-col" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end;">
-              <div style="width: 100%; max-width: 30px; height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px 4px 0 0;"></div>
-              <span style="font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 6px;">อา.</span>
-            </div>
-
+          <!-- Dynamic Announcements List Container (Supabase Realtime) -->
+          <div id="widget-announcements-list" style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="font-size: 0.78rem; color: rgba(255,255,255,0.45); padding: 12px 0; text-align: center;">กำลังโหลดประกาศล่าสุดจากระบบ...</div>
           </div>
         </div>
 
@@ -388,67 +358,40 @@ export function renderStaffDashboard() {
 
         </div>
 
-        <!-- 8. สายด่วนฉุกเฉิน & บันทึกเสียงแจ้งเหตุ -->
-        <div class="smoky-card" id="card-media-discovery">
-          <span class="smoky-meta-label">สายด่วนฉุกเฉิน · ผู้จัดการหอพัก</span>
-          
-          <div style="display: flex; align-items: center; gap: 12px; margin-top: 12px;">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="ผู้จัดการ" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);">
-            <div>
-              <div style="font-size: 0.90rem; font-weight: 600; color: #fff;">นายเกียรติศักดิ์ บริหาร</div>
-              <a href="tel:0869461654" style="font-size: 0.74rem; color: #60A5FA; text-decoration: none; display: flex; align-items: center; gap: 4px; margin-top: 2px;" title="คลิกเพื่อโทรออกทันที">
-                ${ic('phone')} โทร 086-946-1654 (คลิกเพื่อโทรออก 24 ชม.)
-              </a>
+        <!-- 8. กล่องพัสดุและไปรษณียภัณฑ์ (Parcels Widget) -->
+        <div class="smoky-card" id="card-parcels-widget">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 34px; height: 34px; border-radius: 9px; background: rgba(59,130,246,0.18); display: flex; align-items: center; justify-content: center; color: #3B82F6;">
+                ${ic('box')}
+              </div>
+              <div>
+                <span class="smoky-meta-label">พัสดุและไปรษณียภัณฑ์</span>
+                <h3 class="smoky-card-title" style="margin-top: 1px;">พัสดุมาถึง 3 อาคาร (Parcels)</h3>
+              </div>
+            </div>
+
+            <button class="smoky-round-glass-btn" style="width: auto; height: 32px; padding: 0 14px; border-radius: 9999px; font-size: 0.76rem; font-weight: 600; color: #60A5FA; gap: 4px;" onclick="window.switchView('parcels')" title="เปิดดูรายการพัสดุทั้งหมด">
+              <span>ดูพัสดุทั้งหมด</span>
+              <svg class="icon" viewBox="0 0 24 24" style="width: 13px; height: 13px;"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+
+          <!-- Mini Stats Row -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;">
+            <div style="padding: 8px 12px; border-radius: 8px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.22); display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 0.75rem; color: #FBBF24;">รอผู้พักมารับ</span>
+              <span style="font-size: 1.15rem; font-weight: 700; color: #F59E0B;" id="widget-parcels-pending">0 ชิ้น</span>
+            </div>
+            <div style="padding: 8px 12px; border-radius: 8px; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.22); display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 0.75rem; color: #34D399;">รับมอบแล้ว</span>
+              <span style="font-size: 1.15rem; font-weight: 700; color: #10B981;" id="widget-parcels-collected">0 ชิ้น</span>
             </div>
           </div>
 
-          <!-- Blue Audio Waveform with Playhead -->
-          <div class="smoky-waveform-box" id="waveform-box">
-            <!-- 24 bars -->
-            <div class="smoky-wave-bar played" style="height: 35%;"></div>
-            <div class="smoky-wave-bar played" style="height: 55%;"></div>
-            <div class="smoky-wave-bar played" style="height: 80%;"></div>
-            <div class="smoky-wave-bar played" style="height: 100%;"></div>
-            <div class="smoky-wave-bar played" style="height: 65%;"></div>
-            <div class="smoky-wave-bar played" style="height: 45%;"></div>
-            <div class="smoky-wave-bar played" style="height: 90%;"></div>
-            <div class="smoky-wave-bar played" style="height: 75%;"></div>
-            <div class="smoky-wave-bar" style="height: 50%;"></div>
-            <div class="smoky-wave-bar" style="height: 70%;"></div>
-            <div class="smoky-wave-bar" style="height: 85%;"></div>
-            <div class="smoky-wave-bar" style="height: 95%;"></div>
-            <div class="smoky-wave-bar" style="height: 40%;"></div>
-            <div class="smoky-wave-bar" style="height: 30%;"></div>
-            <div class="smoky-wave-bar" style="height: 60%;"></div>
-            <div class="smoky-wave-bar" style="height: 85%;"></div>
-            <div class="smoky-wave-bar" style="height: 70%;"></div>
-            <div class="smoky-wave-bar" style="height: 50%;"></div>
-            <div class="smoky-wave-bar" style="height: 90%;"></div>
-            <div class="smoky-wave-bar" style="height: 65%;"></div>
-            <div class="smoky-wave-bar" style="height: 40%;"></div>
-            <div class="smoky-wave-bar" style="height: 55%;"></div>
-            <div class="smoky-wave-bar" style="height: 80%;"></div>
-            <div class="smoky-wave-bar" style="height: 45%;"></div>
-
-            <!-- Animated Playhead Line -->
-            <div class="smoky-waveform-needle" id="waveform-needle" style="left: 35%;"></div>
-          </div>
-
-          <!-- Audio Controls: prev / play-pause / next -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-            <span style="font-size: 0.76rem; font-family: monospace; color: rgba(255,255,255,0.4);" id="audio-duration-txt">01:24</span>
-
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <button class="smoky-round-glass-btn" style="width: 32px; height: 32px;" onclick="window.seekAudio(0)" title="ย้อนกลับ">
-                <svg class="icon" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
-              </button>
-              <button class="smoky-round-glass-btn" id="btn-audio-play" style="width: 38px; height: 38px; background: #3B82F6; color: #fff; box-shadow: 0 0 15px rgba(59,130,246,0.6);" onclick="window.toggleAudioPlay()" title="เล่น / หยุด">
-                ${ic('play')}
-              </button>
-              <button class="smoky-round-glass-btn" style="width: 32px; height: 32px;" onclick="window.seekAudio(100)" title="ถัดไป">
-                <svg class="icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
-              </button>
-            </div>
+          <!-- Dynamic Parcels List Container (Supabase Realtime) -->
+          <div id="widget-parcels-list" style="margin-top: 14px;">
+            <div style="font-size: 0.78rem; color: rgba(255,255,255,0.45); padding: 12px 0; text-align: center;">กำลังโหลดข้อมูลพัสดุ...</div>
           </div>
         </div>
 
@@ -467,13 +410,17 @@ async function initStaffDashboard() {
       { data: ticketsData },
       { data: billsData },
       { data: bookingsData },
-      { data: usersData }
+      { data: usersData },
+      { data: parcelsData },
+      { data: announcementsData }
     ] = await Promise.all([
       supabase.from('tenants').select('*'),
       supabase.from('maintenance').select('*'),
       supabase.from('meter_readings').select('*'),
       supabase.from('bookings').select('*'),
-      supabase.from('users').select('*')
+      supabase.from('users').select('*'),
+      supabase.from('parcels').select('*').order('arrived_at', { ascending: false }),
+      supabase.from('announcements').select('*').order('pinned', { ascending: false })
     ]);
 
     const tenants = Array.isArray(tenantsData) ? tenantsData.filter(t => t.status !== 'terminated') : [];
@@ -481,6 +428,8 @@ async function initStaffDashboard() {
     const bills = Array.isArray(billsData) ? billsData : [];
     const bookings = Array.isArray(bookingsData) ? bookingsData : [];
     const users = Array.isArray(usersData) ? usersData : [];
+    const parcels = Array.isArray(parcelsData) ? parcelsData : [];
+    const announcements = Array.isArray(announcementsData) ? announcementsData : [];
 
     const totalRooms = 17;
     const occupiedCount = tenants.length;
@@ -493,31 +442,22 @@ async function initStaffDashboard() {
     const vacantCount = Math.max(0, totalRooms - occupiedCount - maintCount);
     const occPercent = totalRooms > 0 ? Math.round((occupiedCount / totalRooms) * 100) : 0;
 
-    // 1. Team Staff Count
-    const staffCount = users.filter(u => u.role === 'admin' || u.role === 'staff').length;
-    const teamEl = document.getElementById('team-staff-count');
-    if (teamEl) teamEl.textContent = `${staffCount} คน ประจำการ`;
+    // 1. Update Staff Team Contact List UI (รายชื่อพร้อมเบอร์ติดต่อ แทนการแสดงรูป)
+    updateStaffTeamUI(users);
 
-    // 2. Target Ring & Chips
-    dashboardState.targetPercent = occPercent;
-    updateTargetRingUI();
-    const targetRoomsLabel = document.getElementById('target-rooms-label');
-    if (targetRoomsLabel) targetRoomsLabel.textContent = `เข้าพักแล้ว ${occupiedCount}/${totalRooms} ห้อง`;
+    // 2. Update User Management Widget UI (กล่องจัดการบัญชีผู้ใช้งาน)
+    updateUsersWidgetUI(users);
 
-    const chipRev = document.getElementById('chip-val-revenue');
-    const chipVac = document.getElementById('chip-val-vacant');
-    const chipMaint = document.getElementById('chip-val-maint');
-    const chipTix = document.getElementById('chip-val-tickets');
+    // 3. Update Announcements Widget UI (กล่องกระดานข่าวสารและประกาศหอพัก)
+    updateAnnouncementsWidgetUI(announcements);
+
+    // 4. Update Parcels Widget UI (กล่องพัสดุและไปรษณียภัณฑ์)
+    updateParcelsWidgetUI(parcels);
 
     const totalPaidBills = bills.filter(b => b.status === 'paid').reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0);
     const totalExpectedBills = bills.reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0) || (occupiedCount * 2800);
-
-    if (chipRev) chipRev.textContent = `฿${totalPaidBills.toLocaleString()}`;
-    if (chipVac) chipVac.textContent = `${vacantCount} ห้อง`;
-    if (chipMaint) chipMaint.textContent = `${maintCount} ห้อง`;
     const pendingTickets = tickets.filter(t => t.status !== 'completed').length;
     const completedTickets = tickets.filter(t => t.status === 'completed').length;
-    if (chipTix) chipTix.textContent = `${pendingTickets} งาน`;
 
     // 3. Tile 1: ผู้พักอาศัย
     const custEl = document.getElementById('kpi-customers-count');
@@ -595,17 +535,215 @@ async function initStaffDashboard() {
     dashboardLiveMetrics.pendingTickets = pendingTickets;
     dashboardLiveMetrics.completedTickets = completedTickets;
     dashboardLiveMetrics.pendingBookings = pendingBookings;
-
-    // Initialize Sales Chart according to current period
-    window.selectSalesPeriod(dashboardState.salesPeriod || 'Week');
-
-    // Animate target percent text
-    animateNumberCountUp('target-percent-text', occPercent, '%');
   } catch (err) {
     console.warn('Realtime dashboard sync error:', err);
-    animateNumberCountUp('target-percent-text', dashboardState.targetPercent, '%');
     animateNumberCountUp('leads-num-count', 0);
   }
+}
+
+// 1. Helper: Render Staff Team Contact List (รายชื่อพร้อมเบอร์ติดต่อ แทนการแสดงรูป)
+function updateStaffTeamUI(users) {
+  const staffListEl = document.getElementById('team-staff-list');
+  if (!staffListEl) return;
+
+  const staffUsers = users.filter(u => u.role === 'admin' || u.role === 'staff');
+  const countEl = document.getElementById('team-staff-count');
+  if (countEl) countEl.textContent = `${staffUsers.length} คน ประจำการ`;
+
+  if (staffUsers.length === 0) {
+    staffListEl.innerHTML = `<div style="font-size: 0.78rem; color: rgba(255,255,255,0.45); padding: 8px 0; text-align: center;">ไม่มีรายชื่อเจ้าหน้าที่ประจำการ</div>`;
+    return;
+  }
+
+  staffListEl.innerHTML = staffUsers.map(s => {
+    const isAdmin = s.role === 'admin';
+    const icon = isAdmin ? '👔' : '🛠️';
+    const roleBadgeText = s.role_title || (isAdmin ? 'ผู้จัดการหอพัก' : 'เจ้าหน้าที่หอพัก');
+    const phone = s.phone || (isAdmin ? '086-946-1654' : '075-345-679');
+
+    return `
+      <div class="staff-contact-row" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: ${isAdmin ? 'rgba(239,68,68,0.15)' : 'rgba(59,130,246,0.15)'}; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0;">
+            ${icon}
+          </div>
+          <div style="min-width: 0;">
+            <div style="font-size: 0.85rem; font-weight: 600; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${s.name || s.username}
+            </div>
+            <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5);">
+              ${roleBadgeText}
+            </div>
+          </div>
+        </div>
+        <a href="tel:${phone.replace(/[^0-9]/g, '')}" class="staff-call-pill" style="flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 9999px; background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3); color: #60A5FA; font-size: 0.74rem; text-decoration: none; font-weight: 600; transition: background 0.2s;" title="คลิกเพื่อโทรออกทันที">
+          ${ic('phone')}
+          <span>${phone}</span>
+        </a>
+      </div>
+    `;
+  }).join('');
+}
+
+// 2. Helper: Render User Management Widget (กล่องจัดการบัญชีผู้ใช้งาน)
+function updateUsersWidgetUI(users) {
+  const adminCount = users.filter(u => u.role === 'admin').length;
+  const staffCount = users.filter(u => u.role === 'staff').length;
+  const studentCount = users.filter(u => u.role === 'student').length;
+  const totalCount = users.length;
+
+  const adminEl = document.getElementById('widget-admin-count');
+  const staffEl = document.getElementById('widget-staff-count');
+  const studentEl = document.getElementById('widget-student-count');
+  const totalEl = document.getElementById('widget-total-users');
+  const listEl = document.getElementById('widget-users-list');
+
+  if (adminEl) adminEl.textContent = adminCount;
+  if (staffEl) staffEl.textContent = staffCount;
+  if (studentEl) studentEl.textContent = studentCount;
+  if (totalEl) totalEl.textContent = `${totalCount} บัญชี`;
+
+  if (listEl) {
+    if (users.length === 0) {
+      listEl.innerHTML = `<div style="font-size: 0.78rem; color: rgba(255,255,255,0.4); text-align: center; padding: 12px 0;">ไม่มีบัญชีผู้ใช้ในระบบ</div>`;
+      return;
+    }
+
+    const previewUsers = users.slice(0, 4);
+    listEl.innerHTML = previewUsers.map(u => {
+      let rolePill = '';
+      if (u.role === 'admin') {
+        rolePill = `<span style="font-size: 0.65rem; font-weight: 700; color: #EF4444; background: rgba(239,68,68,0.15); padding: 2px 7px; border-radius: 9999px;">Admin</span>`;
+      } else if (u.role === 'staff') {
+        rolePill = `<span style="font-size: 0.65rem; font-weight: 700; color: #3B82F6; background: rgba(59,130,246,0.15); padding: 2px 7px; border-radius: 9999px;">Staff</span>`;
+      } else {
+        rolePill = `<span style="font-size: 0.65rem; font-weight: 700; color: #10B981; background: rgba(16,185,129,0.15); padding: 2px 7px; border-radius: 9999px;">ห้อง ${u.room || 'ผู้พัก'}</span>`;
+      }
+
+      return `
+        <div onclick="window.switchView('users')" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); transition: background 0.15s;">
+          <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; color: #fff; flex-shrink: 0;">
+              ${(u.name || u.username || 'U')[0].toUpperCase()}
+            </div>
+            <div style="font-size: 0.80rem; font-weight: 500; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${u.name || u.username}
+            </div>
+          </div>
+          <div style="flex-shrink: 0;">${rolePill}</div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+// 3. Helper: Render Announcements Widget (กล่องกระดานข่าวสารและประกาศหอพัก)
+function updateAnnouncementsWidgetUI(announcements) {
+  const container = document.getElementById('widget-announcements-list');
+  if (!container) return;
+
+  if (!Array.isArray(announcements) || announcements.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 24px 16px; color: rgba(255,255,255,0.45);">
+        <div style="font-size: 0.84rem; font-weight: 600; color: #fff;">ยังไม่มีประกาศใหม่ในขณะนี้</div>
+        <div style="font-size: 0.72rem; margin-top: 4px;">คุณสามารถกดสร้างประกาศใหม่ได้ที่หน้ากระดานข่าวสาร</div>
+      </div>
+    `;
+    return;
+  }
+
+  const list = announcements.slice(0, 3);
+  container.innerHTML = list.map(a => {
+    let catColor = '#60A5FA';
+    let catBg = 'rgba(59,130,246,0.14)';
+    if (a.category === 'ซ่อมบำรุง') {
+      catColor = '#F59E0B';
+      catBg = 'rgba(245,158,11,0.14)';
+    } else if (a.category === 'การเงิน') {
+      catColor = '#34D399';
+      catBg = 'rgba(52,211,153,0.14)';
+    }
+
+    const isPinned = a.pinned === true || a.pinned === 'true';
+
+    return `
+      <div onclick="window.switchView('announcements')" class="announcement-widget-row" style="cursor: pointer; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.06); transition: all 0.2s;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            ${isPinned ? `
+              <span style="font-size: 0.65rem; font-weight: 700; color: #F87171; background: rgba(239,68,68,0.16); padding: 2px 7px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 2px;">
+                📌 ปักหมุด
+              </span>
+            ` : ''}
+            <span style="font-size: 0.65rem; font-weight: 600; color: ${catColor}; background: ${catBg}; padding: 2px 7px; border-radius: 9999px;">
+              ${a.category || 'ทั่วไป'}
+            </span>
+          </div>
+          <span style="font-size: 0.70rem; color: rgba(255,255,255,0.4);">
+            ${fmtDate(a.date || a.created_at)}
+          </span>
+        </div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: #ffffff; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          ${a.title}
+        </div>
+        <div style="font-size: 0.74rem; color: rgba(255,255,255,0.52); margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+          ${a.content || ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// 4. Helper: Render Parcels Widget (กล่องพัสดุและไปรษณียภัณฑ์)
+function updateParcelsWidgetUI(parcels) {
+  const pendingCount = parcels.filter(p => p.status !== 'collected').length;
+  const collectedCount = parcels.filter(p => p.status === 'collected').length;
+
+  const pendingEl = document.getElementById('widget-parcels-pending');
+  const collectedEl = document.getElementById('widget-parcels-collected');
+  const container = document.getElementById('widget-parcels-list');
+
+  if (pendingEl) pendingEl.textContent = `${pendingCount} ชิ้น`;
+  if (collectedEl) collectedEl.textContent = `${collectedCount} ชิ้น`;
+
+  if (!container) return;
+
+  if (!Array.isArray(parcels) || parcels.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 14px 10px 4px;">
+        <div style="font-size: 0.82rem; font-weight: 600; color: #ffffff;" id="parcels-empty-title">ไม่มีพัสดุตกค้างรอรับ</div>
+        <div style="font-size: 0.73rem; color: rgba(255,255,255,0.45); margin-top: 3px;" id="parcels-empty-sub">พัสดุทั้งหมดได้รับการส่งมอบเรียบร้อย</div>
+      </div>
+    `;
+    return;
+  }
+
+  const list = parcels.slice(0, 3);
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      ${list.map(p => {
+        const isCollected = p.status === 'collected';
+        return `
+          <div onclick="window.switchView('parcels')" class="parcel-widget-row" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.06); transition: all 0.2s;">
+            <div style="min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-weight: 700; color: #ffffff; font-size: 0.82rem;">ห้อง ${p.room_number}</span>
+                <span style="font-size: 0.68rem; color: #60A5FA; background: rgba(59,130,246,0.14); padding: 1px 6px; border-radius: 4px;">${p.courier || 'พัสดุ'}</span>
+              </div>
+              <div style="font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${p.recipient_name || ''} · ${p.tracking_number}
+              </div>
+            </div>
+            <div style="flex-shrink: 0;">
+              ${isCollected 
+                ? '<span style="font-size: 0.65rem; color: #34D399; font-weight: 600;">✓ รับแล้ว</span>' 
+                : '<span style="font-size: 0.65rem; color: #F59E0B; font-weight: 600;">⏳ รอรับ</span>'}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
 }
 
 // Animated Counter Utility

@@ -4285,6 +4285,131 @@ body:not(.theme-light) #app-modal-backdrop .upload-dropzone * {
   font-weight: 600 !important;
 }
 
+/* ============================================================
+   Dashboard New Realtime Widgets (Staff Team, Users, Announcements, Parcels)
+   ============================================================ */
+.staff-contact-row {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.staff-contact-row:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+.staff-call-pill:hover {
+  background: rgba(59, 130, 246, 0.25) !important;
+  border-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+.announcement-widget-row:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  transform: translateY(-1px);
+}
+
+/* Light Theme Styling for Dashboard Widgets */
+.theme-light .staff-contact-row {
+  background: rgba(241, 245, 249, 0.85) !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+}
+.theme-light .staff-contact-row:hover {
+  background: rgba(226, 232, 240, 0.95) !important;
+  border-color: rgba(148, 163, 184, 0.8) !important;
+}
+.theme-light .staff-contact-row div[style*="color: #ffffff"],
+.theme-light .staff-contact-row div[style*="color:#ffffff"],
+.theme-light .staff-contact-row div[style*="color: #fff"],
+.theme-light .staff-contact-row div[style*="color:#fff"] {
+  color: #0F172A !important;
+}
+.theme-light .staff-contact-row div[style*="color: rgba(255,255,255,0.5)"] {
+  color: #64748B !important;
+}
+.theme-light .staff-call-pill {
+  background: rgba(37, 99, 235, 0.10) !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
+  color: #1D4ED8 !important;
+}
+.theme-light .staff-call-pill:hover {
+  background: rgba(37, 99, 235, 0.20) !important;
+}
+
+.theme-light #card-users-widget div[style*="color: rgba(255,255,255,0.65)"] {
+  color: #475569 !important;
+}
+.theme-light #card-users-widget div[style*="background: rgba(255,255,255,0.04)"] {
+  background: rgba(241, 245, 249, 0.8) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
+}
+.theme-light #widget-users-list > div {
+  background: rgba(241, 245, 249, 0.85) !important;
+  border: 1px solid rgba(203, 213, 225, 0.75) !important;
+}
+.theme-light #widget-users-list > div:hover {
+  background: rgba(226, 232, 240, 0.95) !important;
+}
+.theme-light #widget-users-list div[style*="color: #ffffff"],
+.theme-light #widget-users-list div[style*="color:#ffffff"] {
+  color: #0F172A !important;
+}
+.theme-light #widget-users-list div[style*="color: #fff"],
+.theme-light #widget-users-list div[style*="color:#fff"] {
+  color: #1E293B !important;
+}
+
+.theme-light .announcement-widget-row {
+  background: rgba(241, 245, 249, 0.85) !important;
+  border: 1px solid rgba(203, 213, 225, 0.75) !important;
+}
+.theme-light .announcement-widget-row:hover {
+  background: rgba(226, 232, 240, 0.95) !important;
+  border-color: rgba(148, 163, 184, 0.8) !important;
+}
+.theme-light .announcement-widget-row div[style*="color: #ffffff"],
+.theme-light .announcement-widget-row div[style*="color:#ffffff"] {
+  color: #0F172A !important;
+}
+.theme-light .announcement-widget-row div[style*="color: rgba(255,255,255,0.52)"] {
+  color: #475569 !important;
+}
+.theme-light .announcement-widget-row span[style*="color: rgba(255,255,255,0.4)"] {
+  color: #64748B !important;
+}
+
+.theme-light .parcel-widget-row {
+  background: rgba(241, 245, 249, 0.85) !important;
+  border: 1px solid rgba(203, 213, 225, 0.75) !important;
+}
+.theme-light .parcel-widget-row:hover {
+  background: rgba(226, 232, 240, 0.95) !important;
+}
+.theme-light .parcel-widget-row span[style*="color: #ffffff"],
+.theme-light .parcel-widget-row span[style*="color:#ffffff"] {
+  color: #0F172A !important;
+}
+.theme-light .parcel-widget-row div[style*="color: #ffffff"],
+.theme-light .parcel-widget-row div[style*="color:#ffffff"] {
+  color: #0F172A !important;
+}
+.theme-light .parcel-widget-row div[style*="color: rgba(255,255,255,0.5)"] {
+  color: #64748B !important;
+}
+
+/* Empty state for parcels: clean, flat text without box borders or box icons */
+.theme-light #parcels-empty-title {
+  color: #0F172A !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.theme-light #parcels-empty-sub {
+  color: #64748B !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 
 
 
