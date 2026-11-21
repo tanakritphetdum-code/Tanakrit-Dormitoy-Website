@@ -463,9 +463,23 @@ function openUserModal(user = null) {
       } catch (_) {}
 
       if (currentUser && currentUser.username && currentUser.username.toLowerCase() === user.username.toLowerCase()) {
+        currentUser.name = name;
+        currentUser.phone = phone;
+        currentUser.email = email;
+        currentUser.role = role;
+        currentUser.room = room;
+        currentUser.roleTitle = title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`));
         currentUser.password = password;
+        currentUser.initial = name ? name.trim().charAt(0) : 'U';
+
         localStorage.setItem('tanakrit_current_user', JSON.stringify(currentUser));
         localStorage.setItem('kp_current_user', JSON.stringify(currentUser));
+
+        // อัปเดตชื่อและตำแหน่งที่หัวขวามือบน (Header Topbar) ทันทีแบบ Realtime
+        const headerNameEl = document.getElementById('header-user-name');
+        const headerRoleEl = document.getElementById('header-user-role-label');
+        if (headerNameEl) headerNameEl.textContent = name;
+        if (headerRoleEl) headerRoleEl.textContent = currentUser.roleTitle;
       }
 
       toast(`แก้ไขบัญชี ${user.username} เรียบร้อยแล้ว`, 'success');

@@ -12,7 +12,8 @@ import { renderReportsView } from './reports.js';
 import { renderSettingsView } from './settings.js';
 import { renderUsersView } from './users.js';
 import { renderBookingsView, openBookingModal } from './bookings.js';
-import { toast, ic, closeModal } from './api.js';
+import { toast, ic, showModal, closeModal } from './api.js';
+import { supabase } from './supabase.js';
 
 // กู้คืนฟังก์ชันปิด Modal สากล
 window.closeAppModal = closeModal;
@@ -231,8 +232,8 @@ window.switchView = async function(viewName) {
     } else if (viewName === 'users') {
       bodyEl.innerHTML = await renderUsersView();
     } else if (viewName === 'profile') {
-      bodyEl.innerHTML = renderProfileView();
-      bindProfileForm();
+      openCompactProfileModal();
+      return;
     } else if (viewName === 'settings') {
       bodyEl.innerHTML = await renderSettingsView();
     }
@@ -279,24 +280,182 @@ function bindNewRequestForm() {
   });
 }
 
-function bindProfileForm() {
-  const form = document.getElementById('form-profile-save');
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const newName = document.getElementById('prof-name').value.trim();
-      const newPhone = document.getElementById('prof-phone').value.trim();
-      if (currentUser) {
-        currentUser.name = newName;
-        currentUser.phone = newPhone;
-        localStorage.setItem('tanakrit_current_user', JSON.stringify(currentUser));
-        localStorage.setItem('kp_current_user', JSON.stringify(currentUser));
-        document.getElementById('header-user-name').textContent = newName;
+// ==================== COMPACT USER PROFILE MODAL (โปรไฟล์ผู้ใช้แบบย่อ) ====================
+export function openCompactProfileModal() {
+  if (!currentUser) return;
+
+  const initial = (currentUser.name || currentUser.username || 'U')[0].toUpperCase();
+  const isAdmin = currentUser.role === 'admin';
+  const isStaff = currentUser.role === 'staff';
+  const roleBadge = isAdmin
+    ? '<span style="font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: rgba(239,68,68,0.18); color: #EF4444; border: 1px solid rgba(239,68,68,0.3);">👑 Admin</span>'
+    : (isStaff
+      ? '<span style="font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: rgba(59,130,246,0.18); color: #3B82F6; border: 1px solid rgba(59,130,246,0.3);">🛠️ Staff</span>'
+      : `<span style="font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: rgba(52,211,153,0.18); color: #10B981; border: 1px solid rgba(52,211,153,0.3);">🏠 ห้อง ${currentUser.room || '-'}</span>`);
+
+  const body = `
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <!-- Profile Header Summary Banner -->
+      <div style="display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);">
+        <div style="position: relative; flex-shrink: 0;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: #3B82F6; color: #fff; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 16px rgba(59,130,246,0.4);">
+            ${initial}
+          </div>
+          <span style="position: absolute; bottom: 0; right: 0; width: 13px; height: 13px; border-radius: 50%; background: #10B981; border: 2px solid #0e121a;"></span>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h4 style="font-size: 1.05rem; font-weight: 700; color: #ffffff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="cp-display-name">
+              ${currentUser.name || currentUser.username}
+            </h4>
+            ${roleBadge}
+          </div>
+          <div style="font-size: 0.78rem; color: rgba(255,255,255,0.52); margin-top: 3px;">
+            ชื่อผู้ใช้: <strong>@${currentUser.username}</strong> · ${currentUser.roleTitle || 'ผู้ดูแลระบบสูงสุด'}
+          </div>
+        </div>
+      </div>
+
+      <!-- Editable Profile Form -->
+      <form id="form-compact-profile" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="field">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 5px; font-size: 0.78rem;">ชื่อ - นามสกุล *</label>
+          <input type="text" id="cp-input-name" class="smoky-glass-input" value="${currentUser.name || ''}" required placeholder="เช่น นายธนกฤษฎ์ เพชรดำ (ผู้จัดการหอพัก)" style="width: 100%;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="field">
+            <label class="smoky-form-label" style="display: block; margin-bottom: 5px; font-size: 0.78rem;">เบอร์โทรศัพท์ติดต่อ</label>
+            <input type="tel" id="cp-input-phone" class="smoky-glass-input" value="${currentUser.phone || ''}" placeholder="08x-xxx-xxxx" style="width: 100%;">
+          </div>
+          <div class="field">
+            <label class="smoky-form-label" style="display: block; margin-bottom: 5px; font-size: 0.78rem;">อีเมล</label>
+            <input type="email" id="cp-input-email" class="smoky-glass-input" value="${currentUser.email || ''}" placeholder="email@example.com" style="width: 100%;">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="smoky-form-label" style="display: block; margin-bottom: 5px; font-size: 0.78rem;">เปลี่ยนรหัสผ่านใหม่ (เว้นว่างไว้หากไม่ต้องการเปลี่ยน)</label>
+          <input type="password" id="cp-input-password" class="smoky-glass-input" placeholder="••••••••" style="width: 100%;">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; font-size: 0.74rem; color: rgba(255,255,255,0.55);">
+          <span>สถานะ: <strong style="color: #34D399;">🟢 ใช้งานปกติ (Active)</strong></span>
+          <span>รหัสระบบ: <strong style="color: #60A5FA;">${currentUser.id || currentUser.username}</strong></span>
+        </div>
+      </form>
+    </div>
+  `;
+
+  const footer = `
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <button type="button" class="btn btn-outline" id="btn-compact-logout" style="color: #EF4444; border-color: rgba(239,68,68,0.3); font-size: 0.78rem; padding: 6px 14px; gap: 4px;">
+        ${ic('logout')} ออกจากระบบ
+      </button>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
+        <button type="button" class="btn btn-primary" id="btn-save-compact-profile" style="background: #3B82F6; border-color: #3B82F6; font-size: 0.80rem; font-weight: 600; padding: 6px 18px;">
+          บันทึกการแก้ไข
+        </button>
+      </div>
+    </div>
+  `;
+
+  showModal({
+    title: 'โปรไฟล์ผู้ใช้แบบย่อ (User Profile)',
+    body,
+    footer,
+    maxWidth: '520px'
+  });
+
+  // Bind Logout
+  const logoutBtn = document.getElementById('btn-compact-logout');
+  if (logoutBtn) {
+    logoutBtn.onclick = () => {
+      closeModal();
+      handleLogout();
+    };
+  }
+
+  // Bind Save Profile Changes
+  const saveBtn = document.getElementById('btn-save-compact-profile');
+  if (saveBtn) {
+    saveBtn.onclick = async () => {
+      const newName = document.getElementById('cp-input-name').value.trim();
+      const newPhone = document.getElementById('cp-input-phone').value.trim();
+      const newEmail = document.getElementById('cp-input-email').value.trim();
+      const newPassword = document.getElementById('cp-input-password').value.trim();
+
+      if (!newName) {
+        toast('กรุณากรอกชื่อ - นามสกุล', 'error');
+        return;
       }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'กำลังบันทึก...';
+
+      const updateData = {
+        name: newName,
+        phone: newPhone,
+        email: newEmail
+      };
+      if (newPassword) {
+        updateData.password = newPassword;
+      }
+
+      // 1. Update Supabase Cloud users table
+      try {
+        let q = supabase.from('users').update(updateData);
+        if (currentUser.id) {
+          q = q.eq('id', currentUser.id);
+        } else {
+          q = q.eq('username', currentUser.username);
+        }
+        const { error } = await q;
+        if (error) console.warn('Supabase profile update warning:', error);
+      } catch (err) {
+        console.warn('Supabase profile update error:', err);
+      }
+
+      // 2. Update currentUser in memory
+      currentUser.name = newName;
+      currentUser.phone = newPhone;
+      currentUser.email = newEmail;
+      currentUser.initial = newName.charAt(0);
+      if (newPassword) {
+        currentUser.password = newPassword;
+        try {
+          const pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
+          pwdOverrides[currentUser.username.toLowerCase()] = newPassword;
+          localStorage.setItem('tanakrit_pwd_overrides', JSON.stringify(pwdOverrides));
+        } catch (_) {}
+      }
+
+      // 3. Update localStorage
+      localStorage.setItem('tanakrit_current_user', JSON.stringify(currentUser));
+      localStorage.setItem('kp_current_user', JSON.stringify(currentUser));
+
+      // 4. Update Header DOM Elements immediately
+      const headerNameEl = document.getElementById('header-user-name');
+      if (headerNameEl) headerNameEl.textContent = newName;
+
+      // 5. Update open page content if on users or dashboard
+      const topTabs = document.querySelector('#smoky-top-tabs .smoky-tab.active');
+      const activeTab = topTabs ? topTabs.getAttribute('data-tab') : '';
+      if (activeTab === 'users') {
+        const refreshBtn = document.getElementById('btn-refresh-users');
+        if (refreshBtn) refreshBtn.click();
+      } else if (activeTab === 'dashboard' || !activeTab) {
+        window.switchView('dashboard');
+      }
+
+      closeModal();
       toast('บันทึกข้อมูลส่วนตัวเรียบร้อยแล้ว', 'success');
-    });
+    };
   }
 }
+
+window.openCompactProfileModal = openCompactProfileModal;
 
 // ==================== THEME MANAGEMENT (DARK / LIGHT MODE) ====================
 export function initTheme() {

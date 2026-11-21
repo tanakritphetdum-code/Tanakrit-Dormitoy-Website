@@ -12,18 +12,50 @@ export const USERS = [
 
 export let currentUser = null;
 
-// กู้คืน Session อัตโนมัติถ้าเคยล็อกอินไว้
+// กู้คืน Session อัตโนมัติถ้าเคยล็อกอินไว้ พร้อมซิงค์ข้อมูลล่าสุดจาก Supabase Cloud แบบเรียลไทม์
 export function initAuth() {
   try {
     const saved = localStorage.getItem('tanakrit_current_user') || localStorage.getItem('kp_current_user');
     if (saved) {
       currentUser = JSON.parse(saved);
+      // ดึงข้อมูลผู้ใช้งานล่าสุดจาก Supabase Cloud ทันทีเพื่อความถูกต้อง
+      syncCurrentUserFromSupabase();
       return currentUser;
     }
   } catch (e) {
     currentUser = null;
   }
   return null;
+}
+
+// ซิงค์ข้อมูลโปรไฟล์ผู้ใช้ปัจจุบันจาก Supabase Cloud เข้าสู่ Session และอัปเดต Header อัตโนมัติ
+export async function syncCurrentUserFromSupabase() {
+  if (!currentUser || !currentUser.username) return;
+  try {
+    const { data, error } = await supabase.from('users').eq('username', currentUser.username);
+    if (!error && data && data.length > 0) {
+      const u = data[0];
+      currentUser.id = u.id || currentUser.id;
+      currentUser.name = u.name;
+      currentUser.phone = u.phone;
+      currentUser.email = u.email;
+      currentUser.role = u.role;
+      currentUser.room = u.room;
+      currentUser.tenantId = u.tenant_id;
+      currentUser.roleTitle = u.role_title || (u.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (u.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${u.room || '-'})`));
+      currentUser.initial = u.name ? u.name.trim().charAt(0) : 'U';
+
+      localStorage.setItem('tanakrit_current_user', JSON.stringify(currentUser));
+      localStorage.setItem('kp_current_user', JSON.stringify(currentUser));
+
+      const nameEl = document.getElementById('header-user-name');
+      const roleEl = document.getElementById('header-user-role-label');
+      if (nameEl) nameEl.textContent = currentUser.name;
+      if (roleEl) roleEl.textContent = currentUser.roleTitle;
+    }
+  } catch (err) {
+    console.warn('Realtime profile sync skipped / offline:', err);
+  }
 }
 
 // ตรวจสอบการ Login ผ่าน Supabase users table หรือ Local Storage สำรอง
