@@ -14,6 +14,7 @@ import { renderUsersView } from './users.js';
 import { renderBookingsView, openBookingModal } from './bookings.js';
 import { toast, ic, showModal, closeModal } from './api.js';
 import { supabase } from './supabase.js';
+import { initRealtime, onRealtimeChange } from './realtime.js';
 
 // กู้คืนฟังก์ชันปิด Modal สากล
 window.closeAppModal = closeModal;
@@ -78,6 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ตรวจสอบ Theme เริ่มต้น
   initTheme();
+
+  // เริ่มต้นการเชื่อมต่อ Realtime WebSocket สดกับ Supabase Cloud
+  initRealtime();
 
   // ล้างแคชข้อมูลจำลอง (Mock data) เก่าทั้งหมด เพื่อบังคับโหลด Realtime จาก Supabase Cloud 100%
   try {
@@ -177,6 +181,7 @@ export function setupSidebarMenu(user) {
 
 // สลับมุมมองหน้าจอใน Dashboard
 window.switchView = async function(viewName) {
+  window.currentAppView = viewName;
   const bodyEl = document.getElementById('app-content-body');
   if (!bodyEl) return;
 

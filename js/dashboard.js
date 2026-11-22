@@ -402,7 +402,8 @@ export function renderStaffDashboard() {
 }
 
 // Initialize Staff Dashboard & Bind Event Listeners
-async function initStaffDashboard() {
+export async function initStaffDashboard() {
+  if (typeof window !== 'undefined') window.initStaffDashboard = initStaffDashboard;
   // 1. Fetch real dormitory data from supabase to augment CRM cards
   try {
     const [

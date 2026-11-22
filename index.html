@@ -815,6 +815,11 @@
 
                     <!-- Right Controls -->
                     <div class="smoky-topbar-right">
+                        <!-- Realtime WebSocket Live Indicator -->
+                        <div id="realtime-status-pill" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 12px; font-size: 0.74rem; gap: 6px; height: 34px; background: rgba(52, 211, 153, 0.12); border: 1px solid rgba(52, 211, 153, 0.35); color: #34D399; cursor: pointer;" title="สถานะการเชื่อมต่อสด Supabase WebSocket (Realtime Live)">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px #34D399; display: inline-block;"></span>
+                            <span id="realtime-status-text">Realtime Live</span>
+                        </div>
                         <button class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 14px; font-size: 0.78rem; gap: 6px; height: 36px; background: rgba(255,255,255,0.08);" onclick="window.returnToLandingPage()" title="กลับหน้าแรกเว็บไซต์">
                             <svg class="icon" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
                             <span>หน้าแรกเว็บไซต์</span>

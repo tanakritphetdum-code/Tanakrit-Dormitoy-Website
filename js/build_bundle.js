@@ -8,6 +8,7 @@ const jsDir = path.resolve(rootDir, 'js');
 
 const files = [
   'supabase.js',
+  'realtime.js',
   'api.js',
   'auth.js',
   'utilities.js',
