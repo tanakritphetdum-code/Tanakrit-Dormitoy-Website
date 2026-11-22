@@ -86,6 +86,56 @@ export function fmtCurrency(num) {
   return Number(num).toLocaleString('th-TH') + ' ฿';
 }
 
+// แปลงตัวเลขเป็นข้อความภาษาไทย (Baht Text สำหรับใบเสร็จรับเงินทางการ)
+export function bahtText(num) {
+  if (!num || isNaN(num) || num <= 0) return 'ศูนย์บาทถ้วน';
+  const thaiNums = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+  const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+  
+  const parts = Number(num).toFixed(2).split('.');
+  let integerPart = parts[0];
+  let decimalPart = parts[1];
+  
+  function convertGroup(digits) {
+    let s = '';
+    const len = digits.length;
+    for (let i = 0; i < len; i++) {
+      const d = parseInt(digits[i], 10);
+      const pos = len - i - 1;
+      if (d !== 0) {
+        if (pos === 1 && d === 1) {
+          s += 'สิบ';
+        } else if (pos === 1 && d === 2) {
+          s += 'ยี่สิบ';
+        } else if (pos === 0 && d === 1 && len > 1 && digits[len - 2] !== '0') {
+          s += 'เอ็ด';
+        } else {
+          s += thaiNums[d] + units[pos];
+        }
+      }
+    }
+    return s;
+  }
+
+  let text = '';
+  if (integerPart.length > 6) {
+    const millions = integerPart.slice(0, -6);
+    integerPart = integerPart.slice(-6);
+    text += convertGroup(millions) + 'ล้าน';
+  }
+  text += convertGroup(integerPart) + 'บาท';
+  
+  if (decimalPart === '00' || !decimalPart) {
+    text += 'ถ้วน';
+  } else {
+    text += convertGroup(decimalPart) + 'สตางค์';
+  }
+  return text;
+}
+if (typeof window !== 'undefined') {
+  window.bahtText = bahtText;
+}
+
 // ระบบ Global Modal Dialog สวยงาม ไม่ต้องใช้ alert()
 export function showModal({ title, body, footer = '', maxWidth = '560px' }) {
   let modalBackdrop = document.getElementById('app-modal-backdrop');

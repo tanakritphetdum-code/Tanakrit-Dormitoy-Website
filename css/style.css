@@ -915,11 +915,44 @@ img, svg { display: block; max-width: 100%; }
 .toast-item.error { border-left-color: var(--danger); background: #2B1110; }
 .toast-item.info { border-left-color: var(--sky); }
 
-/* Print Media Query */
+/* Print Media Query สำหรับใบแจ้งหนี้ และใบเสร็จรับเงินทางการ */
 @media print {
-  body * { visibility: hidden; }
-  #printable-invoice, #printable-invoice * { visibility: visible; }
-  #printable-invoice { position: absolute; left: 0; top: 0; width: 100%; }
+  @page {
+    size: A4 portrait;
+    margin: 15mm 15mm 15mm 15mm;
+  }
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+  body * {
+    visibility: hidden;
+  }
+  #printable-invoice, #printable-invoice *,
+  #printable-receipt, #printable-receipt * {
+    visibility: visible;
+  }
+  #printable-invoice, #printable-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .modal-backdrop, .modal-dialog {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  .no-print, button, .modal-header, .modal-footer, #toast-root {
+    display: none !important;
+  }
 }
 
 /* ==================== PRISMA HERO THEME & LAYOUT ==================== */
