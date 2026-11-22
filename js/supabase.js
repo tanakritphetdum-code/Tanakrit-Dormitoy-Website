@@ -134,10 +134,51 @@ try {
   console.warn('Could not load local settings cache:', e);
 }
 
+// ดึงข้อมูลบัญชีพร้อมเพย์ (หมายเลข + ชื่อผู้รับเงิน)
+export function getPromptPayDetails() {
+  const settings = (typeof window !== 'undefined' && window.getCurrentSettings) ? window.getCurrentSettings() : cachedSettings;
+  const raw = settings?.promptpay_number || '086-946-1654';
+  if (raw.includes('|')) {
+    const parts = raw.split('|');
+    return {
+      number: parts[0].trim(),
+      name: parts.slice(1).join('|').trim() || 'นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก'
+    };
+  }
+  return {
+    number: raw.trim(),
+    name: 'นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก'
+  };
+}
+
+// อัปเดตข้อมูลบัญชีพร้อมเพย์ขึ้น Supabase Cloud
+export async function savePromptPayDetails(number, name) {
+  const cleanNumber = (number || '086-946-1654').trim();
+  const cleanName = (name || 'นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก').trim();
+  const combined = `${cleanNumber}|${cleanName}`;
+  
+  if (cachedSettings) {
+    cachedSettings.promptpay_number = combined;
+  }
+  try {
+    const saved = JSON.parse(localStorage.getItem(SETTINGS_CACHE_KEY) || '{}');
+    saved.promptpay_number = combined;
+    localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(saved));
+  } catch (_) {}
+
+  const res = await supabase.from('settings').eq('id', 'default').update({
+    promptpay_number: combined
+  });
+
+  return res;
+}
+
 // ผูกฟังก์ชันระดับ Window
 if (typeof window !== 'undefined') {
   window.applySettingsToLandingPage = applySettingsToLandingPage;
   window.getCurrentSettings = () => cachedSettings;
+  window.getPromptPayDetails = getPromptPayDetails;
+  window.savePromptPayDetails = savePromptPayDetails;
   applySettingsToLandingPage(cachedSettings);
 }
 

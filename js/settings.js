@@ -1,12 +1,13 @@
 // js/settings.js
 // ตั้งค่าระบบและบัญชีผู้ใช้งาน (System Settings)
 // ออกแบบด้วย Smoky Frosted Glass Design System
-import { supabase } from './supabase.js';
+import { supabase, getPromptPayDetails } from './supabase.js';
 import { ic, toast } from './api.js';
 import { currentUser } from './auth.js';
 
 export async function renderSettingsView() {
   const s = await supabase.getSettings();
+  const pp = getPromptPayDetails();
   const isAdmin = currentUser && currentUser.role === 'admin';
 
   setTimeout(() => {
@@ -123,9 +124,15 @@ export async function renderSettingsView() {
               </div>
             </div>
 
-            <div class="field" style="margin-bottom: 20px;">
-              <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">หมายเลขบัญชีพร้อมเพย์สำหรับรับโอนเงินค่าเช่า (PromptPay QR)</label>
-              <input type="text" id="set-promptpay" class="smoky-glass-input" value="${s.promptpay_number || '086-946-1654'}" style="width: 100%;">
+            <div class="smoky-grid-2" style="margin-bottom: 20px;">
+              <div class="field">
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">หมายเลขบัญชีพร้อมเพย์ (PromptPay No. / เบอร์โทรศัพท์ / เลข ปชช.) *</label>
+                <input type="text" id="set-promptpay" class="smoky-glass-input" value="${pp.number || '086-946-1654'}" placeholder="เช่น 086-946-1654" style="width: 100%;" required>
+              </div>
+              <div class="field">
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อบัญชีผู้รับเงิน / ผู้จัดการหอพัก (แสดงบน QR Code & ใบเสร็จ) *</label>
+                <input type="text" id="set-promptpay-name" class="smoky-glass-input" value="${pp.name || 'นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก'}" placeholder="เช่น นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก" style="width: 100%;" required>
+              </div>
             </div>
 
             <button type="submit" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); font-size: 0.82rem; font-weight: 600;">
@@ -243,7 +250,7 @@ function bindSettingsEvents() {
         common_fee: Number(document.getElementById('set-common-fee').value),
         phone: document.getElementById('set-phone').value.trim(),
         line_id: document.getElementById('set-line').value.trim(),
-        promptpay_number: document.getElementById('set-promptpay').value.trim()
+        promptpay_number: `${document.getElementById('set-promptpay').value.trim()}|${document.getElementById('set-promptpay-name').value.trim()}`
       };
 
       try {

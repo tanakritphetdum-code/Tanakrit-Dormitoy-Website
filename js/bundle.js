@@ -139,10 +139,51 @@ try {
   console.warn('Could not load local settings cache:', e);
 }
 
+// ดึงข้อมูลบัญชีพร้อมเพย์ (หมายเลข + ชื่อผู้รับเงิน)
+function getPromptPayDetails() {
+  const settings = (typeof window !== 'undefined' && window.getCurrentSettings) ? window.getCurrentSettings() : cachedSettings;
+  const raw = settings?.promptpay_number || '086-946-1654';
+  if (raw.includes('|')) {
+    const parts = raw.split('|');
+    return {
+      number: parts[0].trim(),
+      name: parts.slice(1).join('|').trim() || 'นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก'
+    };
+  }
+  return {
+    number: raw.trim(),
+    name: 'นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก'
+  };
+}
+
+// อัปเดตข้อมูลบัญชีพร้อมเพย์ขึ้น Supabase Cloud
+async function savePromptPayDetails(number, name) {
+  const cleanNumber = (number || '086-946-1654').trim();
+  const cleanName = (name || 'นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก').trim();
+  const combined = `${cleanNumber}|${cleanName}`;
+  
+  if (cachedSettings) {
+    cachedSettings.promptpay_number = combined;
+  }
+  try {
+    const saved = JSON.parse(localStorage.getItem(SETTINGS_CACHE_KEY) || '{}');
+    saved.promptpay_number = combined;
+    localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(saved));
+  } catch (_) {}
+
+  const res = await supabase.from('settings').eq('id', 'default').update({
+    promptpay_number: combined
+  });
+
+  return res;
+}
+
 // ผูกฟังก์ชันระดับ Window
 if (typeof window !== 'undefined') {
   window.applySettingsToLandingPage = applySettingsToLandingPage;
   window.getCurrentSettings = () => cachedSettings;
+  window.getPromptPayDetails = getPromptPayDetails;
+  window.savePromptPayDetails = savePromptPayDetails;
   applySettingsToLandingPage(cachedSettings);
 }
 
@@ -1065,7 +1106,11 @@ async function renderUtilitiesView() {
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <button class="smoky-round-glass-btn" id="btn-manage-promptpay" style="width: auto; border-radius: 9999px; padding: 0 15px; height: 38px; background: rgba(59,130,246,0.18); color: #60A5FA; border: 1px solid rgba(59,130,246,0.35); font-size: 0.82rem; font-weight: 600; gap: 6px;" title="ตั้งค่าบัญชีรับเงินพร้อมเพย์และชื่อผู้รับเงิน">
+            ${ic('gear')}
+            <span>บัญชีรับเงิน (PromptPay)</span>
+          </button>
           <button class="smoky-round-glass-btn" id="btn-batch-generate-bills" style="width: auto; border-radius: 9999px; padding: 0 16px; height: 38px; background: rgba(52,211,153,0.18); color: #34D399; border: 1px solid rgba(52,211,153,0.35); box-shadow: 0 0 16px rgba(52,211,153,0.2); font-size: 0.82rem; font-weight: 600; gap: 6px;" title="สร้างบิลอัตโนมัติประจำเดือนสำหรับ 17 ห้องพัก">
             ${ic('sparkles')}
             <span>⚡ สร้างบิลอัตโนมัติ 17 ห้อง</span>
@@ -1411,6 +1456,9 @@ function bindUtilitiesEvents() {
     };
   }
 
+  const btnPp = document.getElementById('btn-manage-promptpay');
+  if (btnPp) btnPp.onclick = openManagePromptPayModal;
+
   const btnBatch = document.getElementById('btn-batch-generate-bills');
   if (btnBatch) btnBatch.onclick = openBatchGenerateBillsModal;
 
@@ -1429,7 +1477,9 @@ function openInvoiceModal(bill) {
   const isPaid = bill.status === 'paid';
   const isVerifying = bill.status === 'verifying';
   const isAdminOrStaff = currentUser && (currentUser.role === 'admin' || currentUser.role === 'staff');
-  const qrMockUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PROMPTPAY-0869461654-AMOUNT-${bill.total_price}`;
+  const pp = getPromptPayDetails();
+  const cleanPpNum = (pp.number || '0869461654').replace(/[^0-9]/g, '');
+  const qrMockUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PROMPTPAY-${cleanPpNum}-AMOUNT-${bill.total_price}`;
 
   let statusBadgeHtml = '<div class="invoice-badge unpaid">รอชำระเงิน</div>';
   if (isPaid) {
@@ -1567,7 +1617,7 @@ function openInvoiceModal(bill) {
             <div style="font-size: 0.82rem; display: flex; flex-direction: column; gap: 6px;">
               <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
                 <span style="color: var(--muted);">บัญชีผู้รับเงิน:</span>
-                <strong style="color: #34D399;">พร้อมเพย์ 086-946-1654 (นายธนกฤษฎ์ เพชรดำ) ✅</strong>
+                <strong style="color: #34D399;">พร้อมเพย์ ${pp.number} (${pp.name}) ✅</strong>
               </div>
               <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
                 <span style="color: var(--muted);">ยอดโอนที่ตรวจพบ:</span>
@@ -1610,7 +1660,7 @@ function openInvoiceModal(bill) {
               📱 สแกนจ่ายผ่าน Thai QR PromptPay
             </div>
             <p class="smoky-modal-meta" style="font-size: 0.85rem; margin: 0 0 8px 0; line-height: 1.5;">
-              รองรับทุกแอปพลิเคชันธนาคาร (พร้อมเพย์: 086-946-1654 นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก)<br>
+              รองรับทุกแอปพลิเคชันธนาคาร (พร้อมเพย์: <strong>${pp.number} ${pp.name}</strong>)<br>
               เมื่อโอนชำระเรียบร้อย สามารถแนบสลิปด้านล่างเพื่อให้ระบบและเจ้าหน้าที่อนุมัติทันที
             </p>
           </div>
@@ -2018,6 +2068,7 @@ function openOfficialReceiptModal(bill) {
     bldName = 'อาคาร กิ่งเพชร (KingPhetch)';
   }
 
+  const pp = getPromptPayDetails();
   const receiptNo = `RC-${(bill.billing_month || '202611').replace(/[^0-9]/g, '')}-${bill.room_number}`;
   const receiptDate = fmtDate(bill.paid_at || bill.slip_uploaded_at || bill.created_at || new Date().toISOString());
   const grandTotal = bill.total_price || 0;
@@ -2069,7 +2120,7 @@ function openOfficialReceiptModal(bill) {
             ${bill.month_label || bill.billing_month}
           </div>
           <div style="color: #059669; font-size: 0.82rem; font-weight: 600; margin-top: 3px;">
-            ช่องทางรับเงิน: Thai QR PromptPay (086-946-1654)
+            ช่องทางรับเงิน: Thai QR PromptPay (${pp.number} ${pp.name})
           </div>
         </div>
       </div>
@@ -2172,10 +2223,10 @@ function openOfficialReceiptModal(bill) {
         <!-- Right: Manager Signature -->
         <div style="text-align: center; width: 220px;">
           <div style="font-family: 'Brush Script MT', cursive, sans-serif; font-size: 1.4rem; color: #0f766e; line-height: 1; margin-bottom: 4px;">
-            ธนกฤษฎ์ เพชรดำ
+            ${pp.name.replace(/ผู้จัดการ.*/, '').replace(/\(.*\)/, '').trim() || 'ธนกฤษฎ์ เพชรดำ'}
           </div>
           <div style="border-top: 1px dotted #94a3b8; padding-top: 6px; font-size: 0.82rem; color: #334155; font-weight: 700;">
-            ( นายธนกฤษฎ์ เพชรดำ )
+            ( ${pp.name} )
           </div>
           <div style="font-size: 0.76rem; color: #64748b;">
             ผู้จัดการหอพักธนกฤษฎ์
@@ -2504,8 +2555,117 @@ async function openBatchGenerateBillsModal() {
   }
 }
 
+// ==========================================
+// ระบบจัดการบัญชีผู้รับเงินพร้อมเพย์ (PromptPay Management Modal)
+// ==========================================
+function openManagePromptPayModal() {
+  const pp = getPromptPayDetails();
+
+  const body = `
+    <form id="form-manage-promptpay" style="display: flex; flex-direction: column; gap: 16px;">
+      
+      <div style="background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.25); border-radius: 12px; padding: 14px 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">📱</span>
+          <div>
+            <div style="font-weight: 700; color: #60A5FA; font-size: 0.95rem;">
+              ตั้งค่าบัญชีรับเงินพร้อมเพย์ (PromptPay Settings)
+            </div>
+            <div style="font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 2px;">
+              กำหนดหมายเลขและชื่อบัญชีผู้รับเงิน ข้อมูลนี้จะแสดงบน QR Code สแกนจ่าย, ใบแจ้งหนี้, และใบเสร็จรับเงินทางการทันที
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">หมายเลขพร้อมเพย์ (เบอร์โทรศัพท์มือถือ หรือเลขประจำตัวประชาชน) *</label>
+        <input type="text" id="pp-input-number" class="smoky-glass-input" value="${pp.number}" placeholder="เช่น 086-946-1654" style="width: 100%; font-size: 1.05rem; font-weight: 600; letter-spacing: 0.03em;" required>
+        <small style="color: rgba(255,255,255,0.45); font-size: 0.75rem; margin-top: 4px; display: block;">ระบบจะนำเบอร์นี้ไปสร้าง PromptPay QR Code ให้อัตโนมัติ</small>
+      </div>
+
+      <div class="field">
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ชื่อบัญชีผู้รับเงิน / ผู้จัดการหอพัก (ผู้มีอำนาจลงนาม) *</label>
+        <input type="text" id="pp-input-name" class="smoky-glass-input" value="${pp.name}" placeholder="เช่น นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก" style="width: 100%; font-size: 0.95rem;" required>
+        <small style="color: rgba(255,255,255,0.45); font-size: 0.75rem; margin-top: 4px; display: block;">ใช้สำหรับยืนยันชื่อในระบบตรวจสลิป และพิมพ์ลงในลายมือชื่อใบเสร็จ</small>
+      </div>
+
+      <!-- Live Preview Box -->
+      <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 14px 16px;">
+        <div style="font-size: 0.76rem; color: rgba(255,255,255,0.5); font-weight: 600; text-transform: uppercase; margin-bottom: 6px;">
+          ตัวอย่างข้อความที่จะแสดงแก่ผู้พักอาศัย:
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="color: #34D399; font-weight: 700;">✓</span>
+          <span style="font-size: 0.88rem; color: #ffffff;" id="pp-preview-text">
+            พร้อมเพย์: <strong style="color: #60A5FA;">${pp.number}</strong> (<span style="color: #34D399;">${pp.name}</span>)
+          </span>
+        </div>
+      </div>
+
+    </form>
+  `;
+
+  const footer = `
+    <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ยกเลิก</button>
+    <button type="button" class="btn btn-primary" id="btn-save-pp-settings" style="background: #3B82F6; border-color: #3B82F6; font-weight: 600;">
+      💾 บันทึกข้อมูลบัญชีรับเงิน
+    </button>
+  `;
+
+  showModal({
+    title: '⚙️ จัดการบัญชีผู้รับเงินค่าเช่า (PromptPay Management)',
+    body,
+    footer,
+    maxWidth: '560px'
+  });
+
+  const numInput = document.getElementById('pp-input-number');
+  const nameInput = document.getElementById('pp-input-name');
+  const previewText = document.getElementById('pp-preview-text');
+
+  const updatePreview = () => {
+    const n = numInput ? numInput.value.trim() : pp.number;
+    const nm = nameInput ? nameInput.value.trim() : pp.name;
+    if (previewText) {
+      previewText.innerHTML = `พร้อมเพย์: <strong style="color: #60A5FA;">${n || '-'}</strong> (<span style="color: #34D399;">${nm || '-'}</span>)`;
+    }
+  };
+
+  if (numInput) numInput.oninput = updatePreview;
+  if (nameInput) nameInput.oninput = updatePreview;
+
+  const btnSave = document.getElementById('btn-save-pp-settings');
+  if (btnSave) {
+    btnSave.onclick = async () => {
+      const number = numInput.value.trim();
+      const name = nameInput.value.trim();
+
+      if (!number || !name) {
+        toast('กรุณากรอกทั้งหมายเลขพร้อมเพย์ และชื่อบัญชีผู้รับเงิน', 'error');
+        return;
+      }
+
+      btnSave.disabled = true;
+      btnSave.textContent = '⏳ กำลังบันทึกลง Supabase Cloud...';
+
+      try {
+        await savePromptPayDetails(number, name);
+        toast(`บันทึกบัญชีรับเงิน "${number} (${name})" เรียบร้อยแล้ว`, 'success');
+        closeModal();
+        if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
+      } catch (err) {
+        toast('เกิดข้อผิดพลาดในการบันทึก: ' + err.message, 'error');
+        btnSave.disabled = false;
+        btnSave.textContent = '💾 บันทึกข้อมูลบัญชีรับเงิน';
+      }
+    };
+  }
+}
+
 // ผูกฟังก์ชัน Global
 if (typeof window !== 'undefined') {
+  window.openManagePromptPayModal = openManagePromptPayModal;
   window.openBatchGenerateBillsModal = openBatchGenerateBillsModal;
   window.openOfficialReceiptModal = openOfficialReceiptModal;
   window.printInvoice = () => window.print();
@@ -7775,6 +7935,7 @@ function openUserModal(user = null) {
 // ออกแบบด้วย Smoky Frosted Glass Design System
 async function renderSettingsView() {
   const s = await supabase.getSettings();
+  const pp = getPromptPayDetails();
   const isAdmin = currentUser && currentUser.role === 'admin';
 
   setTimeout(() => {
@@ -7891,9 +8052,15 @@ async function renderSettingsView() {
               </div>
             </div>
 
-            <div class="field" style="margin-bottom: 20px;">
-              <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">หมายเลขบัญชีพร้อมเพย์สำหรับรับโอนเงินค่าเช่า (PromptPay QR)</label>
-              <input type="text" id="set-promptpay" class="smoky-glass-input" value="${s.promptpay_number || '086-946-1654'}" style="width: 100%;">
+            <div class="smoky-grid-2" style="margin-bottom: 20px;">
+              <div class="field">
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">หมายเลขบัญชีพร้อมเพย์ (PromptPay No. / เบอร์โทรศัพท์ / เลข ปชช.) *</label>
+                <input type="text" id="set-promptpay" class="smoky-glass-input" value="${pp.number || '086-946-1654'}" placeholder="เช่น 086-946-1654" style="width: 100%;" required>
+              </div>
+              <div class="field">
+                <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ชื่อบัญชีผู้รับเงิน / ผู้จัดการหอพัก (แสดงบน QR Code & ใบเสร็จ) *</label>
+                <input type="text" id="set-promptpay-name" class="smoky-glass-input" value="${pp.name || 'นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก'}" placeholder="เช่น นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก" style="width: 100%;" required>
+              </div>
             </div>
 
             <button type="submit" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); font-size: 0.82rem; font-weight: 600;">
@@ -8011,7 +8178,7 @@ function bindSettingsEvents() {
         common_fee: Number(document.getElementById('set-common-fee').value),
         phone: document.getElementById('set-phone').value.trim(),
         line_id: document.getElementById('set-line').value.trim(),
-        promptpay_number: document.getElementById('set-promptpay').value.trim()
+        promptpay_number: `${document.getElementById('set-promptpay').value.trim()}|${document.getElementById('set-promptpay-name').value.trim()}`
       };
 
       try {
