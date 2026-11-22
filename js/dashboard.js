@@ -456,7 +456,7 @@ export async function initStaffDashboard() {
     updateParcelsWidgetUI(parcels);
 
     const totalPaidBills = bills.filter(b => b.status === 'paid').reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0);
-    const totalExpectedBills = bills.reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0) || (occupiedCount * 2800);
+    const totalExpectedBills = bills.reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0) || (occupiedCount * 1500);
     const pendingTickets = tickets.filter(t => t.status !== 'completed').length;
     const completedTickets = tickets.filter(t => t.status === 'completed').length;
 

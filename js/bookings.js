@@ -39,9 +39,9 @@ export function openBookingModal(preselectedType = '') {
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">อาคารและห้องพักที่สนใจ *</label>
           <select id="bk-type" class="smoky-glass-select" required style="width: 100%; height: 42px; border-radius: 8px;">
-            <option value="อาคาร ธนกฤษฎ์ (2,800 ฿)" ${preselectedType.includes('Tanakrit') || preselectedType.includes('ธนกฤษฎ์') ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 2,800 ฿/เดือน</option>
-            <option value="อาคาร กิ่งเพชร (2,600 ฿)" ${preselectedType.includes('KingPhetch') || preselectedType.includes('กิ่งเพชร') ? 'selected' : ''}>อาคาร กิ่งเพชร (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 2,600 ฿/เดือน</option>
-            <option value="อาคาร ใต้บ้าน (1,500 ฿)" ${preselectedType.includes('UnderGround') || preselectedType.includes('ใต้บ้าน') ? 'selected' : ''}>อาคาร ใต้บ้าน (ห้องพัดลม 12 ตร.ม. ห้องน้ำรวม) 1,500 ฿/เดือน</option>
+            <option value="อาคาร ธนกฤษฎ์ (1,500 ฿)" ${preselectedType.includes('Tanakrit') || preselectedType.includes('ธนกฤษฎ์') ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 1,500 ฿/เดือน</option>
+            <option value="อาคาร กิ่งเพชร (1,500 ฿)" ${preselectedType.includes('KingPhetch') || preselectedType.includes('กิ่งเพชร') ? 'selected' : ''}>อาคาร กิ่งเพชร (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 1,500 ฿/เดือน</option>
+            <option value="อาคาร ใต้บ้าน (800 ฿)" ${preselectedType.includes('UnderGround') || preselectedType.includes('ใต้บ้าน') ? 'selected' : ''}>อาคาร ใต้บ้าน (ห้องพัดลม 12 ตร.ม. ห้องน้ำรวม) 800 ฿/เดือน</option>
           </select>
         </div>
       </div>

@@ -12,125 +12,125 @@ const CACHE_KEY = 'tanakrit_rooms_cache_v3';
 
 // รายชื่อห้องพักมาตรฐานทั้ง 17 ห้อง (3 อาคาร) ตามโครงสร้างจริงและราคาที่ถูกต้องของหอพัก
 export const DEFAULT_ROOMS = [
-  // 1. อาคาร ธนกฤษฎ์ (9 ห้อง: 101 - 109) — 2,800 บาท/เดือน
+  // 1. อาคาร ธนกฤษฎ์ (9 ห้อง: 101 - 109) — 1,500 บาท/เดือน
   { 
-    id: 'RM-T101', room_number: '101', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T101', room_number: '101', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T102', room_number: '102', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T102', room_number: '102', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T103', room_number: '103', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T103', room_number: '103', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T104', room_number: '104', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T104', room_number: '104', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T105', room_number: '105', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T105', room_number: '105', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T106', room_number: '106', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T106', room_number: '106', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T107', room_number: '107', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T107', room_number: '107', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'maintenance', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T108', room_number: '108', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T108', room_number: '108', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T109', room_number: '109', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T109', room_number: '109', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
 
-  // 2. อาคาร กิ่งเพชร (5 ห้อง: 201 - 205) — 2,600 บาท/เดือน
+  // 2. อาคาร กิ่งเพชร (5 ห้อง: 201 - 205) — 1,500 บาท/เดือน
   { 
-    id: 'RM-K201', room_number: '201', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K201', room_number: '201', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
-    id: 'RM-K202', room_number: '202', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K202', room_number: '202', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
-    id: 'RM-K203', room_number: '203', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K203', room_number: '203', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
-    id: 'RM-K204', room_number: '204', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K204', room_number: '204', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
-    id: 'RM-K205', room_number: '205', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K205', room_number: '205', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
 
-  // 3. อาคาร ใต้บ้าน (3 ห้อง: B01 - B03) — 1,500 บาท/เดือน
+  // 3. อาคาร ใต้บ้าน (3 ห้อง: B01 - B03) — 800 บาท/เดือน
   { 
-    id: 'RM-UG01', room_number: 'B01', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
+    id: 'RM-UG01', room_number: 'B01', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 800, 
     size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
   },
   { 
-    id: 'RM-UG02', room_number: 'B02', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
+    id: 'RM-UG02', room_number: 'B02', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 800, 
     size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
   },
   { 
-    id: 'RM-UG03', room_number: 'B03', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
+    id: 'RM-UG03', room_number: 'B03', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 800, 
     size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
@@ -552,9 +552,9 @@ function openManageRoomModal(room, allRooms) {
         <div class="field">
           <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">อาคาร</label>
           <select id="m-building" class="form-select" style="width: 100%;">
-            <option value="Tanakrit" ${room.building === 'Tanakrit' ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (2,800 ฿ / เดือน)</option>
-            <option value="KingPhetch" ${room.building === 'KingPhetch' ? 'selected' : ''}>อาคาร กิ่งเพชร (2,600 ฿ / เดือน)</option>
-            <option value="UnderGround" ${room.building === 'UnderGround' ? 'selected' : ''}>อาคาร ใต้บ้าน (1,500 ฿ / เดือน)</option>
+            <option value="Tanakrit" ${room.building === 'Tanakrit' ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (1,500 ฿ / เดือน)</option>
+            <option value="KingPhetch" ${room.building === 'KingPhetch' ? 'selected' : ''}>อาคาร กิ่งเพชร (1,500 ฿ / เดือน)</option>
+            <option value="UnderGround" ${room.building === 'UnderGround' ? 'selected' : ''}>อาคาร ใต้บ้าน (800 ฿ / เดือน)</option>
           </select>
         </div>
       </div>
@@ -707,9 +707,9 @@ function openAddRoomModal() {
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">อาคาร</label>
           <select id="add-building" class="smoky-glass-select" style="width: 100%;">
-            <option value="Tanakrit">อาคาร ธนกฤษฎ์ (2,800 ฿ / เดือน)</option>
-            <option value="KingPhetch">อาคาร กิ่งเพชร (2,600 ฿ / เดือน)</option>
-            <option value="UnderGround">อาคาร ใต้บ้าน (1,500 ฿ / เดือน)</option>
+            <option value="Tanakrit">อาคาร ธนกฤษฎ์ (1,500 ฿ / เดือน)</option>
+            <option value="KingPhetch">อาคาร กิ่งเพชร (1,500 ฿ / เดือน)</option>
+            <option value="UnderGround">อาคาร ใต้บ้าน (800 ฿ / เดือน)</option>
           </select>
         </div>
       </div>
@@ -721,7 +721,7 @@ function openAddRoomModal() {
         </div>
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
-          <input type="number" id="add-price" value="2800" class="smoky-glass-input" style="width: 100%;" required>
+          <input type="number" id="add-price" value="1500" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
@@ -769,15 +769,15 @@ function openAddRoomModal() {
     bldSelect.onchange = () => {
       const val = bldSelect.value;
       if (val === 'UnderGround') {
-        document.getElementById('add-price').value = 1500;
+        document.getElementById('add-price').value = 800;
         document.getElementById('add-size').value = 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)';
         document.getElementById('add-bathroom').value = 'ห้องน้ำรวม';
       } else if (val === 'KingPhetch') {
-        document.getElementById('add-price').value = 2600;
+        document.getElementById('add-price').value = 1500;
         document.getElementById('add-size').value = 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)';
         document.getElementById('add-bathroom').value = 'ห้องน้ำในตัว';
       } else {
-        document.getElementById('add-price').value = 2800;
+        document.getElementById('add-price').value = 1500;
         document.getElementById('add-size').value = 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)';
         document.getElementById('add-bathroom').value = 'ห้องน้ำในตัว';
       }

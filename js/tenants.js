@@ -18,11 +18,11 @@ export const DEFAULT_TENANTS = [];
 export function getBuildingInfo(roomNum) {
   const r = (roomNum || '').toString().trim().toUpperCase();
   if (r.startsWith('B') || r.startsWith('ใต้บ้าน')) {
-    return { name: 'UnderGround', nameTh: 'อาคาร ใต้บ้าน', rent: 1500, color: '#10B981', badge: '🚗 อาคาร ใต้บ้าน' };
+    return { name: 'UnderGround', nameTh: 'อาคาร ใต้บ้าน', rent: 800, color: '#10B981', badge: '🚗 อาคาร ใต้บ้าน' };
   } else if (r.startsWith('2')) {
-    return { name: 'KingPhetch', nameTh: 'อาคาร กิ่งเพชร', rent: 2600, color: '#3B82F6', badge: '🏡 อาคาร กิ่งเพชร' };
+    return { name: 'KingPhetch', nameTh: 'อาคาร กิ่งเพชร', rent: 1500, color: '#3B82F6', badge: '🏡 อาคาร กิ่งเพชร' };
   } else {
-    return { name: 'Tanakrit', nameTh: 'อาคาร ธนกฤษฎ์', rent: 2800, color: '#8B5CF6', badge: '🏢 อาคาร ธนกฤษฎ์' };
+    return { name: 'Tanakrit', nameTh: 'อาคาร ธนกฤษฎ์', rent: 1500, color: '#8B5CF6', badge: '🏢 อาคาร ธนกฤษฎ์' };
   }
 }
 
@@ -696,17 +696,17 @@ export function openEditTenantModal(tenant) {
         <div>
           <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ห้องพัก (ทั้ง 17 ห้อง) *</label>
           <select id="ed-tenant-room" class="smoky-glass-input" style="width: 100%; height: 38px;">
-            <optgroup label="🏢 อาคาร ธนกฤษฎ์ (2,800 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🏢 อาคาร ธนกฤษฎ์ (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
               ${['101', '102', '103', '104', '105', '106', '107', '108', '109'].map(r => `
                 <option value="${r}" ${tenant.room === r ? 'selected' : ''}>ห้อง ${r} (อาคาร ธนกฤษฎ์)</option>
               `).join('')}
             </optgroup>
-            <optgroup label="🏡 อาคาร กิ่งเพชร (2,600 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🏡 อาคาร กิ่งเพชร (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
               ${['201', '202', '203', '204', '205'].map(r => `
                 <option value="${r}" ${tenant.room === r ? 'selected' : ''}>ห้อง ${r} (อาคาร กิ่งเพชร)</option>
               `).join('')}
             </optgroup>
-            <optgroup label="🚗 อาคาร ใต้บ้าน (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🚗 อาคาร ใต้บ้าน (800 ฿/เดือน)" style="background: #141a29; color: white;">
               ${['B01', 'B02', 'B03'].map(r => `
                 <option value="${r}" ${tenant.room === r ? 'selected' : ''}>ห้อง ${r} (อาคาร ใต้บ้าน)</option>
               `).join('')}
@@ -875,7 +875,7 @@ export function openAddTenantModal() {
         <div>
           <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">เลือกห้องพัก (ทั้ง 17 ห้อง) *</label>
           <select id="add-tenant-room" class="smoky-glass-input" style="width: 100%; height: 38px;">
-            <optgroup label="🏢 อาคาร ธนกฤษฎ์ (2,800 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🏢 อาคาร ธนกฤษฎ์ (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
               <option value="107">ห้อง 107 (กำลังตรวจเช็ก)</option>
               <option value="108" selected>ห้อง 108 (ห้องว่างพร้อมอยู่)</option>
               <option value="109">ห้อง 109 (ห้องว่างพร้อมอยู่)</option>
@@ -886,14 +886,14 @@ export function openAddTenantModal() {
               <option value="105">ห้อง 105</option>
               <option value="106">ห้อง 106</option>
             </optgroup>
-            <optgroup label="🏡 อาคาร กิ่งเพชร (2,600 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🏡 อาคาร กิ่งเพชร (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
               <option value="204">ห้อง 204 (ห้องว่างพร้อมอยู่)</option>
               <option value="205">ห้อง 205 (ห้องว่างพร้อมอยู่)</option>
               <option value="201">ห้อง 201</option>
               <option value="202">ห้อง 202</option>
               <option value="203">ห้อง 203</option>
             </optgroup>
-            <optgroup label="🚗 อาคาร ใต้บ้าน (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🚗 อาคาร ใต้บ้าน (800 ฿/เดือน)" style="background: #141a29; color: white;">
               <option value="B03">ห้อง B03 (ห้องว่างพร้อมอยู่)</option>
               <option value="B01">ห้อง B01</option>
               <option value="B02">ห้อง B02</option>

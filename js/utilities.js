@@ -833,7 +833,7 @@ async function openAddMeterModal() {
         </div>
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ค่าเช่าห้องพัก (บาท/เดือน)</label>
-          <input type="number" id="mr-room-price" value="2800" class="smoky-glass-input" style="width: 100%;" required>
+          <input type="number" id="mr-room-price" value="1500" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
@@ -1300,7 +1300,7 @@ export async function openBatchGenerateBillsModal() {
               ระบบสร้างบิลประจำเดือนอัตโนมัติทั้ง 17 ห้อง (3 อาคาร)
             </div>
             <div style="font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 2px;">
-              ดึงข้อมูลผู้เช่าและราคาห้องพักอัตโนมัติ (ธนกฤษฎ์ 2,800฿ · กิ่งเพชร 2,600฿ · ใต้บ้าน 1,500฿) + ค่าบริการคงที่ 70฿ + จดมิเตอร์ต่อเนื่อง
+              ดึงข้อมูลผู้เช่าและราคาห้องพักอัตโนมัติ (ธนกฤษฎ์ 1,500฿ · กิ่งเพชร 1,500฿ · ใต้บ้าน 800฿) + ค่าบริการคงที่ 70฿ + จดมิเตอร์ต่อเนื่อง
             </div>
           </div>
         </div>

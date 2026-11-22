@@ -1905,7 +1905,7 @@ async function openAddMeterModal() {
         </div>
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ค่าเช่าห้องพัก (บาท/เดือน)</label>
-          <input type="number" id="mr-room-price" value="2800" class="smoky-glass-input" style="width: 100%;" required>
+          <input type="number" id="mr-room-price" value="1500" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
@@ -2372,7 +2372,7 @@ async function openBatchGenerateBillsModal() {
               ระบบสร้างบิลประจำเดือนอัตโนมัติทั้ง 17 ห้อง (3 อาคาร)
             </div>
             <div style="font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 2px;">
-              ดึงข้อมูลผู้เช่าและราคาห้องพักอัตโนมัติ (ธนกฤษฎ์ 2,800฿ · กิ่งเพชร 2,600฿ · ใต้บ้าน 1,500฿) + ค่าบริการคงที่ 70฿ + จดมิเตอร์ต่อเนื่อง
+              ดึงข้อมูลผู้เช่าและราคาห้องพักอัตโนมัติ (ธนกฤษฎ์ 1,500฿ · กิ่งเพชร 1,500฿ · ใต้บ้าน 800฿) + ค่าบริการคงที่ 70฿ + จดมิเตอร์ต่อเนื่อง
             </div>
           </div>
         </div>
@@ -2687,125 +2687,125 @@ const CACHE_KEY = 'tanakrit_rooms_cache_v3';
 
 // รายชื่อห้องพักมาตรฐานทั้ง 17 ห้อง (3 อาคาร) ตามโครงสร้างจริงและราคาที่ถูกต้องของหอพัก
 const DEFAULT_ROOMS = [
-  // 1. อาคาร ธนกฤษฎ์ (9 ห้อง: 101 - 109) — 2,800 บาท/เดือน
+  // 1. อาคาร ธนกฤษฎ์ (9 ห้อง: 101 - 109) — 1,500 บาท/เดือน
   { 
-    id: 'RM-T101', room_number: '101', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T101', room_number: '101', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T102', room_number: '102', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T102', room_number: '102', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T103', room_number: '103', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T103', room_number: '103', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T104', room_number: '104', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T104', room_number: '104', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T105', room_number: '105', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T105', room_number: '105', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T106', room_number: '106', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T106', room_number: '106', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T107', room_number: '107', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T107', room_number: '107', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'maintenance', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T108', room_number: '108', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T108', room_number: '108', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
   { 
-    id: 'RM-T109', room_number: '109', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 2800, 
+    id: 'RM-T109', room_number: '109', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
   },
 
-  // 2. อาคาร กิ่งเพชร (5 ห้อง: 201 - 205) — 2,600 บาท/เดือน
+  // 2. อาคาร กิ่งเพชร (5 ห้อง: 201 - 205) — 1,500 บาท/เดือน
   { 
-    id: 'RM-K201', room_number: '201', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K201', room_number: '201', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
-    id: 'RM-K202', room_number: '202', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K202', room_number: '202', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
-    id: 'RM-K203', room_number: '203', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K203', room_number: '203', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
-    id: 'RM-K204', room_number: '204', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K204', room_number: '204', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
   { 
-    id: 'RM-K205', room_number: '205', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 2600, 
+    id: 'RM-K205', room_number: '205', building: 'KingPhetch', floor: 1, type: 'ห้องพัดลม', price: 1500, 
     size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ราวตากผ้าหลังห้อง' 
   },
 
-  // 3. อาคาร ใต้บ้าน (3 ห้อง: B01 - B03) — 1,500 บาท/เดือน
+  // 3. อาคาร ใต้บ้าน (3 ห้อง: B01 - B03) — 800 บาท/เดือน
   { 
-    id: 'RM-UG01', room_number: 'B01', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
+    id: 'RM-UG01', room_number: 'B01', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 800, 
     size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
   },
   { 
-    id: 'RM-UG02', room_number: 'B02', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
+    id: 'RM-UG02', room_number: 'B02', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 800, 
     size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
   },
   { 
-    id: 'RM-UG03', room_number: 'B03', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 1500, 
+    id: 'RM-UG03', room_number: 'B03', building: 'UnderGround', floor: 0, type: 'ห้องพัดลม', price: 800, 
     size: 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)', bathroom: 'ห้องน้ำรวม', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'ราคาสบายกระเป๋า เฟอร์นิเจอร์พร้อมอยู่', 
@@ -3226,9 +3226,9 @@ function openManageRoomModal(room, allRooms) {
         <div class="field">
           <label style="font-size: 0.80rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 6px; display: block;">อาคาร</label>
           <select id="m-building" class="form-select" style="width: 100%;">
-            <option value="Tanakrit" ${room.building === 'Tanakrit' ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (2,800 ฿ / เดือน)</option>
-            <option value="KingPhetch" ${room.building === 'KingPhetch' ? 'selected' : ''}>อาคาร กิ่งเพชร (2,600 ฿ / เดือน)</option>
-            <option value="UnderGround" ${room.building === 'UnderGround' ? 'selected' : ''}>อาคาร ใต้บ้าน (1,500 ฿ / เดือน)</option>
+            <option value="Tanakrit" ${room.building === 'Tanakrit' ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (1,500 ฿ / เดือน)</option>
+            <option value="KingPhetch" ${room.building === 'KingPhetch' ? 'selected' : ''}>อาคาร กิ่งเพชร (1,500 ฿ / เดือน)</option>
+            <option value="UnderGround" ${room.building === 'UnderGround' ? 'selected' : ''}>อาคาร ใต้บ้าน (800 ฿ / เดือน)</option>
           </select>
         </div>
       </div>
@@ -3381,9 +3381,9 @@ function openAddRoomModal() {
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">อาคาร</label>
           <select id="add-building" class="smoky-glass-select" style="width: 100%;">
-            <option value="Tanakrit">อาคาร ธนกฤษฎ์ (2,800 ฿ / เดือน)</option>
-            <option value="KingPhetch">อาคาร กิ่งเพชร (2,600 ฿ / เดือน)</option>
-            <option value="UnderGround">อาคาร ใต้บ้าน (1,500 ฿ / เดือน)</option>
+            <option value="Tanakrit">อาคาร ธนกฤษฎ์ (1,500 ฿ / เดือน)</option>
+            <option value="KingPhetch">อาคาร กิ่งเพชร (1,500 ฿ / เดือน)</option>
+            <option value="UnderGround">อาคาร ใต้บ้าน (800 ฿ / เดือน)</option>
           </select>
         </div>
       </div>
@@ -3395,7 +3395,7 @@ function openAddRoomModal() {
         </div>
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ราคาค่าเช่าต่อเดือน (บาท)</label>
-          <input type="number" id="add-price" value="2800" class="smoky-glass-input" style="width: 100%;" required>
+          <input type="number" id="add-price" value="1500" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
@@ -3443,15 +3443,15 @@ function openAddRoomModal() {
     bldSelect.onchange = () => {
       const val = bldSelect.value;
       if (val === 'UnderGround') {
-        document.getElementById('add-price').value = 1500;
+        document.getElementById('add-price').value = 800;
         document.getElementById('add-size').value = 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)';
         document.getElementById('add-bathroom').value = 'ห้องน้ำรวม';
       } else if (val === 'KingPhetch') {
-        document.getElementById('add-price').value = 2600;
+        document.getElementById('add-price').value = 1500;
         document.getElementById('add-size').value = 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)';
         document.getElementById('add-bathroom').value = 'ห้องน้ำในตัว';
       } else {
-        document.getElementById('add-price').value = 2800;
+        document.getElementById('add-price').value = 1500;
         document.getElementById('add-size').value = 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)';
         document.getElementById('add-bathroom').value = 'ห้องน้ำในตัว';
       }
@@ -3535,11 +3535,11 @@ const DEFAULT_TENANTS = [];
 function getBuildingInfo(roomNum) {
   const r = (roomNum || '').toString().trim().toUpperCase();
   if (r.startsWith('B') || r.startsWith('ใต้บ้าน')) {
-    return { name: 'UnderGround', nameTh: 'อาคาร ใต้บ้าน', rent: 1500, color: '#10B981', badge: '🚗 อาคาร ใต้บ้าน' };
+    return { name: 'UnderGround', nameTh: 'อาคาร ใต้บ้าน', rent: 800, color: '#10B981', badge: '🚗 อาคาร ใต้บ้าน' };
   } else if (r.startsWith('2')) {
-    return { name: 'KingPhetch', nameTh: 'อาคาร กิ่งเพชร', rent: 2600, color: '#3B82F6', badge: '🏡 อาคาร กิ่งเพชร' };
+    return { name: 'KingPhetch', nameTh: 'อาคาร กิ่งเพชร', rent: 1500, color: '#3B82F6', badge: '🏡 อาคาร กิ่งเพชร' };
   } else {
-    return { name: 'Tanakrit', nameTh: 'อาคาร ธนกฤษฎ์', rent: 2800, color: '#8B5CF6', badge: '🏢 อาคาร ธนกฤษฎ์' };
+    return { name: 'Tanakrit', nameTh: 'อาคาร ธนกฤษฎ์', rent: 1500, color: '#8B5CF6', badge: '🏢 อาคาร ธนกฤษฎ์' };
   }
 }
 
@@ -4213,17 +4213,17 @@ function openEditTenantModal(tenant) {
         <div>
           <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ห้องพัก (ทั้ง 17 ห้อง) *</label>
           <select id="ed-tenant-room" class="smoky-glass-input" style="width: 100%; height: 38px;">
-            <optgroup label="🏢 อาคาร ธนกฤษฎ์ (2,800 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🏢 อาคาร ธนกฤษฎ์ (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
               ${['101', '102', '103', '104', '105', '106', '107', '108', '109'].map(r => `
                 <option value="${r}" ${tenant.room === r ? 'selected' : ''}>ห้อง ${r} (อาคาร ธนกฤษฎ์)</option>
               `).join('')}
             </optgroup>
-            <optgroup label="🏡 อาคาร กิ่งเพชร (2,600 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🏡 อาคาร กิ่งเพชร (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
               ${['201', '202', '203', '204', '205'].map(r => `
                 <option value="${r}" ${tenant.room === r ? 'selected' : ''}>ห้อง ${r} (อาคาร กิ่งเพชร)</option>
               `).join('')}
             </optgroup>
-            <optgroup label="🚗 อาคาร ใต้บ้าน (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🚗 อาคาร ใต้บ้าน (800 ฿/เดือน)" style="background: #141a29; color: white;">
               ${['B01', 'B02', 'B03'].map(r => `
                 <option value="${r}" ${tenant.room === r ? 'selected' : ''}>ห้อง ${r} (อาคาร ใต้บ้าน)</option>
               `).join('')}
@@ -4392,7 +4392,7 @@ function openAddTenantModal() {
         <div>
           <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">เลือกห้องพัก (ทั้ง 17 ห้อง) *</label>
           <select id="add-tenant-room" class="smoky-glass-input" style="width: 100%; height: 38px;">
-            <optgroup label="🏢 อาคาร ธนกฤษฎ์ (2,800 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🏢 อาคาร ธนกฤษฎ์ (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
               <option value="107">ห้อง 107 (กำลังตรวจเช็ก)</option>
               <option value="108" selected>ห้อง 108 (ห้องว่างพร้อมอยู่)</option>
               <option value="109">ห้อง 109 (ห้องว่างพร้อมอยู่)</option>
@@ -4403,14 +4403,14 @@ function openAddTenantModal() {
               <option value="105">ห้อง 105</option>
               <option value="106">ห้อง 106</option>
             </optgroup>
-            <optgroup label="🏡 อาคาร กิ่งเพชร (2,600 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🏡 อาคาร กิ่งเพชร (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
               <option value="204">ห้อง 204 (ห้องว่างพร้อมอยู่)</option>
               <option value="205">ห้อง 205 (ห้องว่างพร้อมอยู่)</option>
               <option value="201">ห้อง 201</option>
               <option value="202">ห้อง 202</option>
               <option value="203">ห้อง 203</option>
             </optgroup>
-            <optgroup label="🚗 อาคาร ใต้บ้าน (1,500 ฿/เดือน)" style="background: #141a29; color: white;">
+            <optgroup label="🚗 อาคาร ใต้บ้าน (800 ฿/เดือน)" style="background: #141a29; color: white;">
               <option value="B03">ห้อง B03 (ห้องว่างพร้อมอยู่)</option>
               <option value="B01">ห้อง B01</option>
               <option value="B02">ห้อง B02</option>
@@ -4687,9 +4687,9 @@ function openBookingModal(preselectedType = '') {
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">อาคารและห้องพักที่สนใจ *</label>
           <select id="bk-type" class="smoky-glass-select" required style="width: 100%; height: 42px; border-radius: 8px;">
-            <option value="อาคาร ธนกฤษฎ์ (2,800 ฿)" ${preselectedType.includes('Tanakrit') || preselectedType.includes('ธนกฤษฎ์') ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 2,800 ฿/เดือน</option>
-            <option value="อาคาร กิ่งเพชร (2,600 ฿)" ${preselectedType.includes('KingPhetch') || preselectedType.includes('กิ่งเพชร') ? 'selected' : ''}>อาคาร กิ่งเพชร (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 2,600 ฿/เดือน</option>
-            <option value="อาคาร ใต้บ้าน (1,500 ฿)" ${preselectedType.includes('UnderGround') || preselectedType.includes('ใต้บ้าน') ? 'selected' : ''}>อาคาร ใต้บ้าน (ห้องพัดลม 12 ตร.ม. ห้องน้ำรวม) 1,500 ฿/เดือน</option>
+            <option value="อาคาร ธนกฤษฎ์ (1,500 ฿)" ${preselectedType.includes('Tanakrit') || preselectedType.includes('ธนกฤษฎ์') ? 'selected' : ''}>อาคาร ธนกฤษฎ์ (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 1,500 ฿/เดือน</option>
+            <option value="อาคาร กิ่งเพชร (1,500 ฿)" ${preselectedType.includes('KingPhetch') || preselectedType.includes('กิ่งเพชร') ? 'selected' : ''}>อาคาร กิ่งเพชร (ห้องพัดลม 28 ตร.ม. ห้องน้ำในตัว) 1,500 ฿/เดือน</option>
+            <option value="อาคาร ใต้บ้าน (800 ฿)" ${preselectedType.includes('UnderGround') || preselectedType.includes('ใต้บ้าน') ? 'selected' : ''}>อาคาร ใต้บ้าน (ห้องพัดลม 12 ตร.ม. ห้องน้ำรวม) 800 ฿/เดือน</option>
           </select>
         </div>
       </div>
@@ -8672,7 +8672,7 @@ async function initStaffDashboard() {
     updateParcelsWidgetUI(parcels);
 
     const totalPaidBills = bills.filter(b => b.status === 'paid').reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0);
-    const totalExpectedBills = bills.reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0) || (occupiedCount * 2800);
+    const totalExpectedBills = bills.reduce((acc, curr) => acc + (Number(curr.total_price) || 0), 0) || (occupiedCount * 1500);
     const pendingTickets = tickets.filter(t => t.status !== 'completed').length;
     const completedTickets = tickets.filter(t => t.status === 'completed').length;
 
