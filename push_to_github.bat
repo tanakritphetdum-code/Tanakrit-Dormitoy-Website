@@ -1,16 +1,20 @@
 @echo off
 chcp 65001 >nul
 echo ========================================================
-echo   Tanakrit Dormitory System - Push v1.0.3 to GitHub
+echo   Tanakrit Dormitory System - Push to GitHub
 echo ========================================================
 echo.
-set "PATH=C:\Users\tanakrit\.local\git\cmd;C:\Users\tanakrit\.local\gcm;C:\Users\tanakrit\.local\gh\bin;%PATH%"
+set "PATH=C:\Program Files\Git\cmd;%PATH%"
 
 echo Checking Git status...
 git status
 echo.
-echo Pushing commit and tags (v1.0.3) to GitHub...
-git push origin main --tags
+echo Adding and committing changes...
+git add -A
+git commit -m "Update utility rates, remove KPlogin, and improve system" 2>nul
+echo.
+echo Pushing to GitHub (origin main)...
+git push origin main
 
 echo.
 if %ERRORLEVEL% equ 0 (
@@ -21,7 +25,6 @@ if %ERRORLEVEL% equ 0 (
 ) else (
     echo ========================================================
     echo   [NOTICE] If browser window opened, please click Sign in.
-    echo   Or run: gh auth login
     echo ========================================================
 )
 echo.
