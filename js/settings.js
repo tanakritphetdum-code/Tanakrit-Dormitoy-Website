@@ -108,7 +108,7 @@ export async function renderSettingsView() {
               </div>
               <div class="field">
                 <label class="smoky-form-label" style="font-size: 0.82rem; display: block; margin-bottom: 6px;">ค่าบริการส่วนกลาง (บาท/เดือน)</label>
-                <input type="number" id="set-common-fee" class="smoky-glass-input" value="${s.common_fee !== undefined ? s.common_fee : 100}" required style="width: 100%;">
+                <input type="number" id="set-common-fee" class="smoky-glass-input" value="${s.common_fee !== undefined ? s.common_fee : 50}" required style="width: 100%;">
               </div>
             </div>
 

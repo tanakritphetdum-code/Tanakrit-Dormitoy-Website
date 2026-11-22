@@ -465,11 +465,11 @@
                     <div style="background:var(--mint-50); border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:20px;">
                         <span style="font-size:0.85rem; color:var(--muted); display:block; margin-bottom:4px;">เงื่อนไขอัตราค่าสาธารณูปโภค:</span>
                         <div style="font-size:0.88rem; color:var(--teal-900); font-weight:500; line-height:1.7;">
-                            • ค่าน้ำประปา: <span id="landing-rate-water">18</span> บาท/หน่วย<br>
-                            • ค่าไฟฟ้า: <span id="landing-rate-elec">8</span> บาท/หน่วย<br>
-                            • ค่าบริการส่วนกลาง  : <span id="landing-rate-common">100</span> บาท/เดือน<br>
-                            • Wi-Fi : 100 บาท/เดือน<br>
-                            • ค่าบริการกำจัดขยะ  : 20 บาท/เดือน
+                            • ค่าน้ำประปา: คิดตามอัตราที่เทศบาลกำหนด<br>
+                            • ค่าไฟฟ้า: คิดตามอัตราที่การไฟฟ้ากำหนด<br>
+                            • ค่าบริการส่วนกลาง : 50 บาท/เดือน<br>
+                            • Wi-Fi : FREE<br>
+                            • ค่าบริการกำจัดขยะ : 20 บาท/เดือน
                         </div>
                     </div>
                 </div>
@@ -486,16 +486,12 @@
                             <strong id="calc-deposit-show">1,500 ฿</strong>
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
-                            <span>ค่ามัดจำคีย์การ์ดและกุญแจ:</span>
-                            <strong>300 ฿</strong>
+                            <span>ค่ามัดจำกุญแจห้องพัก:</span>
+                            <strong id="calc-key-show">100 ฿</strong>
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
                             <span>ค่าบริการส่วนกลางเดือนแรก:</span>
-                            <strong>100 ฿</strong>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
-                            <span>ค่าบริการ Wi-Fi เดือนแรก:</span>
-                            <strong>100 ฿</strong>
+                            <strong id="calc-common-show">50 ฿</strong>
                         </div>
                         <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.92rem;">
                             <span>ค่าบริการกำจัดขยะเดือนแรก:</span>
@@ -506,7 +502,7 @@
                     <div style="border-top:2px dashed var(--line); padding-top:16px; margin-top:20px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="font-size:1.1rem; font-weight:600; color:var(--teal-950);">ยอดรวมแรกเข้าทั้งหมด:</span>
-                            <span style="font-family:'Kanit'; font-size:1.9rem; font-weight:700; color:var(--emerald);" id="calc-total-show">3,520 ฿</span>
+                            <span style="font-family:'Kanit'; font-size:1.9rem; font-weight:700; color:var(--emerald);" id="calc-total-show">3,170 ฿</span>
                         </div>
                         <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="window.openBookingModal && window.openBookingModal()">
                             📝 ติดต่อจองห้องพักทันที
@@ -858,11 +854,10 @@
             calcSelect.addEventListener('change', () => {
                 const rent = Number(calcSelect.value);
                 const deposit = rent;
-                const keycard = 300;
-                const common = 100;
-                const wifi = 100;
+                const keyDeposit = 100;
+                const common = 50;
                 const garbage = 20;
-                const total = rent + deposit + keycard + common + wifi + garbage;
+                const total = rent + deposit + keyDeposit + common + garbage;
                 document.getElementById('calc-rent-show').textContent = rent.toLocaleString() + ' ฿';
                 document.getElementById('calc-deposit-show').textContent = deposit.toLocaleString() + ' ฿';
                 document.getElementById('calc-total-show').textContent = total.toLocaleString() + ' ฿';

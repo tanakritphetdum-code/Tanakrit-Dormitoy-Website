@@ -29,7 +29,7 @@ export async function renderUtilitiesView() {
               ระบบบันทึกมิเตอร์น้ำ-ไฟ และออกใบแจ้งหนี้ (Billing & Utilities)
             </h2>
             <span style="font-size: 0.82rem; color: rgba(255,255,255,0.48); margin-top: 3px; display: block;">
-              ค่าน้ำประปา (18 ฿/หน่วย) · ค่าไฟฟ้า (8 ฿/หน่วย) · ค่าบริการส่วนกลาง 100 ฿ · Wi-Fi 100 ฿ · ขยะ 20 ฿ · QR สแกนจ่าย
+              ค่าน้ำประปา (ตามอัตราเทศบาล) · ค่าไฟฟ้า (ตามอัตราการไฟฟ้า) · ค่าบริการส่วนกลาง 50 ฿ · Wi-Fi : FREE · ขยะ 20 ฿ · QR สแกนจ่าย
             </span>
           </div>
         </div>
@@ -449,15 +449,15 @@ export function openInvoiceModal(bill) {
             <td>ค่าบริการส่วนกลาง</td>
             <td style="text-align: center;">-</td>
             <td style="text-align: center;">1 เดือน</td>
-            <td style="text-align: right;">100 ฿</td>
-            <td style="text-align: right;">100 ฿</td>
+            <td style="text-align: right;">50 ฿</td>
+            <td style="text-align: right;">50 ฿</td>
           </tr>
           <tr>
             <td>ค่าบริการ Wi-Fi ความเร็วสูง</td>
             <td style="text-align: center;">-</td>
             <td style="text-align: center;">1 เดือน</td>
-            <td style="text-align: right;">100 ฿</td>
-            <td style="text-align: right;">100 ฿</td>
+            <td style="text-align: right;">FREE</td>
+            <td style="text-align: right;">0 ฿</td>
           </tr>
           <tr>
             <td>ค่าบริการกำจัดขยะ</td>
@@ -782,14 +782,14 @@ async function openAddMeterModal() {
 
       <!-- Fixed Charges Box -->
       <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 14px; font-size: 0.78rem; color: rgba(255,255,255,0.7); display: flex; justify-content: space-between;">
-        <span>ค่าบริการคงที่รายเดือน (ส่วนกลาง 100฿ + Wi-Fi 100฿ + ขยะ 20฿):</span>
-        <strong style="color: #ffffff;">220 ฿</strong>
+        <span>ค่าบริการคงที่รายเดือน (ส่วนกลาง 50฿ + Wi-Fi FREE + ขยะ 20฿):</span>
+        <strong style="color: #ffffff;">70 ฿</strong>
       </div>
 
       <!-- Grand Total -->
       <div style="background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
         <span style="font-weight: 600; color: #ffffff; font-size: 0.90rem;">ยอดรวมทั้งสิ้น (ค่าห้อง + น้ำ + ไฟ + บริการ):</span>
-        <strong style="font-size: 1.35rem; color: #ffffff;" id="mr-grand-total">3,470 ฿</strong>
+        <strong style="font-size: 1.35rem; color: #ffffff;" id="mr-grand-total">3,320 ฿</strong>
       </div>
     </form>
   `;
@@ -821,7 +821,7 @@ async function openAddMeterModal() {
     const eUnits = Math.max(0, eCurr - ePrev);
     const eCost = eUnits * 8;
 
-    const fixedFees = 100 + 100 + 20; // ค่าบริการส่วนกลาง 100 + Wi-Fi 100 + กำจัดขยะ 20
+    const fixedFees = 50 + 0 + 20; // ค่าบริการส่วนกลาง 50 + Wi-Fi ฟรี + กำจัดขยะ 20
     const grand = roomPrice + wCost + eCost + fixedFees;
 
     document.getElementById('mr-water-total').value = wCost.toLocaleString() + ' ฿';

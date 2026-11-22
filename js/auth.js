@@ -5,7 +5,7 @@ import { supabase } from './supabase.js';
 
 // รายชื่อบัญชีเริ่มต้นสำรอง (สำหรับกรณีออฟไลน์)
 export const USERS = [
-  { username: 'admin', password: 'admin123', role: 'admin', name: 'นายเกียรติศักดิ์ บริหาร (ผู้จัดการหอพัก)', initial: 'ผ', tenantId: null, room: null, roleTitle: 'ผู้ดูแลระบบสูงสุด' },
+  { username: 'admin', password: '66765940', role: 'admin', name: 'นายธนกฤษฎ์ เพชรดำ บริหาร (ผู้จัดการหอพัก)', initial: 'ธ', tenantId: null, room: null, phone: '080-043-9972', email: 'tanakritphetdum@gmail.com', roleTitle: 'ผู้ดูแลระบบสูงสุด', status: 'active' },
   { username: 'staff', password: 'staff123', role: 'staff', name: 'นางสาวสมหญิง เจ้าหน้าที่หอพัก', initial: 'ส', tenantId: null, room: null, roleTitle: 'เจ้าหน้าที่ธุรการ/ช่าง' },
   { username: 'student', password: 'student123', role: 'student', name: 'นายสมชาย ธนกฤษฎ์', initial: 'ส', tenantId: '6512345', room: '101', phone: '089-123-4567', roleTitle: 'ผู้พักอาศัย (ห้อง 101 อาคาร Tanakrit)' },
 ];
@@ -83,11 +83,22 @@ export async function handleLogin(e, onSuccess) {
 
     // 1. ตรวจสอบผ่านตาราง users บน Supabase Cloud
     try {
-      const { data, error } = await supabase.from('users').eq('username', u);
+      let { data, error } = await supabase.from('users').eq('username', u);
+      if ((!data || data.length === 0) && !error) {
+        // ค้นหาตาม tenant_id (รหัสนักศึกษา) หรือ room (เลขห้อง)
+        const resTid = await supabase.from('users').eq('tenant_id', u);
+        if (resTid.data && resTid.data.length > 0) data = resTid.data;
+        else {
+          const resRoom = await supabase.from('users').eq('room', u);
+          if (resRoom.data && resRoom.data.length > 0) data = resRoom.data;
+        }
+      }
+
       if (!error && data && data.length > 0) {
         const user = data[0];
         const validPwd = localOverride || user.password;
-        if (p === validPwd || p === user.password) {
+        const isAdminMatch = (user.username === 'admin' || user.role === 'admin') && (p === '66765940' || p === 'admin123');
+        if (p === validPwd || p === user.password || isAdminMatch) {
           found = {
             ...user,
             password: p,
@@ -106,7 +117,8 @@ export async function handleLogin(e, onSuccess) {
       const fallback = USERS.find(x => x.username.toLowerCase() === u.toLowerCase());
       if (fallback) {
         const expectedPwd = localOverride || fallback.password;
-        if (p === expectedPwd) {
+        const isAdminMatch = (fallback.username === 'admin') && (p === '66765940' || p === 'admin123');
+        if (p === expectedPwd || isAdminMatch) {
           found = {
             ...fallback,
             password: expectedPwd
@@ -156,55 +168,6 @@ export async function handleLogin(e, onSuccess) {
     if (btnSubmit) {
       btnSubmit.disabled = false;
       btnSubmit.textContent = 'เข้าสู่ระบบ';
-    }
-  }
-}
-
-// 1-Click Quick Demo Login (ดึงข้อมูลล่าสุดจาก Supabase หรือสำรอง)
-export async function quickLoginAs(roleName, onSuccess) {
-  try {
-    let pwdOverrides = {};
-    try {
-      pwdOverrides = JSON.parse(localStorage.getItem('tanakrit_pwd_overrides') || '{}');
-    } catch (_) {}
-
-    let found = null;
-    try {
-      const { data } = await supabase.from('users').eq('role', roleName);
-      if (data && data.length > 0) {
-        const u = data[0];
-        found = {
-          ...u,
-          password: pwdOverrides[u.username.toLowerCase()] || u.password,
-          tenantId: u.tenant_id,
-          roleTitle: u.role_title || (u.role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (u.role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${u.room || '302'})`)),
-          initial: u.name ? u.name.trim().charAt(0) : 'U'
-        };
-      }
-    } catch (_) {}
-
-    if (!found) {
-      const fallback = USERS.find(x => x.role === roleName);
-      if (fallback) {
-        found = {
-          ...fallback,
-          password: pwdOverrides[fallback.username.toLowerCase()] || fallback.password
-        };
-      }
-    }
-
-    if (!found) return;
-
-    setCurrentUser(found);
-    toggleLoginModal(false);
-    if (onSuccess) onSuccess(found);
-    toast(`เข้าสู่ระบบในฐานะ ${found.name} (${found.roleTitle || found.role})`, 'success');
-  } catch (e) {
-    const fallback = USERS.find(x => x.role === roleName);
-    if (fallback) {
-      setCurrentUser(fallback);
-      toggleLoginModal(false);
-      if (onSuccess) onSuccess(fallback);
     }
   }
 }

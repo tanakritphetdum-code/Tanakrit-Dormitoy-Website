@@ -81,7 +81,6 @@
 
 ```text
 ├── index.html          # หน้าเว็บหลัก (Landing Page + แอปจัดการระบบ)
-├── KPlogin.html        # หน้า Redirect ไปยัง index.html (ตัวเลือกสำรอง)
 ├── build_bundle.js     # สคริปต์ Node.js รวมไฟล์ JS
 ├── build_bundle.ps1    # สคริปต์ PowerShell รวมไฟล์ JS สำหรับ Windows
 ├── README.md           # เอกสารแนะนำและคู่มือโปรเจกต์ (v1.0.3)
