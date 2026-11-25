@@ -82,6 +82,12 @@ function triggerSmartRefresh(tableName) {
     }
 
     // 2. ถ้าอยู่หน้าจอที่ตรงกับตารางที่มีการเปลี่ยนแปลง ให้รีเฟรชหน้าจอนั้นทันที
+    if (tableName === 'rooms' && currentView === 'rooms') {
+      if (typeof window.reloadRoomsData === 'function') {
+        window.reloadRoomsData();
+        return;
+      }
+    }
     if (typeof window.switchView === 'function') {
       if (tableName === 'rooms' && currentView === 'rooms') {
         window.switchView('rooms');
@@ -139,7 +145,9 @@ function handlePostgresChanges(payload) {
     playChime();
     toast(`📦 มีพัสดุมาส่งใหม่: ห้อง ${record.room_number || ''} (${record.carrier || 'พัสดุ'})`, 'info');
   } else if (table === 'rooms' && type === 'UPDATE' && oldRecord.status !== record.status) {
-    toast(`🚪 สถานะห้อง ${record.number || record.room_number || ''} เปลี่ยนเป็น: ${record.status}`, 'info');
+    const statusLabelMap = { vacant: 'ห้องว่างพร้อมอยู่', occupied: 'มีผู้พักอาศัย', maintenance: 'ปิดปรับปรุง / ซ่อมบำรุง' };
+    const statusText = statusLabelMap[record.status] || record.status;
+    toast(`🚪 สถานะห้อง ${record.number || record.room_number || ''} เปลี่ยนเป็น: ${statusText}`, 'info');
   } else if (table === 'announcements' && type === 'INSERT') {
     playChime();
     toast(`📢 มีประกาศข่าวสารใหม่: ${record.title || ''}`, 'info');

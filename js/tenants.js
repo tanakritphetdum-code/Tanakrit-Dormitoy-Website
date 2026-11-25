@@ -800,6 +800,7 @@ export function openEditTenantModal(tenant) {
       return;
     }
 
+    const oldRoom = tenant.room;
     const bInfo = getBuildingInfo(room);
 
     // อัปเดตใน Cached Array
@@ -834,6 +835,19 @@ export function openEditTenantModal(tenant) {
         phone,
         email,
         check_in: checkin
+      });
+      // ซิงค์ rooms หากเปลี่ยนห้องหรือแก้ไขข้อมูลผู้เช่า
+      if (oldRoom && oldRoom !== room) {
+        await supabase.from('rooms').eq('room_number', oldRoom).update({
+          status: 'vacant',
+          tenant_name: '',
+          tenant_phone: ''
+        });
+      }
+      await supabase.from('rooms').eq('room_number', room).update({
+        status: 'occupied',
+        tenant_name: name,
+        tenant_phone: phone
       });
       // ซิงค์ users
       await supabase.from('users').eq('room', room).update({

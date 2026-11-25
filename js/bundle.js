@@ -450,6 +450,12 @@ function triggerSmartRefresh(tableName) {
     }
 
     // 2. ถ้าอยู่หน้าจอที่ตรงกับตารางที่มีการเปลี่ยนแปลง ให้รีเฟรชหน้าจอนั้นทันที
+    if (tableName === 'rooms' && currentView === 'rooms') {
+      if (typeof window.reloadRoomsData === 'function') {
+        window.reloadRoomsData();
+        return;
+      }
+    }
     if (typeof window.switchView === 'function') {
       if (tableName === 'rooms' && currentView === 'rooms') {
         window.switchView('rooms');
@@ -507,7 +513,9 @@ function handlePostgresChanges(payload) {
     playChime();
     toast(`📦 มีพัสดุมาส่งใหม่: ห้อง ${record.room_number || ''} (${record.carrier || 'พัสดุ'})`, 'info');
   } else if (table === 'rooms' && type === 'UPDATE' && oldRecord.status !== record.status) {
-    toast(`🚪 สถานะห้อง ${record.number || record.room_number || ''} เปลี่ยนเป็น: ${record.status}`, 'info');
+    const statusLabelMap = { vacant: 'ห้องว่างพร้อมอยู่', occupied: 'มีผู้พักอาศัย', maintenance: 'ปิดปรับปรุง / ซ่อมบำรุง' };
+    const statusText = statusLabelMap[record.status] || record.status;
+    toast(`🚪 สถานะห้อง ${record.number || record.room_number || ''} เปลี่ยนเป็น: ${statusText}`, 'info');
   } else if (table === 'announcements' && type === 'INSERT') {
     playChime();
     toast(`📢 มีประกาศข่าวสารใหม่: ${record.title || ''}`, 'info');
@@ -1881,7 +1889,7 @@ function openInvoiceModal(bill) {
 
 // Modal จดมิเตอร์ใหม่ (Smoky Glass)
 async function openAddMeterModal() {
-  const rooms = DEFAULT_ROOMS;
+  const rooms = await fetchLiveRooms();
 
   const roomOptions = rooms.map(r => `
     <option value="${r.room_number}" data-price="${r.price}" data-tenant="${r.tenant_name || ''}">
@@ -2296,7 +2304,7 @@ async function openBatchGenerateBillsModal() {
     }
   });
 
-  const rooms = DEFAULT_ROOMS;
+  const rooms = await fetchLiveRooms();
 
   const renderRows = (selMonth) => {
     return rooms.map(r => {
@@ -2732,7 +2740,7 @@ const DEFAULT_ROOMS = [
   },
   { 
     id: 'RM-T107', room_number: '107', building: 'Tanakrit', floor: 1, type: 'ห้องพัดลม', price: 1500, 
-    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'maintenance', 
+    size: 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)', bathroom: 'ห้องน้ำในตัว', status: 'vacant', 
     tenant_name: '', tenant_phone: '', 
     condition: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม ระเบียงส่วนตัว', 
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ห้องน้ำในตัว, ระเบียงตากผ้าหลังห้องส่วนตัว' 
@@ -2812,6 +2820,87 @@ const DEFAULT_ROOMS = [
     amenities: 'เตียง+ที่นอน, ตู้เสื้อผ้า, ใช้ห้องน้ำรวมที่สะอาด' 
   }
 ];
+function inferBuildingFromRoom(roomNum) {
+  const s = String(roomNum || '').trim().toUpperCase();
+  if (s.startsWith('B')) return 'UnderGround';
+  const num = parseInt(s, 10);
+  if (!isNaN(num) && num >= 200) return 'KingPhetch';
+  return 'Tanakrit';
+}
+
+function getRoomSortOrder(roomNum) {
+  const s = String(roomNum || '').trim().toUpperCase();
+  if (s.startsWith('B')) return 3000 + (parseInt(s.slice(1), 10) || 0);
+  const n = parseInt(s, 10);
+  return !isNaN(n) ? n : 9000;
+}
+
+// ดึงข้อมูลห้องพักล่าสุดจาก Supabase Cloud เป็นหลัก พร้อมรวมข้อมูลรายละเอียดห้องจาก Cache/ค่าเริ่มต้น
+async function fetchLiveRooms() {
+  let cachedList = [];
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) cachedList = parsed;
+    }
+  } catch (_) {}
+
+  try {
+    const [roomsRes, tenantsRes] = await Promise.all([
+      supabase.from('rooms').select('*'),
+      supabase.from('tenants').select('*')
+    ]);
+
+    const dbTenants = (!tenantsRes.error && Array.isArray(tenantsRes.data)) ? tenantsRes.data : [];
+
+    if (!roomsRes.error && Array.isArray(roomsRes.data) && roomsRes.data.length > 0) {
+      const rooms = roomsRes.data.map(dbRoom => {
+        const cleanNum = String(dbRoom.room_number || '').trim();
+        const defMeta = DEFAULT_ROOMS.find(d => String(d.room_number).trim() === cleanNum) || {};
+        const localMeta = cachedList.find(c => c.id === dbRoom.id || String(c.room_number || '').trim() === cleanNum) || {};
+        const building = localMeta.building || defMeta.building || inferBuildingFromRoom(cleanNum);
+        const tenant = dbTenants.find(t => String(t.room || '').trim() === cleanNum && t.status !== 'terminated');
+        const status = dbRoom.status || 'vacant';
+
+        let tenantName = '';
+        let tenantPhone = '';
+        if (status === 'occupied') {
+          tenantName = dbRoom.tenant_name || (tenant ? tenant.name : '') || '';
+          tenantPhone = dbRoom.tenant_phone || (tenant ? tenant.phone : '') || '';
+        }
+
+        return {
+          ...defMeta,
+          ...localMeta,
+          id: dbRoom.id,
+          room_number: cleanNum,
+          building,
+          floor: dbRoom.floor ?? defMeta.floor ?? (building === 'UnderGround' ? 0 : 1),
+          type: dbRoom.type || defMeta.type || 'ห้องพัดลม',
+          price: Number(dbRoom.price ?? defMeta.price ?? (building === 'UnderGround' ? 800 : 1500)),
+          size: localMeta.size || defMeta.size || (building === 'UnderGround' ? 'กว้าง 3 เมตร ยาว 4 เมตร รวม (12 ตร.ม.)' : 'กว้าง 3.5 เมตร ยาว 8 เมตร รวม (28 ตร.ม.)'),
+          bathroom: localMeta.bathroom || defMeta.bathroom || (building === 'UnderGround' ? 'ห้องน้ำรวม' : 'ห้องน้ำในตัว'),
+          status,
+          tenant_name: tenantName,
+          tenant_phone: tenantPhone
+        };
+      });
+
+      rooms.sort((a, b) => getRoomSortOrder(a.room_number) - getRoomSortOrder(b.room_number) || String(a.room_number).localeCompare(String(b.room_number)));
+
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(rooms));
+      } catch (_) {}
+
+      return rooms;
+    }
+  } catch (err) {
+    console.warn('fetchLiveRooms fallback:', err);
+  }
+
+  return cachedList.length > 0 ? cachedList : JSON.parse(JSON.stringify(DEFAULT_ROOMS));
+}
 async function renderRoomsView() {
   setTimeout(() => {
     bindRoomsEvents();
@@ -2859,24 +2948,24 @@ async function renderRoomsView() {
             <span style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.4); display: flex; align-items: center;">
               ${ic('search')}
             </span>
-            <input type="text" id="rooms-search-input" class="smoky-glass-input" placeholder="ค้นหาเลขห้อง หรือชื่อผู้เช่า..." style="width: 100%; padding-left: 38px;">
+            <input type="text" id="rooms-search-input" class="smoky-glass-input" value="${currentSearch}" placeholder="ค้นหาเลขห้อง หรือชื่อผู้เช่า..." style="width: 100%; padding-left: 38px;">
           </div>
 
           <!-- Building Tabs (Segmented Control) -->
           <div class="smoky-segmented" id="building-tabs" style="overflow-x: auto; max-width: 100%;">
-            <button class="smoky-seg-btn active" data-building="all">ทุกอาคาร (17 ห้อง)</button>
-            <button class="smoky-seg-btn" data-building="Tanakrit">🏢 อาคาร ธนกฤษฎ์ (9)</button>
-            <button class="smoky-seg-btn" data-building="KingPhetch">🏡 อาคาร กิ่งเพชร (5)</button>
-            <button class="smoky-seg-btn" data-building="UnderGround">🛋️ อาคาร ใต้บ้าน (3)</button>
+            <button class="smoky-seg-btn ${currentBuildingFilter === 'all' ? 'active' : ''}" data-building="all">ทุกอาคาร (17 ห้อง)</button>
+            <button class="smoky-seg-btn ${currentBuildingFilter === 'Tanakrit' ? 'active' : ''}" data-building="Tanakrit">🏢 อาคาร ธนกฤษฎ์ (9)</button>
+            <button class="smoky-seg-btn ${currentBuildingFilter === 'KingPhetch' ? 'active' : ''}" data-building="KingPhetch">🏡 อาคาร กิ่งเพชร (5)</button>
+            <button class="smoky-seg-btn ${currentBuildingFilter === 'UnderGround' ? 'active' : ''}" data-building="UnderGround">🛋️ อาคาร ใต้บ้าน (3)</button>
           </div>
 
           <!-- Status Dropdown Filter -->
           <div>
             <select id="rooms-status-select" class="smoky-glass-select">
-              <option value="all">สถานะทั้งหมด</option>
-              <option value="occupied">เฉพาะห้องที่มีผู้เช่า</option>
-              <option value="vacant">เฉพาะห้องว่างพร้อมอยู่</option>
-              <option value="maintenance">เฉพาะห้องที่ปิดปรับปรุง / ซ่อมบำรุง</option>
+              <option value="all" ${currentStatusFilter === 'all' ? 'selected' : ''}>สถานะทั้งหมด</option>
+              <option value="occupied" ${currentStatusFilter === 'occupied' ? 'selected' : ''}>เฉพาะห้องที่มีผู้เช่า</option>
+              <option value="vacant" ${currentStatusFilter === 'vacant' ? 'selected' : ''}>เฉพาะห้องว่างพร้อมอยู่</option>
+              <option value="maintenance" ${currentStatusFilter === 'maintenance' ? 'selected' : ''}>เฉพาะห้องที่ปิดปรับปรุง / ซ่อมบำรุง</option>
             </select>
           </div>
 
@@ -2899,51 +2988,7 @@ async function loadRoomsData() {
   const summary = document.getElementById('room-stats-summary');
   if (!container) return;
 
-  // 1. นำโครงสร้างห้องพักมาตรฐาน 17 ห้องเป็นตัวตั้ง
-  let rooms = JSON.parse(JSON.stringify(DEFAULT_ROOMS));
-
-  // 2. ซิงค์กับข้อมูลผู้พักอาศัยล่าสุดจาก Supabase Cloud Realtime
-  let dbTenants = [];
-  try {
-    const { data, error } = await supabase.from('tenants').select('*');
-    if (!error && Array.isArray(data)) {
-      dbTenants = data;
-    }
-  } catch (_) {}
-
-  // 3. ซิงค์กับรายการแจ้งซ่อมบำรุง (Maintenance) ที่กำลังดำเนินการจาก Supabase Realtime
-  const activeMaintRooms = new Set();
-  try {
-    const { data: tickets } = await supabase.from('maintenance').select('room_number, status');
-    if (tickets && Array.isArray(tickets)) {
-      tickets.filter(t => t.status !== 'completed').forEach(t => {
-        if (t.room_number) activeMaintRooms.add(t.room_number.replace(/[^0-9B]/gi, ''));
-      });
-    }
-  } catch (_) {}
-
-  // 4. แมปสถานะห้องพักและผู้เช่าของแต่ละห้อง
-  rooms.forEach(r => {
-    const cleanNum = String(r.room_number).trim();
-    const tenant = dbTenants.find(t => String(t.room).trim() === cleanNum && t.status !== 'terminated');
-    if (tenant) {
-      r.status = 'occupied';
-      r.tenant_name = tenant.name || '';
-      r.tenant_phone = tenant.phone || '';
-    } else if (activeMaintRooms.has(cleanNum) || r.status === 'maintenance') {
-      r.status = 'maintenance';
-      r.tenant_name = '';
-      r.tenant_phone = '';
-    } else {
-      r.status = 'vacant';
-      r.tenant_name = '';
-      r.tenant_phone = '';
-    }
-  });
-
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(rooms));
-  } catch (_) {}
+  const rooms = await fetchLiveRooms();
 
   // Update Summary Stats
   const total = rooms.length;
@@ -3299,6 +3344,7 @@ function openManageRoomModal(room, allRooms) {
   });
 
   document.getElementById('btn-save-manage-room').onclick = async () => {
+    const saveBtn = document.getElementById('btn-save-manage-room');
     const num = document.getElementById('m-room-number').value.trim();
     const bld = document.getElementById('m-building').value;
     const tp = document.getElementById('m-type').value.trim();
@@ -3309,62 +3355,106 @@ function openManageRoomModal(room, allRooms) {
     const tName = document.getElementById('m-tenant-name').value.trim();
     const tPhone = document.getElementById('m-tenant-phone').value.trim();
 
-    const updatedData = {
+    if (!num) {
+      toast('กรุณาระบุหมายเลขห้อง', 'error');
+      return;
+    }
+
+    const origNum = String(room.room_number || '').trim();
+    const targetFloor = bld === 'UnderGround' ? 0 : (Number(room.floor) > 0 ? Number(room.floor) : 1);
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'กำลังบันทึก...';
+
+    const dbPayload = {
       room_number: num,
-      building: bld,
-      floor: bld === 'UnderGround' ? 0 : 1,
-      type: tp,
-      price: pr,
-      size: sz,
-      bathroom: br,
+      floor: targetFloor,
+      type: tp || 'ห้องพัดลม',
+      price: Number.isFinite(pr) ? pr : 1500,
       status: st,
       tenant_name: st === 'occupied' ? tName : '',
       tenant_phone: st === 'occupied' ? tPhone : ''
     };
 
-    try {
-      const dbPayload = {
-        room_number: num,
-        floor: bld === 'UnderGround' ? 0 : 1,
-        type: tp,
-        price: pr,
-        status: st,
-        tenant_name: st === 'occupied' ? tName : '',
-        tenant_phone: st === 'occupied' ? tPhone : ''
-      };
-      await supabase.from('rooms').eq('id', room.id).update(dbPayload);
-    } catch (_) {}
+    let saveRes = await supabase.from('rooms').eq('id', room.id).update(dbPayload);
+    if (!saveRes.error && (!Array.isArray(saveRes.data) || saveRes.data.length === 0)) {
+      saveRes = await supabase.from('rooms').eq('room_number', origNum).update(dbPayload);
+    }
+    if (!saveRes.error && (!Array.isArray(saveRes.data) || saveRes.data.length === 0)) {
+      saveRes = await supabase.from('rooms').insert([{ id: room.id || ('R' + num), ...dbPayload }]);
+    }
+
+    if (saveRes.error) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'บันทึกข้อมูล';
+      toast(`บันทึกข้อมูลไม่สำเร็จ: ${saveRes.error.message || 'กรุณาตรวจสอบการเชื่อมต่อฐานข้อมูล'}`, 'error');
+      return;
+    }
+
+    // หากเปลี่ยนสถานะจาก "ปิดปรับปรุง" เป็น "พร้อมใช้งาน" ให้ปิดงานซ่อมค้างของห้องนี้ด้วยเพื่อให้ข้อมูลตรงกันทุกหน้า
+    if (st === 'vacant') {
+      try {
+        const { data: openTickets } = await supabase.from('maintenance').select('id,status').eq('room_number', num);
+        if (Array.isArray(openTickets)) {
+          for (const tk of openTickets) {
+            if (tk.status !== 'completed') {
+              await supabase.from('maintenance').eq('id', tk.id).update({ status: 'completed' });
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    const savedRow = Array.isArray(saveRes.data) && saveRes.data[0] ? saveRes.data[0] : null;
+    const updatedData = {
+      ...room,
+      id: savedRow ? savedRow.id : room.id,
+      room_number: num,
+      building: bld,
+      floor: targetFloor,
+      type: dbPayload.type,
+      price: dbPayload.price,
+      size: sz,
+      bathroom: br,
+      status: st,
+      tenant_name: dbPayload.tenant_name,
+      tenant_phone: dbPayload.tenant_phone
+    };
 
     // อัปเดตใน LocalStorage Cache
     try {
       const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
-      const idx = cached.findIndex(x => x.id === room.id);
+      const idx = cached.findIndex(x => x.id === room.id || String(x.room_number || '').trim() === origNum);
       if (idx !== -1) {
         cached[idx] = { ...cached[idx], ...updatedData };
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
+      } else {
+        cached.push(updatedData);
       }
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
     } catch (_) {}
 
     toast(`อัปเดตข้อมูลห้อง ${num} เรียบร้อยแล้ว`, 'success');
     closeModal();
-    loadRoomsData();
+    await loadRoomsData();
   };
 
   document.getElementById('btn-delete-room').onclick = async () => {
     if (confirm(`คุณต้องการลบห้อง ${room.room_number} ออกจากระบบใช่หรือไม่?`)) {
-      try {
-        await supabase.from('rooms').eq('id', room.id).delete();
-      } catch (_) {}
+      let delRes = await supabase.from('rooms').eq('id', room.id).delete();
+      if (delRes.error) {
+        toast(`ลบห้องไม่สำเร็จ: ${delRes.error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
+      }
 
       try {
         let cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
-        cached = cached.filter(x => x.id !== room.id);
+        cached = cached.filter(x => x.id !== room.id && String(x.room_number || '').trim() !== String(room.room_number || '').trim());
         localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
       } catch (_) {}
 
       toast(`ลบห้อง ${room.room_number} สำเร็จ`, 'info');
       closeModal();
-      loadRoomsData();
+      await loadRoomsData();
     }
   };
 }
@@ -3459,6 +3549,7 @@ function openAddRoomModal() {
   }
 
   document.getElementById('btn-submit-add-room').onclick = async () => {
+    const addBtn = document.getElementById('btn-submit-add-room');
     const num = document.getElementById('add-room-number').value.trim();
     const bld = document.getElementById('add-building').value;
     const tp = document.getElementById('add-type').value.trim();
@@ -3472,13 +3563,36 @@ function openAddRoomModal() {
       return;
     }
 
+    const roomId = 'R' + num;
+    addBtn.disabled = true;
+    addBtn.textContent = 'กำลังบันทึก...';
+
+    const dbPayload = {
+      id: roomId,
+      room_number: num,
+      floor: bld === 'UnderGround' ? 0 : 1,
+      type: tp || 'ห้องพัดลม',
+      price: Number.isFinite(pr) ? pr : 1500,
+      status: st,
+      tenant_name: '',
+      tenant_phone: ''
+    };
+
+    const { error } = await supabase.from('rooms').insert([dbPayload]);
+    if (error) {
+      addBtn.disabled = false;
+      addBtn.textContent = 'เพิ่มห้องพัก';
+      toast(`ไม่สามารถเพิ่มห้องพักได้: ${error.message || 'เลขห้องอาจซ้ำในระบบ'}`, 'error');
+      return;
+    }
+
     const newRoom = {
-      id: 'RM-' + Math.floor(1000 + Math.random() * 9000),
+      id: roomId,
       room_number: num,
       building: bld,
       floor: bld === 'UnderGround' ? 0 : 1,
-      type: tp,
-      price: pr,
+      type: dbPayload.type,
+      price: dbPayload.price,
       size: sz,
       bathroom: br,
       status: st,
@@ -3489,20 +3603,6 @@ function openAddRoomModal() {
     };
 
     try {
-      const dbPayload = {
-        id: 'R' + num,
-        room_number: num,
-        floor: bld === 'UnderGround' ? 0 : 1,
-        type: tp,
-        price: pr,
-        status: st,
-        tenant_name: '',
-        tenant_phone: ''
-      };
-      await supabase.from('rooms').insert([dbPayload]);
-    } catch (_) {}
-
-    try {
       const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || '[]');
       cached.push(newRoom);
       localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
@@ -3510,8 +3610,12 @@ function openAddRoomModal() {
 
     toast(`เพิ่มห้องพัก ${num} (${bld === 'KingPhetch' ? 'อาคาร กิ่งเพชร' : (bld === 'UnderGround' ? 'อาคาร ใต้บ้าน' : 'อาคาร ธนกฤษฎ์')}) เรียบร้อยแล้ว`, 'success');
     closeModal();
-    loadRoomsData();
+    await loadRoomsData();
   };
+}
+
+if (typeof window !== 'undefined') {
+  window.reloadRoomsData = loadRoomsData;
 }
 
 
@@ -4317,6 +4421,7 @@ function openEditTenantModal(tenant) {
       return;
     }
 
+    const oldRoom = tenant.room;
     const bInfo = getBuildingInfo(room);
 
     // อัปเดตใน Cached Array
@@ -4351,6 +4456,19 @@ function openEditTenantModal(tenant) {
         phone,
         email,
         check_in: checkin
+      });
+      // ซิงค์ rooms หากเปลี่ยนห้องหรือแก้ไขข้อมูลผู้เช่า
+      if (oldRoom && oldRoom !== room) {
+        await supabase.from('rooms').eq('room_number', oldRoom).update({
+          status: 'vacant',
+          tenant_name: '',
+          tenant_phone: ''
+        });
+      }
+      await supabase.from('rooms').eq('room_number', room).update({
+        status: 'occupied',
+        tenant_name: name,
+        tenant_phone: phone
       });
       // ซิงค์ users
       await supabase.from('users').eq('room', room).update({
@@ -6035,10 +6153,31 @@ function openUpdateTicketModal(ticket) {
     const st = document.getElementById('up-status').value;
     const tech = document.getElementById('up-tech').value.trim();
 
-    await supabase.from('maintenance').eq('id', ticket.id).update({
+    const { error } = await supabase.from('maintenance').eq('id', ticket.id).update({
       status: st,
       technician: tech
     });
+
+    if (error) {
+      toast('บันทึกสถานะงานซ่อมไม่สำเร็จ', 'error');
+      return;
+    }
+
+    // หากปิดงานซ่อม (completed) แล้วห้องนั้นยังอยู่สถานะปิดปรับปรุงและไม่มีงานซ่อมอื่นค้าง ให้เปลี่ยนเป็นพร้อมใช้งานอัตโนมัติ
+    if (st === 'completed' && ticket.room_number) {
+      try {
+        const cleanRoom = String(ticket.room_number).trim();
+        const [{ data: roomRows }, { data: remainingTickets }] = await Promise.all([
+          supabase.from('rooms').select('id,status').eq('room_number', cleanRoom),
+          supabase.from('maintenance').select('id,status').eq('room_number', cleanRoom)
+        ]);
+        const hasOpen = Array.isArray(remainingTickets) && remainingTickets.some(t => t.id !== ticket.id && t.status !== 'completed');
+        const targetRoom = Array.isArray(roomRows) ? roomRows[0] : null;
+        if (!hasOpen && targetRoom && targetRoom.status === 'maintenance') {
+          await supabase.from('rooms').eq('id', targetRoom.id).update({ status: 'vacant' });
+        }
+      } catch (_) {}
+    }
 
     toast('บันทึกความคืบหน้ารายการซ่อมเรียบร้อยแล้ว', 'success');
     closeModal();
@@ -8623,6 +8762,7 @@ async function initStaffDashboard() {
   // 1. Fetch real dormitory data from supabase to augment CRM cards
   try {
     const [
+      { data: roomsData },
       { data: tenantsData },
       { data: ticketsData },
       { data: billsData },
@@ -8631,6 +8771,7 @@ async function initStaffDashboard() {
       { data: parcelsData },
       { data: announcementsData }
     ] = await Promise.all([
+      supabase.from('rooms').select('*'),
       supabase.from('tenants').select('*'),
       supabase.from('maintenance').select('*'),
       supabase.from('meter_readings').select('*'),
@@ -8640,6 +8781,7 @@ async function initStaffDashboard() {
       supabase.from('announcements').select('*').order('pinned', { ascending: false })
     ]);
 
+    const roomsList = Array.isArray(roomsData) ? roomsData : [];
     const tenants = Array.isArray(tenantsData) ? tenantsData.filter(t => t.status !== 'terminated') : [];
     const tickets = Array.isArray(ticketsData) ? ticketsData : [];
     const bills = Array.isArray(billsData) ? billsData : [];
@@ -8648,15 +8790,20 @@ async function initStaffDashboard() {
     const parcels = Array.isArray(parcelsData) ? parcelsData : [];
     const announcements = Array.isArray(announcementsData) ? announcementsData : [];
 
-    const totalRooms = 17;
-    const occupiedCount = tenants.length;
-    // Maintenance rooms dynamically populated from Supabase
-    const activeMaintSet = new Set();
+    const totalRooms = roomsList.length > 0 ? roomsList.length : 17;
+    const occupiedRoomSet = new Set(roomsList.filter(r => r.status === 'occupied' && r.room_number).map(r => String(r.room_number).trim()));
+    tenants.forEach(t => { if (t.room) occupiedRoomSet.add(String(t.room).trim()); });
+    const occupiedCount = occupiedRoomSet.size;
+
+    const maintRoomSet = new Set(roomsList.filter(r => r.status === 'maintenance' && r.room_number).map(r => String(r.room_number).trim()));
     tickets.filter(t => t.status !== 'completed' && t.room_number).forEach(t => {
-      activeMaintSet.add(t.room_number.replace(/[^0-9B]/gi, ''));
+      const rm = t.room_number.replace(/[^0-9B]/gi, '');
+      if (!occupiedRoomSet.has(rm)) maintRoomSet.add(rm);
     });
-    const maintCount = activeMaintSet.size;
-    const vacantCount = Math.max(0, totalRooms - occupiedCount - maintCount);
+    const maintCount = maintRoomSet.size;
+    const vacantCount = roomsList.length > 0
+      ? roomsList.filter(r => r.status === 'vacant').length
+      : Math.max(0, totalRooms - occupiedCount - maintCount);
     const occPercent = totalRooms > 0 ? Math.round((occupiedCount / totalRooms) * 100) : 0;
 
     // 1. Update Staff Team Contact List UI (รายชื่อพร้อมเบอร์ติดต่อ แทนการแสดงรูป)
@@ -8689,8 +8836,7 @@ async function initStaffDashboard() {
     let occTanakrit = 0;
     let occKing = 0;
     let occUG = 0;
-    tenants.forEach(t => {
-      const rm = String(t.room || '').trim();
+    occupiedRoomSet.forEach(rm => {
       if (rm.startsWith('B')) occUG++;
       else if (Number(rm) >= 200) occKing++;
       else if (rm) occTanakrit++;
@@ -9862,7 +10008,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ล้างแคชข้อมูลจำลอง (Mock data) เก่าทั้งหมด เพื่อบังคับโหลด Realtime จาก Supabase Cloud 100%
   try {
-    const DATA_VERSION = 'tanakrit_realtime_v5_clean';
+    const DATA_VERSION = 'tanakrit_realtime_v6_rooms_sync';
     if (localStorage.getItem('tanakrit_data_version') !== DATA_VERSION) {
       localStorage.removeItem('tanakrit_rooms_cache');
       localStorage.removeItem('tanakrit_rooms_cache_v3');

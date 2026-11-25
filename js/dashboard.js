@@ -407,6 +407,7 @@ export async function initStaffDashboard() {
   // 1. Fetch real dormitory data from supabase to augment CRM cards
   try {
     const [
+      { data: roomsData },
       { data: tenantsData },
       { data: ticketsData },
       { data: billsData },
@@ -415,6 +416,7 @@ export async function initStaffDashboard() {
       { data: parcelsData },
       { data: announcementsData }
     ] = await Promise.all([
+      supabase.from('rooms').select('*'),
       supabase.from('tenants').select('*'),
       supabase.from('maintenance').select('*'),
       supabase.from('meter_readings').select('*'),
@@ -424,6 +426,7 @@ export async function initStaffDashboard() {
       supabase.from('announcements').select('*').order('pinned', { ascending: false })
     ]);
 
+    const roomsList = Array.isArray(roomsData) ? roomsData : [];
     const tenants = Array.isArray(tenantsData) ? tenantsData.filter(t => t.status !== 'terminated') : [];
     const tickets = Array.isArray(ticketsData) ? ticketsData : [];
     const bills = Array.isArray(billsData) ? billsData : [];
@@ -432,15 +435,20 @@ export async function initStaffDashboard() {
     const parcels = Array.isArray(parcelsData) ? parcelsData : [];
     const announcements = Array.isArray(announcementsData) ? announcementsData : [];
 
-    const totalRooms = 17;
-    const occupiedCount = tenants.length;
-    // Maintenance rooms dynamically populated from Supabase
-    const activeMaintSet = new Set();
+    const totalRooms = roomsList.length > 0 ? roomsList.length : 17;
+    const occupiedRoomSet = new Set(roomsList.filter(r => r.status === 'occupied' && r.room_number).map(r => String(r.room_number).trim()));
+    tenants.forEach(t => { if (t.room) occupiedRoomSet.add(String(t.room).trim()); });
+    const occupiedCount = occupiedRoomSet.size;
+
+    const maintRoomSet = new Set(roomsList.filter(r => r.status === 'maintenance' && r.room_number).map(r => String(r.room_number).trim()));
     tickets.filter(t => t.status !== 'completed' && t.room_number).forEach(t => {
-      activeMaintSet.add(t.room_number.replace(/[^0-9B]/gi, ''));
+      const rm = t.room_number.replace(/[^0-9B]/gi, '');
+      if (!occupiedRoomSet.has(rm)) maintRoomSet.add(rm);
     });
-    const maintCount = activeMaintSet.size;
-    const vacantCount = Math.max(0, totalRooms - occupiedCount - maintCount);
+    const maintCount = maintRoomSet.size;
+    const vacantCount = roomsList.length > 0
+      ? roomsList.filter(r => r.status === 'vacant').length
+      : Math.max(0, totalRooms - occupiedCount - maintCount);
     const occPercent = totalRooms > 0 ? Math.round((occupiedCount / totalRooms) * 100) : 0;
 
     // 1. Update Staff Team Contact List UI (รายชื่อพร้อมเบอร์ติดต่อ แทนการแสดงรูป)
@@ -473,8 +481,7 @@ export async function initStaffDashboard() {
     let occTanakrit = 0;
     let occKing = 0;
     let occUG = 0;
-    tenants.forEach(t => {
-      const rm = String(t.room || '').trim();
+    occupiedRoomSet.forEach(rm => {
       if (rm.startsWith('B')) occUG++;
       else if (Number(rm) >= 200) occKing++;
       else if (rm) occTanakrit++;

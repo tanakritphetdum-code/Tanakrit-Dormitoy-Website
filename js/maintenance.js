@@ -625,10 +625,31 @@ function openUpdateTicketModal(ticket) {
     const st = document.getElementById('up-status').value;
     const tech = document.getElementById('up-tech').value.trim();
 
-    await supabase.from('maintenance').eq('id', ticket.id).update({
+    const { error } = await supabase.from('maintenance').eq('id', ticket.id).update({
       status: st,
       technician: tech
     });
+
+    if (error) {
+      toast('บันทึกสถานะงานซ่อมไม่สำเร็จ', 'error');
+      return;
+    }
+
+    // หากปิดงานซ่อม (completed) แล้วห้องนั้นยังอยู่สถานะปิดปรับปรุงและไม่มีงานซ่อมอื่นค้าง ให้เปลี่ยนเป็นพร้อมใช้งานอัตโนมัติ
+    if (st === 'completed' && ticket.room_number) {
+      try {
+        const cleanRoom = String(ticket.room_number).trim();
+        const [{ data: roomRows }, { data: remainingTickets }] = await Promise.all([
+          supabase.from('rooms').select('id,status').eq('room_number', cleanRoom),
+          supabase.from('maintenance').select('id,status').eq('room_number', cleanRoom)
+        ]);
+        const hasOpen = Array.isArray(remainingTickets) && remainingTickets.some(t => t.id !== ticket.id && t.status !== 'completed');
+        const targetRoom = Array.isArray(roomRows) ? roomRows[0] : null;
+        if (!hasOpen && targetRoom && targetRoom.status === 'maintenance') {
+          await supabase.from('rooms').eq('id', targetRoom.id).update({ status: 'vacant' });
+        }
+      } catch (_) {}
+    }
 
     toast('บันทึกความคืบหน้ารายการซ่อมเรียบร้อยแล้ว', 'success');
     closeModal();

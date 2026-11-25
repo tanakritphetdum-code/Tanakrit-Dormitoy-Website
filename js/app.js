@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ล้างแคชข้อมูลจำลอง (Mock data) เก่าทั้งหมด เพื่อบังคับโหลด Realtime จาก Supabase Cloud 100%
   try {
-    const DATA_VERSION = 'tanakrit_realtime_v5_clean';
+    const DATA_VERSION = 'tanakrit_realtime_v6_rooms_sync';
     if (localStorage.getItem('tanakrit_data_version') !== DATA_VERSION) {
       localStorage.removeItem('tanakrit_rooms_cache');
       localStorage.removeItem('tanakrit_rooms_cache_v3');

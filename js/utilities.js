@@ -4,7 +4,7 @@
 import { supabase, getPromptPayDetails, savePromptPayDetails } from './supabase.js';
 import { ic, fmtCurrency, fmtDate, showModal, closeModal, toast, compressImage, showImageModal, bahtText } from './api.js';
 import { currentUser } from './auth.js';
-import { DEFAULT_ROOMS } from './rooms.js';
+import { DEFAULT_ROOMS, fetchLiveRooms } from './rooms.js';
 
 let utilityStatusFilter = 'all';
 let utilitySearchQuery = '';
@@ -809,7 +809,7 @@ export function openInvoiceModal(bill) {
 
 // Modal จดมิเตอร์ใหม่ (Smoky Glass)
 async function openAddMeterModal() {
-  const rooms = DEFAULT_ROOMS;
+  const rooms = await fetchLiveRooms();
 
   const roomOptions = rooms.map(r => `
     <option value="${r.room_number}" data-price="${r.price}" data-tenant="${r.tenant_name || ''}">
@@ -1224,7 +1224,7 @@ export async function openBatchGenerateBillsModal() {
     }
   });
 
-  const rooms = DEFAULT_ROOMS;
+  const rooms = await fetchLiveRooms();
 
   const renderRows = (selMonth) => {
     return rooms.map(r => {
