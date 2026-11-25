@@ -43,7 +43,7 @@ async function fetchTenantsList() {
       // ทำการแมปข้อมูลที่ได้จาก Supabase ตรงตามจริง
       const mapped = data.map(dbItem => {
         const bInfo = getBuildingInfo(dbItem.room);
-        const existing = (cachedTenants.length > 0 ? cachedTenants : []).find(x => x.room === dbItem.room || x.id === dbItem.id);
+        const existing = (cachedTenants.length > 0 ? cachedTenants : []).find(x => x.id === dbItem.id);
         return {
           id: dbItem.id || 'T-' + Math.random().toString(36).substring(2, 7),
           tenant_id: dbItem.tenant_id || (existing ? existing.tenant_id : '6512000'),
@@ -51,7 +51,7 @@ async function fetchTenantsList() {
           room: dbItem.room || (existing ? existing.room : '101'),
           building: bInfo.name,
           building_th: bInfo.nameTh,
-          rent: existing ? existing.rent : bInfo.rent,
+          rent: bInfo.rent,
           phone: dbItem.phone || (existing ? existing.phone : '-'),
           email: dbItem.email || (existing ? existing.email : '-'),
           line_id: (existing && existing.line_id) ? existing.line_id : '-',
@@ -738,9 +738,9 @@ export function openEditTenantModal(tenant) {
         <div>
           <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ระยะเวลาสัญญา</label>
           <select id="ed-tenant-lease" class="smoky-glass-input" style="width: 100%; height: 38px;">
-            <option value="สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)" style="background:#141a29; color:white;">สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)</option>
-            <option value="สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)" style="background:#141a29; color:white;">สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)</option>
-            <option value="สัญญารายเดือน" style="background:#141a29; color:white;">สัญญารายเดือน</option>
+            <option value="สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)" ${tenant.lease_term === 'สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)' ? 'selected' : ''} style="background:#141a29; color:white;">สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)</option>
+            <option value="สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)" ${tenant.lease_term === 'สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)' ? 'selected' : ''} style="background:#141a29; color:white;">สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)</option>
+            <option value="สัญญารายเดือน" ${tenant.lease_term === 'สัญญารายเดือน' ? 'selected' : ''} style="background:#141a29; color:white;">สัญญารายเดือน</option>
           </select>
         </div>
       </div>
@@ -783,6 +783,7 @@ export function openEditTenantModal(tenant) {
   });
 
   document.getElementById('btn-submit-edit-tenant').onclick = async () => {
+    const saveBtn = document.getElementById('btn-submit-edit-tenant');
     const name = document.getElementById('ed-tenant-name').value.trim();
     const tid = document.getElementById('ed-tenant-tid').value.trim();
     const room = document.getElementById('ed-tenant-room').value;
@@ -802,6 +803,53 @@ export function openEditTenantModal(tenant) {
 
     const oldRoom = tenant.room;
     const bInfo = getBuildingInfo(room);
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'กำลังบันทึก...';
+
+    // ซิงค์ไปยัง Supabase ก่อน
+    const { error: tErr } = await supabase.from('tenants').eq('id', tenant.id).update({
+      name,
+      tenant_id: tid,
+      room,
+      phone,
+      email,
+      check_in: checkin
+    });
+
+    if (tErr) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'บันทึกการแก้ไข';
+      toast(`บันทึกข้อมูลผู้เช่าไม่สำเร็จ: ${tErr.message || 'กรุณาลองใหม่'}`, 'error');
+      return;
+    }
+
+    try {
+      // ซิงค์ rooms หากเปลี่ยนห้องหรือแก้ไขข้อมูลผู้เช่า
+      if (oldRoom && oldRoom !== room) {
+        await supabase.from('rooms').eq('room_number', oldRoom).update({
+          status: 'vacant',
+          tenant_name: '',
+          tenant_phone: ''
+        });
+      }
+      await supabase.from('rooms').eq('room_number', room).update({
+        status: 'occupied',
+        tenant_name: name,
+        tenant_phone: phone
+      });
+      // ซิงค์ users
+      if (tid) {
+        await supabase.from('users').eq('username', tid).update({
+          name,
+          room,
+          phone,
+          email
+        });
+      }
+    } catch (err) {
+      console.warn('Sync edit tenant secondary error:', err);
+    }
 
     // อัปเดตใน Cached Array
     const idx = cachedTenants.findIndex(x => x.id === tenant.id);
@@ -824,39 +872,6 @@ export function openEditTenantModal(tenant) {
         notes
       };
       localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
-    }
-
-    // ซิงค์ไปยัง Supabase
-    try {
-      await supabase.from('tenants').eq('id', tenant.id).update({
-        name,
-        tenant_id: tid,
-        room,
-        phone,
-        email,
-        check_in: checkin
-      });
-      // ซิงค์ rooms หากเปลี่ยนห้องหรือแก้ไขข้อมูลผู้เช่า
-      if (oldRoom && oldRoom !== room) {
-        await supabase.from('rooms').eq('room_number', oldRoom).update({
-          status: 'vacant',
-          tenant_name: '',
-          tenant_phone: ''
-        });
-      }
-      await supabase.from('rooms').eq('room_number', room).update({
-        status: 'occupied',
-        tenant_name: name,
-        tenant_phone: phone
-      });
-      // ซิงค์ users
-      await supabase.from('users').eq('room', room).update({
-        name,
-        phone,
-        email
-      });
-    } catch (err) {
-      console.warn('Sync edit tenant error:', err);
     }
 
     closeModal();
@@ -979,6 +994,7 @@ export function openAddTenantModal() {
   });
 
   document.getElementById('btn-submit-add-tenant').onclick = async () => {
+    const addBtn = document.getElementById('btn-submit-add-tenant');
     const name = document.getElementById('add-tenant-name').value.trim();
     const tid = document.getElementById('add-tenant-tid').value.trim() || '6512' + Math.floor(100 + Math.random() * 900);
     const room = document.getElementById('add-tenant-room').value;
@@ -997,6 +1013,66 @@ export function openAddTenantModal() {
 
     const bInfo = getBuildingInfo(room);
     const newId = 'T-' + Math.floor(1000 + Math.random() * 9000);
+
+    addBtn.disabled = true;
+    addBtn.textContent = 'กำลังบันทึก...';
+
+    // บันทึกลง Supabase ก่อน
+    const { error: tErr } = await supabase.from('tenants').insert([{
+      id: newId,
+      tenant_id: tid,
+      name,
+      room,
+      phone,
+      email,
+      check_in: checkin,
+      role: 'student'
+    }]);
+
+    if (tErr) {
+      addBtn.disabled = false;
+      addBtn.textContent = '+ ยืนยันการลงทะเบียน';
+      toast(`ลงทะเบียนผู้เช่าไม่สำเร็จ: ${tErr.message || 'กรุณาลองใหม่'}`, 'error');
+      return;
+    }
+
+    try {
+      await supabase.from('rooms').eq('room_number', room).update({
+        status: 'occupied',
+        tenant_name: name,
+        tenant_phone: phone
+      });
+
+      // สร้างหรืออัปเดตบัญชีผู้ใช้งานสำหรับผู้พักอาศัยเข้าสู่ระบบ (Username: tid, Password: room)
+      const { data: existingUser } = await supabase.from('users').eq('username', tid);
+      if (Array.isArray(existingUser) && existingUser.length > 0) {
+        await supabase.from('users').eq('id', existingUser[0].id).update({
+          room,
+          name,
+          phone,
+          email,
+          tenant_id: tid,
+          role_title: `ผู้พักอาศัย (ห้อง ${room})`,
+          status: 'active'
+        });
+      } else {
+        await supabase.from('users').insert([{
+          id: 'U-' + Math.floor(1000 + Math.random() * 9000),
+          username: tid,
+          password: room,
+          role: 'student',
+          room,
+          name,
+          phone,
+          email,
+          tenant_id: tid,
+          role_title: `ผู้พักอาศัย (ห้อง ${room})`,
+          status: 'active'
+        }]);
+      }
+    } catch (err) {
+      console.warn('Sync add tenant secondary error:', err);
+    }
 
     const newTenant = {
       id: newId,
@@ -1019,31 +1095,8 @@ export function openAddTenantModal() {
       notes: 'ลงทะเบียนเข้าพักใหม่'
     };
 
-    // เพิ่มลง cache
     cachedTenants.unshift(newTenant);
     localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
-
-    // บันทึกลง Supabase
-    try {
-      await supabase.from('tenants').insert([{
-        id: newId,
-        tenant_id: tid,
-        name,
-        room,
-        phone,
-        email,
-        check_in: checkin,
-        role: 'student'
-      }]);
-
-      await supabase.from('rooms').eq('room_number', room).update({
-        status: 'occupied',
-        tenant_name: name,
-        tenant_phone: phone
-      });
-    } catch (err) {
-      console.warn('Sync add tenant error:', err);
-    }
 
     closeModal();
     renderTenantsTable();
@@ -1060,13 +1113,18 @@ export async function deleteTenant(id) {
     return;
   }
 
+  const { error } = await supabase.from('tenants').eq('id', id).delete();
+  if (error) {
+    toast(`บันทึกการย้ายออกไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+    return;
+  }
+
   // ลบออกจาก cache
   cachedTenants = cachedTenants.filter(x => x.id !== id);
   localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
 
-  // ซิงค์การลบกับ Supabase
+  // ซิงค์ห้องว่างกับ Supabase
   try {
-    await supabase.from('tenants').eq('id', id).delete();
     await supabase.from('rooms').eq('room_number', tenant.room).update({
       status: 'vacant',
       tenant_name: '',

@@ -150,11 +150,20 @@ async function loadRequestsTable() {
       const target = requests.find(x => x.id === id);
       if (!target) return;
       if (confirm(`ยืนยันการอนุมัติคำร้อง ${target.request_id || target.id} ให้ย้ายจากห้อง ${target.current_room} ไป ${target.target_room}?`)) {
-        await supabase.from('requests').eq('id', id).update({ status: 'approved' });
+        const { error } = await supabase.from('requests').eq('id', id).update({ status: 'approved' });
+        if (error) {
+          toast(`อนุมัติคำร้องไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         // Auto update room tenant if exists
-        await supabase.from('rooms').eq('room_number', target.current_room).update({ status: 'vacant', tenant_name: '', tenant_phone: '' });
-        await supabase.from('rooms').eq('room_number', target.target_room).update({ status: 'occupied', tenant_name: target.requester_name, tenant_phone: target.phone });
+        if (target.current_room) {
+          await supabase.from('rooms').eq('room_number', target.current_room).update({ status: 'vacant', tenant_name: '', tenant_phone: '' });
+        }
+        if (target.target_room) {
+          await supabase.from('rooms').eq('room_number', target.target_room).update({ status: 'occupied', tenant_name: target.requester_name, tenant_phone: target.phone || '' });
+        }
         await supabase.from('tenants').eq('name', target.requester_name).update({ room: target.target_room });
+        await supabase.from('users').eq('username', target.requester_id || '').update({ room: target.target_room });
         toast(`อนุมัติคำร้องของ ${target.requester_name} เรียบร้อยแล้ว`, 'success');
         loadRequestsTable();
       }
@@ -168,7 +177,11 @@ async function loadRequestsTable() {
       const target = requests.find(x => x.id === id);
       if (!target) return;
       if (confirm(`ยืนยันการปฏิเสธคำร้อง ${target.request_id || target.id}?`)) {
-        await supabase.from('requests').eq('id', id).update({ status: 'rejected' });
+        const { error } = await supabase.from('requests').eq('id', id).update({ status: 'rejected' });
+        if (error) {
+          toast(`ปฏิเสธคำร้องไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         toast(`ปฏิเสธคำร้องเรียบร้อยแล้ว`, 'info');
         loadRequestsTable();
       }

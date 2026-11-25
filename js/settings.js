@@ -199,12 +199,12 @@ function bindSettingsEvents() {
       }
 
       try {
-        try {
-          await supabase.from('users').eq('username', currentUser.username).update({
-            password: p1
-          });
-        } catch (dbErr) {
-          console.warn('Supabase update warning:', dbErr);
+        const { error } = await supabase.from('users').eq('username', currentUser.username).update({
+          password: p1
+        });
+        if (error) {
+          toast(`บันทึกรหัสผ่านลงฐานข้อมูลไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
         }
 
         currentUser.password = p1;

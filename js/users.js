@@ -280,7 +280,11 @@ async function loadUsersData() {
       const target = users.find(x => x.id === id);
       if (!target) return;
       const nextStatus = target.status === 'suspended' ? 'active' : 'suspended';
-      await supabase.from('users').eq('id', id).update({ status: nextStatus });
+      const { error } = await supabase.from('users').eq('id', id).update({ status: nextStatus });
+      if (error) {
+        toast(`เปลี่ยนสถานะบัญชีไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
+      }
       toast(`เปลี่ยนสถานะบัญชี ${target.username} เป็น ${nextStatus === 'active' ? 'เปิดใช้งาน' : 'ระงับการใช้งาน'} แล้ว`, 'success');
       loadUsersData();
     };
@@ -291,7 +295,11 @@ async function loadUsersData() {
       const id = btn.getAttribute('data-user-id');
       const uName = btn.getAttribute('data-username');
       if (confirm(`คุณต้องการลบบัญชีผู้ใช้ "${uName}" หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้`)) {
-        await supabase.from('users').eq('id', id).delete();
+        const { error } = await supabase.from('users').eq('id', id).delete();
+        if (error) {
+          toast(`ลบบัญชีผู้ใช้ไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         toast(`ลบบัญชีผู้ใช้ ${uName} สำเร็จ`, 'info');
         loadUsersData();
       }
@@ -421,6 +429,7 @@ function openUserModal(user = null) {
   if (cancelBtn) cancelBtn.onclick = closeModal;
 
   document.getElementById('btn-submit-user').onclick = async () => {
+    const submitBtn = document.getElementById('btn-submit-user');
     const username = document.getElementById('u-username').value.trim();
     const password = document.getElementById('u-password').value.trim();
     const role = document.getElementById('u-role').value;
@@ -437,22 +446,30 @@ function openUserModal(user = null) {
       return;
     }
 
+    const origBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'กำลังบันทึก...';
+
+    const resolvedTitle = title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room || '-'})`));
+
     if (isEdit) {
-      try {
-        const { error } = await supabase.from('users').eq('id', user.id).update({
-          password,
-          role,
-          room: role === 'student' ? room : null,
-          name,
-          role_title: title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`)),
-          phone,
-          email,
-          tenant_id,
-          status
-        });
-        if (error) console.warn('Supabase user update warning:', error);
-      } catch (dbErr) {
-        console.warn('Supabase user update offline / skipped:', dbErr);
+      const { error } = await supabase.from('users').eq('id', user.id).update({
+        password,
+        role,
+        room: role === 'student' ? room : null,
+        name,
+        role_title: resolvedTitle,
+        phone,
+        email,
+        tenant_id,
+        status
+      });
+
+      if (error) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
+        toast(`แก้ไขบัญชีไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
       }
 
       // บันทึกรหัสผ่านใหม่ลง Local Storage เพื่อรองรับการทำงานแบบออฟไลน์
@@ -468,7 +485,7 @@ function openUserModal(user = null) {
         currentUser.email = email;
         currentUser.role = role;
         currentUser.room = room;
-        currentUser.roleTitle = title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`));
+        currentUser.roleTitle = resolvedTitle;
         currentUser.password = password;
         currentUser.initial = name ? name.trim().charAt(0) : 'U';
 
@@ -483,12 +500,18 @@ function openUserModal(user = null) {
       }
 
       toast(`แก้ไขบัญชี ${user.username} เรียบร้อยแล้ว`, 'success');
-      closeModal();
-      loadUsersData();
     } else {
       // Check duplicate username
-      const { data: exist } = await supabase.from('users').eq('username', username);
+      const { data: exist, error: existErr } = await supabase.from('users').eq('username', username);
+      if (existErr) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
+        toast('ไม่สามารถตรวจสอบชื่อผู้ใช้ได้ กรุณาลองใหม่', 'error');
+        return;
+      }
       if (exist && exist.length > 0) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
         toast('ชื่อผู้ใช้นี้ (Username) มีอยู่ในระบบแล้ว', 'error');
         return;
       }
@@ -501,7 +524,7 @@ function openUserModal(user = null) {
         role,
         room: role === 'student' ? room : null,
         name,
-        role_title: title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`)),
+        role_title: resolvedTitle,
         phone,
         email,
         tenant_id,
@@ -509,7 +532,9 @@ function openUserModal(user = null) {
       }]);
 
       if (error) {
-        toast('เกิดข้อผิดพลาดในการสร้างบัญชีผู้ใช้', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
+        toast(`เกิดข้อผิดพลาดในการสร้างบัญชีผู้ใช้: ${error.message || ''}`, 'error');
         return;
       }
       toast(`สร้างบัญชีผู้ใช้ ${username} สำเร็จ`, 'success');

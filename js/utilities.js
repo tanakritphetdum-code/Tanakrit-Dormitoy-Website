@@ -335,10 +335,13 @@ async function loadUtilitiesData() {
       const target = readings.find(x => x.id === id);
       if (!target) return;
       const nextStatus = target.status === 'paid' ? 'pending' : 'paid';
-      await supabase.from('meter_readings').eq('id', id).update({ 
-        status: nextStatus,
-        paid_at: nextStatus === 'paid' ? new Date().toISOString() : null
+      const { error } = await supabase.from('meter_readings').eq('id', id).update({
+        status: nextStatus
       });
+      if (error) {
+        toast(`เปลี่ยนสถานะบิลไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
+      }
       toast(`เปลี่ยนสถานะบิล ${target.id} เป็น "${nextStatus === 'paid' ? 'ชำระแล้ว' : 'รอชำระ'}"`, 'success');
       loadUtilitiesData();
     };
@@ -736,12 +739,13 @@ export function openInvoiceModal(bill) {
         const dataUrl = await compressImage(selectedSlipFile, 1200, 0.85);
         const notes = document.getElementById('slip-notes-input').value.trim();
 
-        await supabase.from('meter_readings').eq('id', bill.id).update({
+        const { error } = await supabase.from('meter_readings').eq('id', bill.id).update({
           status: 'verifying',
           slip_url: dataUrl,
           slip_uploaded_at: new Date().toISOString(),
           payment_notes: notes
         });
+        if (error) throw error;
 
         toast('ส่งหลักฐานสลิปโอนเงินเรียบร้อยแล้ว รอเจ้าหน้าที่ตรวจสอบ', 'success');
         closeModal();
@@ -757,13 +761,19 @@ export function openInvoiceModal(bill) {
   const btnApproveSlip = document.getElementById('btn-approve-slip');
   if (btnApproveSlip) {
     btnApproveSlip.onclick = async () => {
+      const origHtml = btnApproveSlip.innerHTML;
       btnApproveSlip.disabled = true;
       btnApproveSlip.innerHTML = '⏳ กำลังอนุมัติและออกใบเสร็จ...';
       const paidAt = new Date().toISOString();
-      await supabase.from('meter_readings').eq('id', bill.id).update({
-        status: 'paid',
-        paid_at: paidAt
+      const { error } = await supabase.from('meter_readings').eq('id', bill.id).update({
+        status: 'paid'
       });
+      if (error) {
+        btnApproveSlip.disabled = false;
+        btnApproveSlip.innerHTML = origHtml;
+        toast(`อนุมัติบิลไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
+      }
       bill.status = 'paid';
       bill.paid_at = paidAt;
       toast(`อนุมัติการชำระเงินห้อง ${bill.room_number} สำเร็จ`, 'success');
@@ -796,10 +806,15 @@ export function openInvoiceModal(bill) {
       if (reason === null) return;
 
       btnRejectSlip.disabled = true;
-      await supabase.from('meter_readings').eq('id', bill.id).update({
+      const { error } = await supabase.from('meter_readings').eq('id', bill.id).update({
         status: 'pending',
         payment_notes: `[ปฏิเสธ]: ${reason}`
       });
+      if (error) {
+        btnRejectSlip.disabled = false;
+        toast(`ปฏิเสธสลิปไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
+      }
       toast(`ปฏิเสธสลิปและแจ้งให้ห้อง ${bill.room_number} โอนใหม่แล้ว`, 'info');
       closeModal();
       if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
@@ -833,7 +848,7 @@ async function openAddMeterModal() {
         </div>
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ค่าเช่าห้องพัก (บาท/เดือน)</label>
-          <input type="number" id="mr-room-price" value="1500" class="smoky-glass-input" style="width: 100%;" required>
+          <input type="number" id="mr-room-price" value="${rooms[0]?.price ?? 1500}" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
@@ -948,6 +963,7 @@ async function openAddMeterModal() {
   calc();
 
   document.getElementById('btn-submit-meter').onclick = async () => {
+    const submitBtn = document.getElementById('btn-submit-meter');
     const vals = calc();
     const sel = document.getElementById('mr-room');
     const roomNum = sel.value;
@@ -955,7 +971,11 @@ async function openAddMeterModal() {
     const month = document.getElementById('mr-month').value;
     const invId = `INV-${month.replace('-', '')}-${roomNum}`;
 
-    await supabase.from('meter_readings').insert([{
+    submitBtn.disabled = true;
+    const origText = submitBtn.textContent;
+    submitBtn.textContent = 'กำลังบันทึกบิล...';
+
+    const { error } = await supabase.from('meter_readings').insert([{
       id: invId,
       room_number: roomNum,
       tenant_name: tenantName,
@@ -977,6 +997,14 @@ async function openAddMeterModal() {
       status: 'pending',
       due_date: new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0]
     }]);
+
+    if (error) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = origText;
+      const isDup = String(error.code || '') === '23505';
+      toast(isDup ? `ห้อง ${roomNum} มีบิลรอบเดือน ${month} อยู่ในระบบแล้ว` : `ออกบิลไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+      return;
+    }
 
     toast(`ออกบิล ${invId} สำหรับห้อง ${roomNum} สำเร็จ`, 'success');
     closeModal();
@@ -1207,8 +1235,9 @@ export async function openBatchGenerateBillsModal() {
 
   const tenantMap = {};
   tenants.forEach(t => {
-    if (t.room_number) {
-      tenantMap[t.room_number.replace(/[^0-9B]/gi, '')] = t.name;
+    const r = t.room || t.room_number;
+    if (r) {
+      tenantMap[String(r).replace(/[^0-9B]/gi, '')] = t.name;
     }
   });
 
@@ -1578,7 +1607,8 @@ export function openManagePromptPayModal() {
       btnSave.textContent = '⏳ กำลังบันทึกลง Supabase Cloud...';
 
       try {
-        await savePromptPayDetails(number, name);
+        const res = await savePromptPayDetails(number, name);
+        if (res && res.error) throw res.error;
         toast(`บันทึกบัญชีรับเงิน "${number} (${name})" เรียบร้อยแล้ว`, 'success');
         closeModal();
         if (typeof loadUtilitiesData === 'function') loadUtilitiesData();

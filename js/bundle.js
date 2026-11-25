@@ -1415,10 +1415,13 @@ async function loadUtilitiesData() {
       const target = readings.find(x => x.id === id);
       if (!target) return;
       const nextStatus = target.status === 'paid' ? 'pending' : 'paid';
-      await supabase.from('meter_readings').eq('id', id).update({ 
-        status: nextStatus,
-        paid_at: nextStatus === 'paid' ? new Date().toISOString() : null
+      const { error } = await supabase.from('meter_readings').eq('id', id).update({
+        status: nextStatus
       });
+      if (error) {
+        toast(`เปลี่ยนสถานะบิลไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
+      }
       toast(`เปลี่ยนสถานะบิล ${target.id} เป็น "${nextStatus === 'paid' ? 'ชำระแล้ว' : 'รอชำระ'}"`, 'success');
       loadUtilitiesData();
     };
@@ -1816,12 +1819,13 @@ function openInvoiceModal(bill) {
         const dataUrl = await compressImage(selectedSlipFile, 1200, 0.85);
         const notes = document.getElementById('slip-notes-input').value.trim();
 
-        await supabase.from('meter_readings').eq('id', bill.id).update({
+        const { error } = await supabase.from('meter_readings').eq('id', bill.id).update({
           status: 'verifying',
           slip_url: dataUrl,
           slip_uploaded_at: new Date().toISOString(),
           payment_notes: notes
         });
+        if (error) throw error;
 
         toast('ส่งหลักฐานสลิปโอนเงินเรียบร้อยแล้ว รอเจ้าหน้าที่ตรวจสอบ', 'success');
         closeModal();
@@ -1837,13 +1841,19 @@ function openInvoiceModal(bill) {
   const btnApproveSlip = document.getElementById('btn-approve-slip');
   if (btnApproveSlip) {
     btnApproveSlip.onclick = async () => {
+      const origHtml = btnApproveSlip.innerHTML;
       btnApproveSlip.disabled = true;
       btnApproveSlip.innerHTML = '⏳ กำลังอนุมัติและออกใบเสร็จ...';
       const paidAt = new Date().toISOString();
-      await supabase.from('meter_readings').eq('id', bill.id).update({
-        status: 'paid',
-        paid_at: paidAt
+      const { error } = await supabase.from('meter_readings').eq('id', bill.id).update({
+        status: 'paid'
       });
+      if (error) {
+        btnApproveSlip.disabled = false;
+        btnApproveSlip.innerHTML = origHtml;
+        toast(`อนุมัติบิลไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
+      }
       bill.status = 'paid';
       bill.paid_at = paidAt;
       toast(`อนุมัติการชำระเงินห้อง ${bill.room_number} สำเร็จ`, 'success');
@@ -1876,10 +1886,15 @@ function openInvoiceModal(bill) {
       if (reason === null) return;
 
       btnRejectSlip.disabled = true;
-      await supabase.from('meter_readings').eq('id', bill.id).update({
+      const { error } = await supabase.from('meter_readings').eq('id', bill.id).update({
         status: 'pending',
         payment_notes: `[ปฏิเสธ]: ${reason}`
       });
+      if (error) {
+        btnRejectSlip.disabled = false;
+        toast(`ปฏิเสธสลิปไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
+      }
       toast(`ปฏิเสธสลิปและแจ้งให้ห้อง ${bill.room_number} โอนใหม่แล้ว`, 'info');
       closeModal();
       if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
@@ -1913,7 +1928,7 @@ async function openAddMeterModal() {
         </div>
         <div class="field">
           <label class="smoky-form-label" style="font-size: 0.82rem; margin-bottom: 6px; display: block;">ค่าเช่าห้องพัก (บาท/เดือน)</label>
-          <input type="number" id="mr-room-price" value="1500" class="smoky-glass-input" style="width: 100%;" required>
+          <input type="number" id="mr-room-price" value="${rooms[0]?.price ?? 1500}" class="smoky-glass-input" style="width: 100%;" required>
         </div>
       </div>
 
@@ -2028,6 +2043,7 @@ async function openAddMeterModal() {
   calc();
 
   document.getElementById('btn-submit-meter').onclick = async () => {
+    const submitBtn = document.getElementById('btn-submit-meter');
     const vals = calc();
     const sel = document.getElementById('mr-room');
     const roomNum = sel.value;
@@ -2035,7 +2051,11 @@ async function openAddMeterModal() {
     const month = document.getElementById('mr-month').value;
     const invId = `INV-${month.replace('-', '')}-${roomNum}`;
 
-    await supabase.from('meter_readings').insert([{
+    submitBtn.disabled = true;
+    const origText = submitBtn.textContent;
+    submitBtn.textContent = 'กำลังบันทึกบิล...';
+
+    const { error } = await supabase.from('meter_readings').insert([{
       id: invId,
       room_number: roomNum,
       tenant_name: tenantName,
@@ -2057,6 +2077,14 @@ async function openAddMeterModal() {
       status: 'pending',
       due_date: new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0]
     }]);
+
+    if (error) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = origText;
+      const isDup = String(error.code || '') === '23505';
+      toast(isDup ? `ห้อง ${roomNum} มีบิลรอบเดือน ${month} อยู่ในระบบแล้ว` : `ออกบิลไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+      return;
+    }
 
     toast(`ออกบิล ${invId} สำหรับห้อง ${roomNum} สำเร็จ`, 'success');
     closeModal();
@@ -2287,8 +2315,9 @@ async function openBatchGenerateBillsModal() {
 
   const tenantMap = {};
   tenants.forEach(t => {
-    if (t.room_number) {
-      tenantMap[t.room_number.replace(/[^0-9B]/gi, '')] = t.name;
+    const r = t.room || t.room_number;
+    if (r) {
+      tenantMap[String(r).replace(/[^0-9B]/gi, '')] = t.name;
     }
   });
 
@@ -2658,7 +2687,8 @@ function openManagePromptPayModal() {
       btnSave.textContent = '⏳ กำลังบันทึกลง Supabase Cloud...';
 
       try {
-        await savePromptPayDetails(number, name);
+        const res = await savePromptPayDetails(number, name);
+        if (res && res.error) throw res.error;
         toast(`บันทึกบัญชีรับเงิน "${number} (${name})" เรียบร้อยแล้ว`, 'success');
         closeModal();
         if (typeof loadUtilitiesData === 'function') loadUtilitiesData();
@@ -3664,7 +3694,7 @@ async function fetchTenantsList() {
       // ทำการแมปข้อมูลที่ได้จาก Supabase ตรงตามจริง
       const mapped = data.map(dbItem => {
         const bInfo = getBuildingInfo(dbItem.room);
-        const existing = (cachedTenants.length > 0 ? cachedTenants : []).find(x => x.room === dbItem.room || x.id === dbItem.id);
+        const existing = (cachedTenants.length > 0 ? cachedTenants : []).find(x => x.id === dbItem.id);
         return {
           id: dbItem.id || 'T-' + Math.random().toString(36).substring(2, 7),
           tenant_id: dbItem.tenant_id || (existing ? existing.tenant_id : '6512000'),
@@ -3672,7 +3702,7 @@ async function fetchTenantsList() {
           room: dbItem.room || (existing ? existing.room : '101'),
           building: bInfo.name,
           building_th: bInfo.nameTh,
-          rent: existing ? existing.rent : bInfo.rent,
+          rent: bInfo.rent,
           phone: dbItem.phone || (existing ? existing.phone : '-'),
           email: dbItem.email || (existing ? existing.email : '-'),
           line_id: (existing && existing.line_id) ? existing.line_id : '-',
@@ -4359,9 +4389,9 @@ function openEditTenantModal(tenant) {
         <div>
           <label class="smoky-form-label" style="display: block; font-size: 0.82rem; margin-bottom: 5px;">ระยะเวลาสัญญา</label>
           <select id="ed-tenant-lease" class="smoky-glass-input" style="width: 100%; height: 38px;">
-            <option value="สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)" style="background:#141a29; color:white;">สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)</option>
-            <option value="สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)" style="background:#141a29; color:white;">สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)</option>
-            <option value="สัญญารายเดือน" style="background:#141a29; color:white;">สัญญารายเดือน</option>
+            <option value="สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)" ${tenant.lease_term === 'สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)' ? 'selected' : ''} style="background:#141a29; color:white;">สัญญา 1 ปี (มิ.ย. 68 - พ.ค. 69)</option>
+            <option value="สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)" ${tenant.lease_term === 'สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)' ? 'selected' : ''} style="background:#141a29; color:white;">สัญญา 6 เดือน (ก.ค. 68 - ธ.ค. 68)</option>
+            <option value="สัญญารายเดือน" ${tenant.lease_term === 'สัญญารายเดือน' ? 'selected' : ''} style="background:#141a29; color:white;">สัญญารายเดือน</option>
           </select>
         </div>
       </div>
@@ -4404,6 +4434,7 @@ function openEditTenantModal(tenant) {
   });
 
   document.getElementById('btn-submit-edit-tenant').onclick = async () => {
+    const saveBtn = document.getElementById('btn-submit-edit-tenant');
     const name = document.getElementById('ed-tenant-name').value.trim();
     const tid = document.getElementById('ed-tenant-tid').value.trim();
     const room = document.getElementById('ed-tenant-room').value;
@@ -4423,6 +4454,53 @@ function openEditTenantModal(tenant) {
 
     const oldRoom = tenant.room;
     const bInfo = getBuildingInfo(room);
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'กำลังบันทึก...';
+
+    // ซิงค์ไปยัง Supabase ก่อน
+    const { error: tErr } = await supabase.from('tenants').eq('id', tenant.id).update({
+      name,
+      tenant_id: tid,
+      room,
+      phone,
+      email,
+      check_in: checkin
+    });
+
+    if (tErr) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'บันทึกการแก้ไข';
+      toast(`บันทึกข้อมูลผู้เช่าไม่สำเร็จ: ${tErr.message || 'กรุณาลองใหม่'}`, 'error');
+      return;
+    }
+
+    try {
+      // ซิงค์ rooms หากเปลี่ยนห้องหรือแก้ไขข้อมูลผู้เช่า
+      if (oldRoom && oldRoom !== room) {
+        await supabase.from('rooms').eq('room_number', oldRoom).update({
+          status: 'vacant',
+          tenant_name: '',
+          tenant_phone: ''
+        });
+      }
+      await supabase.from('rooms').eq('room_number', room).update({
+        status: 'occupied',
+        tenant_name: name,
+        tenant_phone: phone
+      });
+      // ซิงค์ users
+      if (tid) {
+        await supabase.from('users').eq('username', tid).update({
+          name,
+          room,
+          phone,
+          email
+        });
+      }
+    } catch (err) {
+      console.warn('Sync edit tenant secondary error:', err);
+    }
 
     // อัปเดตใน Cached Array
     const idx = cachedTenants.findIndex(x => x.id === tenant.id);
@@ -4445,39 +4523,6 @@ function openEditTenantModal(tenant) {
         notes
       };
       localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
-    }
-
-    // ซิงค์ไปยัง Supabase
-    try {
-      await supabase.from('tenants').eq('id', tenant.id).update({
-        name,
-        tenant_id: tid,
-        room,
-        phone,
-        email,
-        check_in: checkin
-      });
-      // ซิงค์ rooms หากเปลี่ยนห้องหรือแก้ไขข้อมูลผู้เช่า
-      if (oldRoom && oldRoom !== room) {
-        await supabase.from('rooms').eq('room_number', oldRoom).update({
-          status: 'vacant',
-          tenant_name: '',
-          tenant_phone: ''
-        });
-      }
-      await supabase.from('rooms').eq('room_number', room).update({
-        status: 'occupied',
-        tenant_name: name,
-        tenant_phone: phone
-      });
-      // ซิงค์ users
-      await supabase.from('users').eq('room', room).update({
-        name,
-        phone,
-        email
-      });
-    } catch (err) {
-      console.warn('Sync edit tenant error:', err);
     }
 
     closeModal();
@@ -4600,6 +4645,7 @@ function openAddTenantModal() {
   });
 
   document.getElementById('btn-submit-add-tenant').onclick = async () => {
+    const addBtn = document.getElementById('btn-submit-add-tenant');
     const name = document.getElementById('add-tenant-name').value.trim();
     const tid = document.getElementById('add-tenant-tid').value.trim() || '6512' + Math.floor(100 + Math.random() * 900);
     const room = document.getElementById('add-tenant-room').value;
@@ -4618,6 +4664,66 @@ function openAddTenantModal() {
 
     const bInfo = getBuildingInfo(room);
     const newId = 'T-' + Math.floor(1000 + Math.random() * 9000);
+
+    addBtn.disabled = true;
+    addBtn.textContent = 'กำลังบันทึก...';
+
+    // บันทึกลง Supabase ก่อน
+    const { error: tErr } = await supabase.from('tenants').insert([{
+      id: newId,
+      tenant_id: tid,
+      name,
+      room,
+      phone,
+      email,
+      check_in: checkin,
+      role: 'student'
+    }]);
+
+    if (tErr) {
+      addBtn.disabled = false;
+      addBtn.textContent = '+ ยืนยันการลงทะเบียน';
+      toast(`ลงทะเบียนผู้เช่าไม่สำเร็จ: ${tErr.message || 'กรุณาลองใหม่'}`, 'error');
+      return;
+    }
+
+    try {
+      await supabase.from('rooms').eq('room_number', room).update({
+        status: 'occupied',
+        tenant_name: name,
+        tenant_phone: phone
+      });
+
+      // สร้างหรืออัปเดตบัญชีผู้ใช้งานสำหรับผู้พักอาศัยเข้าสู่ระบบ (Username: tid, Password: room)
+      const { data: existingUser } = await supabase.from('users').eq('username', tid);
+      if (Array.isArray(existingUser) && existingUser.length > 0) {
+        await supabase.from('users').eq('id', existingUser[0].id).update({
+          room,
+          name,
+          phone,
+          email,
+          tenant_id: tid,
+          role_title: `ผู้พักอาศัย (ห้อง ${room})`,
+          status: 'active'
+        });
+      } else {
+        await supabase.from('users').insert([{
+          id: 'U-' + Math.floor(1000 + Math.random() * 9000),
+          username: tid,
+          password: room,
+          role: 'student',
+          room,
+          name,
+          phone,
+          email,
+          tenant_id: tid,
+          role_title: `ผู้พักอาศัย (ห้อง ${room})`,
+          status: 'active'
+        }]);
+      }
+    } catch (err) {
+      console.warn('Sync add tenant secondary error:', err);
+    }
 
     const newTenant = {
       id: newId,
@@ -4640,31 +4746,8 @@ function openAddTenantModal() {
       notes: 'ลงทะเบียนเข้าพักใหม่'
     };
 
-    // เพิ่มลง cache
     cachedTenants.unshift(newTenant);
     localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
-
-    // บันทึกลง Supabase
-    try {
-      await supabase.from('tenants').insert([{
-        id: newId,
-        tenant_id: tid,
-        name,
-        room,
-        phone,
-        email,
-        check_in: checkin,
-        role: 'student'
-      }]);
-
-      await supabase.from('rooms').eq('room_number', room).update({
-        status: 'occupied',
-        tenant_name: name,
-        tenant_phone: phone
-      });
-    } catch (err) {
-      console.warn('Sync add tenant error:', err);
-    }
 
     closeModal();
     renderTenantsTable();
@@ -4681,13 +4764,18 @@ async function deleteTenant(id) {
     return;
   }
 
+  const { error } = await supabase.from('tenants').eq('id', id).delete();
+  if (error) {
+    toast(`บันทึกการย้ายออกไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+    return;
+  }
+
   // ลบออกจาก cache
   cachedTenants = cachedTenants.filter(x => x.id !== id);
   localStorage.setItem(TENANTS_STORAGE_KEY, JSON.stringify(cachedTenants));
 
-  // ซิงค์การลบกับ Supabase
+  // ซิงค์ห้องว่างกับ Supabase
   try {
-    await supabase.from('tenants').eq('id', id).delete();
     await supabase.from('rooms').eq('room_number', tenant.room).update({
       status: 'vacant',
       tenant_name: '',
@@ -4890,6 +4978,9 @@ function openBookingModal(preselectedType = '') {
       }
 
       closeModal();
+      if (document.getElementById('bookings-tbody')) {
+        loadBookingsData();
+      }
       showModal({
         title: '🎉 ส่งข้อมูลการจองสำเร็จ',
         body: `
@@ -4901,7 +4992,7 @@ function openBookingModal(preselectedType = '') {
               เจ้าหน้าที่หอพักชายธนกฤษฎ์จะติดต่อกลับผ่านเบอร์ <strong>${phone}</strong> เพื่อยืนยันห้องพักและขั้นตอนเข้าพักโดยเร็วที่สุดครับ
             </p>
             <div style="font-size:0.85rem; background:#F8FAFC; border: 1px solid #E2E8F0; padding:12px; border-radius:8px; color:#334155;">
-              📞 ติดต่อด่วน: <strong>086-946-1654 (นายเกียรติศักดิ์ บริหาร)</strong> หรือ Line: <strong>Tonyeiei</strong>
+              📞 ติดต่อด่วน: <strong>086-946-1654 (นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก)</strong> หรือ Line: <strong>Tonyeiei</strong>
             </div>
           </div>
         `,
@@ -5161,7 +5252,12 @@ async function loadBookingsData() {
     sel.onchange = async (e) => {
       const id = sel.getAttribute('data-id');
       const newStatus = e.target.value;
-      await supabase.from('bookings').eq('id', id).update({ status: newStatus });
+      const { error } = await supabase.from('bookings').eq('id', id).update({ status: newStatus });
+      if (error) {
+        toast(`อัปเดตสถานะการจองไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        loadBookingsData();
+        return;
+      }
       toast(`อัปเดตสถานะการจอง ${id} เรียบร้อยแล้ว`, 'success');
       loadBookingsData();
     };
@@ -5172,9 +5268,11 @@ async function loadBookingsData() {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
       if (confirm(`คุณต้องการลบรายการจอง ${id} หรือไม่?`)) {
-        try {
-          await supabase.from('bookings').eq('id', id).delete();
-        } catch (_) {}
+        const { error } = await supabase.from('bookings').eq('id', id).delete();
+        if (error) {
+          toast(`ลบรายการจองไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         cachedBookings = cachedBookings.filter(b => b.id !== id);
         toast('ลบรายการจองเรียบร้อยแล้ว', 'info');
         loadBookingsData();
@@ -5366,11 +5464,20 @@ async function loadRequestsTable() {
       const target = requests.find(x => x.id === id);
       if (!target) return;
       if (confirm(`ยืนยันการอนุมัติคำร้อง ${target.request_id || target.id} ให้ย้ายจากห้อง ${target.current_room} ไป ${target.target_room}?`)) {
-        await supabase.from('requests').eq('id', id).update({ status: 'approved' });
+        const { error } = await supabase.from('requests').eq('id', id).update({ status: 'approved' });
+        if (error) {
+          toast(`อนุมัติคำร้องไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         // Auto update room tenant if exists
-        await supabase.from('rooms').eq('room_number', target.current_room).update({ status: 'vacant', tenant_name: '', tenant_phone: '' });
-        await supabase.from('rooms').eq('room_number', target.target_room).update({ status: 'occupied', tenant_name: target.requester_name, tenant_phone: target.phone });
+        if (target.current_room) {
+          await supabase.from('rooms').eq('room_number', target.current_room).update({ status: 'vacant', tenant_name: '', tenant_phone: '' });
+        }
+        if (target.target_room) {
+          await supabase.from('rooms').eq('room_number', target.target_room).update({ status: 'occupied', tenant_name: target.requester_name, tenant_phone: target.phone || '' });
+        }
         await supabase.from('tenants').eq('name', target.requester_name).update({ room: target.target_room });
+        await supabase.from('users').eq('username', target.requester_id || '').update({ room: target.target_room });
         toast(`อนุมัติคำร้องของ ${target.requester_name} เรียบร้อยแล้ว`, 'success');
         loadRequestsTable();
       }
@@ -5384,7 +5491,11 @@ async function loadRequestsTable() {
       const target = requests.find(x => x.id === id);
       if (!target) return;
       if (confirm(`ยืนยันการปฏิเสธคำร้อง ${target.request_id || target.id}?`)) {
-        await supabase.from('requests').eq('id', id).update({ status: 'rejected' });
+        const { error } = await supabase.from('requests').eq('id', id).update({ status: 'rejected' });
+        if (error) {
+          toast(`ปฏิเสธคำร้องไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         toast(`ปฏิเสธคำร้องเรียบร้อยแล้ว`, 'info');
         loadRequestsTable();
       }
@@ -6040,7 +6151,7 @@ function openCreateTicketModal() {
       }
     }
 
-    const newTicketId = 'FIX-' + Math.floor(100 + Math.random() * 900);
+    const newTicketId = 'FIX-' + Math.floor(1000 + Math.random() * 9000);
 
     const { error } = await supabase.from('maintenance').insert([{
       id: newTicketId,
@@ -6150,8 +6261,12 @@ function openUpdateTicketModal(ticket) {
   }
 
   document.getElementById('btn-save-ticket-status').onclick = async () => {
+    const saveBtn = document.getElementById('btn-save-ticket-status');
     const st = document.getElementById('up-status').value;
     const tech = document.getElementById('up-tech').value.trim();
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'กำลังบันทึก...';
 
     const { error } = await supabase.from('maintenance').eq('id', ticket.id).update({
       status: st,
@@ -6159,7 +6274,9 @@ function openUpdateTicketModal(ticket) {
     });
 
     if (error) {
-      toast('บันทึกสถานะงานซ่อมไม่สำเร็จ', 'error');
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'บันทึกความคืบหน้า';
+      toast(`บันทึกสถานะงานซ่อมไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
       return;
     }
 
@@ -6469,10 +6586,14 @@ async function loadParcelsData() {
       const target = cachedParcels.find(x => x.id === id);
       if (!target) return;
       if (confirm(`ยืนยันการรับพัสดุเลขที่ "${target.tracking_number}" สำหรับห้อง ${target.room_number}?`)) {
-        await supabase.from('parcels').eq('id', id).update({
+        const { error } = await supabase.from('parcels').eq('id', id).update({
           status: 'collected',
           collected_at: new Date().toISOString().split('T')[0]
         });
+        if (error) {
+          toast(`บันทึกการรับพัสดุไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         toast('บันทึกการรับพัสดุเรียบร้อยแล้ว', 'success');
         loadParcelsData();
       }
@@ -6610,6 +6731,7 @@ function openAddParcelModal() {
   });
 
   document.getElementById('btn-submit-parcel').onclick = async () => {
+    const submitBtn = document.getElementById('btn-submit-parcel');
     const courier = document.getElementById('pk-courier').value;
     const tracking = document.getElementById('pk-tracking').value.trim();
     const room = document.getElementById('pk-room').value.trim();
@@ -6621,7 +6743,10 @@ function openAddParcelModal() {
       return;
     }
 
-    const newId = 'PKG-' + Math.floor(100 + Math.random() * 900);
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'กำลังบันทึก...';
+
+    const newId = 'PKG-' + Math.floor(1000 + Math.random() * 9000);
 
     const { error } = await supabase.from('parcels').insert([{
       id: newId,
@@ -6636,7 +6761,9 @@ function openAddParcelModal() {
 
     if (error) {
       console.error('Parcel insert error:', error);
-      toast('เกิดข้อผิดพลาดในการบันทึกพัสดุ', 'error');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'บันทึกรับพัสดุ';
+      toast(`เกิดข้อผิดพลาดในการบันทึกพัสดุ: ${error.message || ''}`, 'error');
       return;
     }
 
@@ -6880,7 +7007,11 @@ async function loadAnnouncementsData() {
       btn.onclick = async () => {
         const id = btn.getAttribute('data-id');
         if (confirm('คุณต้องการลบประกาศนี้ใช่หรือไม่?')) {
-          await supabase.from('announcements').eq('id', id).delete();
+          const { error } = await supabase.from('announcements').eq('id', id).delete();
+          if (error) {
+            toast(`ลบประกาศไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+            return;
+          }
           toast('ลบประกาศเรียบร้อยแล้ว', 'info');
           loadAnnouncementsData();
         }
@@ -6967,6 +7098,7 @@ function openAddAnnouncementModal() {
   });
 
   document.getElementById('btn-submit-ann').onclick = async () => {
+    const submitBtn = document.getElementById('btn-submit-ann');
     const title = document.getElementById('ann-title').value.trim();
     const cat = document.getElementById('ann-cat').value;
     const pinned = document.getElementById('ann-pinned').checked;
@@ -6977,7 +7109,10 @@ function openAddAnnouncementModal() {
       return;
     }
 
-    const newId = 'ANN-' + Math.floor(10 + Math.random() * 90);
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'กำลังเผยแพร่...';
+
+    const newId = 'ANN-' + Math.floor(1000 + Math.random() * 9000);
 
     const { error } = await supabase.from('announcements').insert([{
       id: newId,
@@ -6989,7 +7124,9 @@ function openAddAnnouncementModal() {
     }]);
 
     if (error) {
-      toast('เกิดข้อผิดพลาดในการบันทึกประกาศ', 'error');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'โพสต์ประกาศ';
+      toast(`เกิดข้อผิดพลาดในการบันทึกประกาศ: ${error.message || ''}`, 'error');
       return;
     }
 
@@ -7827,7 +7964,11 @@ async function loadUsersData() {
       const target = users.find(x => x.id === id);
       if (!target) return;
       const nextStatus = target.status === 'suspended' ? 'active' : 'suspended';
-      await supabase.from('users').eq('id', id).update({ status: nextStatus });
+      const { error } = await supabase.from('users').eq('id', id).update({ status: nextStatus });
+      if (error) {
+        toast(`เปลี่ยนสถานะบัญชีไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
+      }
       toast(`เปลี่ยนสถานะบัญชี ${target.username} เป็น ${nextStatus === 'active' ? 'เปิดใช้งาน' : 'ระงับการใช้งาน'} แล้ว`, 'success');
       loadUsersData();
     };
@@ -7838,7 +7979,11 @@ async function loadUsersData() {
       const id = btn.getAttribute('data-user-id');
       const uName = btn.getAttribute('data-username');
       if (confirm(`คุณต้องการลบบัญชีผู้ใช้ "${uName}" หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้`)) {
-        await supabase.from('users').eq('id', id).delete();
+        const { error } = await supabase.from('users').eq('id', id).delete();
+        if (error) {
+          toast(`ลบบัญชีผู้ใช้ไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         toast(`ลบบัญชีผู้ใช้ ${uName} สำเร็จ`, 'info');
         loadUsersData();
       }
@@ -7968,6 +8113,7 @@ function openUserModal(user = null) {
   if (cancelBtn) cancelBtn.onclick = closeModal;
 
   document.getElementById('btn-submit-user').onclick = async () => {
+    const submitBtn = document.getElementById('btn-submit-user');
     const username = document.getElementById('u-username').value.trim();
     const password = document.getElementById('u-password').value.trim();
     const role = document.getElementById('u-role').value;
@@ -7984,22 +8130,30 @@ function openUserModal(user = null) {
       return;
     }
 
+    const origBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'กำลังบันทึก...';
+
+    const resolvedTitle = title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room || '-'})`));
+
     if (isEdit) {
-      try {
-        const { error } = await supabase.from('users').eq('id', user.id).update({
-          password,
-          role,
-          room: role === 'student' ? room : null,
-          name,
-          role_title: title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`)),
-          phone,
-          email,
-          tenant_id,
-          status
-        });
-        if (error) console.warn('Supabase user update warning:', error);
-      } catch (dbErr) {
-        console.warn('Supabase user update offline / skipped:', dbErr);
+      const { error } = await supabase.from('users').eq('id', user.id).update({
+        password,
+        role,
+        room: role === 'student' ? room : null,
+        name,
+        role_title: resolvedTitle,
+        phone,
+        email,
+        tenant_id,
+        status
+      });
+
+      if (error) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
+        toast(`แก้ไขบัญชีไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
       }
 
       // บันทึกรหัสผ่านใหม่ลง Local Storage เพื่อรองรับการทำงานแบบออฟไลน์
@@ -8015,7 +8169,7 @@ function openUserModal(user = null) {
         currentUser.email = email;
         currentUser.role = role;
         currentUser.room = room;
-        currentUser.roleTitle = title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`));
+        currentUser.roleTitle = resolvedTitle;
         currentUser.password = password;
         currentUser.initial = name ? name.trim().charAt(0) : 'U';
 
@@ -8030,12 +8184,18 @@ function openUserModal(user = null) {
       }
 
       toast(`แก้ไขบัญชี ${user.username} เรียบร้อยแล้ว`, 'success');
-      closeModal();
-      loadUsersData();
     } else {
       // Check duplicate username
-      const { data: exist } = await supabase.from('users').eq('username', username);
+      const { data: exist, error: existErr } = await supabase.from('users').eq('username', username);
+      if (existErr) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
+        toast('ไม่สามารถตรวจสอบชื่อผู้ใช้ได้ กรุณาลองใหม่', 'error');
+        return;
+      }
       if (exist && exist.length > 0) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
         toast('ชื่อผู้ใช้นี้ (Username) มีอยู่ในระบบแล้ว', 'error');
         return;
       }
@@ -8048,7 +8208,7 @@ function openUserModal(user = null) {
         role,
         room: role === 'student' ? room : null,
         name,
-        role_title: title || (role === 'admin' ? 'ผู้ดูแลระบบสูงสุด' : (role === 'staff' ? 'เจ้าหน้าที่หอพัก' : `ผู้พักอาศัย (ห้อง ${room})`)),
+        role_title: resolvedTitle,
         phone,
         email,
         tenant_id,
@@ -8056,7 +8216,9 @@ function openUserModal(user = null) {
       }]);
 
       if (error) {
-        toast('เกิดข้อผิดพลาดในการสร้างบัญชีผู้ใช้', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = origBtnText;
+        toast(`เกิดข้อผิดพลาดในการสร้างบัญชีผู้ใช้: ${error.message || ''}`, 'error');
         return;
       }
       toast(`สร้างบัญชีผู้ใช้ ${username} สำเร็จ`, 'success');
@@ -8266,12 +8428,12 @@ function bindSettingsEvents() {
       }
 
       try {
-        try {
-          await supabase.from('users').eq('username', currentUser.username).update({
-            password: p1
-          });
-        } catch (dbErr) {
-          console.warn('Supabase update warning:', dbErr);
+        const { error } = await supabase.from('users').eq('username', currentUser.username).update({
+          password: p1
+        });
+        if (error) {
+          toast(`บันทึกรหัสผ่านลงฐานข้อมูลไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
         }
 
         currentUser.password = p1;
@@ -10178,14 +10340,27 @@ function bindNewRequestForm() {
   if (!form) return;
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
     const phone = document.getElementById('f-phone').value.trim();
     const targetRoom = document.getElementById('f-target').value.trim();
     const reason = document.getElementById('f-reason').value.trim();
     const date = document.getElementById('f-date').value;
 
+    if (!phone || !targetRoom || !reason || !date) {
+      toast('กรุณากรอกข้อมูลคำร้องให้ครบถ้วน', 'error');
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.dataset.origText = submitBtn.textContent;
+      submitBtn.textContent = 'กำลังส่งคำร้อง...';
+    }
+
+    const reqId = 'REQ-' + Math.floor(1000 + Math.random() * 9000);
     const newReq = {
-      id: 'REQ-' + Math.floor(1000 + Math.random() * 9000),
-      request_id: 'REQ-' + Math.floor(1000 + Math.random() * 9000),
+      id: reqId,
+      request_id: reqId,
       requester_name: currentUser.name,
       requester_id: currentUser.tenantId || '6512345',
       current_room: currentUser.room || '302',
@@ -10199,7 +10374,11 @@ function bindNewRequestForm() {
 
     const { error } = await supabase.from('requests').insert([newReq]);
     if (error) {
-      toast('เกิดข้อผิดพลาดในการส่งคำร้อง', 'error');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitBtn.dataset.origText || 'ส่งคำร้องขอสลับห้อง';
+      }
+      toast(`เกิดข้อผิดพลาดในการส่งคำร้อง: ${error.message || 'กรุณาลองใหม่'}`, 'error');
       return;
     }
 
@@ -10332,17 +10511,19 @@ function openCompactProfileModal() {
       }
 
       // 1. Update Supabase Cloud users table
-      try {
-        let q = supabase.from('users').update(updateData);
-        if (currentUser.id) {
-          q = q.eq('id', currentUser.id);
-        } else {
-          q = q.eq('username', currentUser.username);
-        }
-        const { error } = await q;
-        if (error) console.warn('Supabase profile update warning:', error);
-      } catch (err) {
-        console.warn('Supabase profile update error:', err);
+      let saveRes = currentUser.id
+        ? await supabase.from('users').eq('id', currentUser.id).update(updateData)
+        : await supabase.from('users').eq('username', currentUser.username).update(updateData);
+
+      if (!saveRes.error && (!Array.isArray(saveRes.data) || saveRes.data.length === 0) && currentUser.username) {
+        saveRes = await supabase.from('users').eq('username', currentUser.username).update(updateData);
+      }
+
+      if (saveRes.error) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'บันทึกการแก้ไข';
+        toast(`บันทึกข้อมูลส่วนตัวไม่สำเร็จ: ${saveRes.error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
       }
 
       // 2. Update currentUser in memory

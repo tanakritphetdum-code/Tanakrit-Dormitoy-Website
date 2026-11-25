@@ -512,7 +512,7 @@ function openCreateTicketModal() {
       }
     }
 
-    const newTicketId = 'FIX-' + Math.floor(100 + Math.random() * 900);
+    const newTicketId = 'FIX-' + Math.floor(1000 + Math.random() * 9000);
 
     const { error } = await supabase.from('maintenance').insert([{
       id: newTicketId,
@@ -622,8 +622,12 @@ function openUpdateTicketModal(ticket) {
   }
 
   document.getElementById('btn-save-ticket-status').onclick = async () => {
+    const saveBtn = document.getElementById('btn-save-ticket-status');
     const st = document.getElementById('up-status').value;
     const tech = document.getElementById('up-tech').value.trim();
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'กำลังบันทึก...';
 
     const { error } = await supabase.from('maintenance').eq('id', ticket.id).update({
       status: st,
@@ -631,7 +635,9 @@ function openUpdateTicketModal(ticket) {
     });
 
     if (error) {
-      toast('บันทึกสถานะงานซ่อมไม่สำเร็จ', 'error');
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'บันทึกความคืบหน้า';
+      toast(`บันทึกสถานะงานซ่อมไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
       return;
     }
 

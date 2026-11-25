@@ -284,10 +284,14 @@ async function loadParcelsData() {
       const target = cachedParcels.find(x => x.id === id);
       if (!target) return;
       if (confirm(`ยืนยันการรับพัสดุเลขที่ "${target.tracking_number}" สำหรับห้อง ${target.room_number}?`)) {
-        await supabase.from('parcels').eq('id', id).update({
+        const { error } = await supabase.from('parcels').eq('id', id).update({
           status: 'collected',
           collected_at: new Date().toISOString().split('T')[0]
         });
+        if (error) {
+          toast(`บันทึกการรับพัสดุไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         toast('บันทึกการรับพัสดุเรียบร้อยแล้ว', 'success');
         loadParcelsData();
       }
@@ -425,6 +429,7 @@ function openAddParcelModal() {
   });
 
   document.getElementById('btn-submit-parcel').onclick = async () => {
+    const submitBtn = document.getElementById('btn-submit-parcel');
     const courier = document.getElementById('pk-courier').value;
     const tracking = document.getElementById('pk-tracking').value.trim();
     const room = document.getElementById('pk-room').value.trim();
@@ -436,7 +441,10 @@ function openAddParcelModal() {
       return;
     }
 
-    const newId = 'PKG-' + Math.floor(100 + Math.random() * 900);
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'กำลังบันทึก...';
+
+    const newId = 'PKG-' + Math.floor(1000 + Math.random() * 9000);
 
     const { error } = await supabase.from('parcels').insert([{
       id: newId,
@@ -451,7 +459,9 @@ function openAddParcelModal() {
 
     if (error) {
       console.error('Parcel insert error:', error);
-      toast('เกิดข้อผิดพลาดในการบันทึกพัสดุ', 'error');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'บันทึกรับพัสดุ';
+      toast(`เกิดข้อผิดพลาดในการบันทึกพัสดุ: ${error.message || ''}`, 'error');
       return;
     }
 

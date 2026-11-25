@@ -255,14 +255,27 @@ function bindNewRequestForm() {
   if (!form) return;
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
     const phone = document.getElementById('f-phone').value.trim();
     const targetRoom = document.getElementById('f-target').value.trim();
     const reason = document.getElementById('f-reason').value.trim();
     const date = document.getElementById('f-date').value;
 
+    if (!phone || !targetRoom || !reason || !date) {
+      toast('กรุณากรอกข้อมูลคำร้องให้ครบถ้วน', 'error');
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.dataset.origText = submitBtn.textContent;
+      submitBtn.textContent = 'กำลังส่งคำร้อง...';
+    }
+
+    const reqId = 'REQ-' + Math.floor(1000 + Math.random() * 9000);
     const newReq = {
-      id: 'REQ-' + Math.floor(1000 + Math.random() * 9000),
-      request_id: 'REQ-' + Math.floor(1000 + Math.random() * 9000),
+      id: reqId,
+      request_id: reqId,
       requester_name: currentUser.name,
       requester_id: currentUser.tenantId || '6512345',
       current_room: currentUser.room || '302',
@@ -276,7 +289,11 @@ function bindNewRequestForm() {
 
     const { error } = await supabase.from('requests').insert([newReq]);
     if (error) {
-      toast('เกิดข้อผิดพลาดในการส่งคำร้อง', 'error');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitBtn.dataset.origText || 'ส่งคำร้องขอสลับห้อง';
+      }
+      toast(`เกิดข้อผิดพลาดในการส่งคำร้อง: ${error.message || 'กรุณาลองใหม่'}`, 'error');
       return;
     }
 
@@ -409,17 +426,19 @@ export function openCompactProfileModal() {
       }
 
       // 1. Update Supabase Cloud users table
-      try {
-        let q = supabase.from('users').update(updateData);
-        if (currentUser.id) {
-          q = q.eq('id', currentUser.id);
-        } else {
-          q = q.eq('username', currentUser.username);
-        }
-        const { error } = await q;
-        if (error) console.warn('Supabase profile update warning:', error);
-      } catch (err) {
-        console.warn('Supabase profile update error:', err);
+      let saveRes = currentUser.id
+        ? await supabase.from('users').eq('id', currentUser.id).update(updateData)
+        : await supabase.from('users').eq('username', currentUser.username).update(updateData);
+
+      if (!saveRes.error && (!Array.isArray(saveRes.data) || saveRes.data.length === 0) && currentUser.username) {
+        saveRes = await supabase.from('users').eq('username', currentUser.username).update(updateData);
+      }
+
+      if (saveRes.error) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'บันทึกการแก้ไข';
+        toast(`บันทึกข้อมูลส่วนตัวไม่สำเร็จ: ${saveRes.error.message || 'กรุณาลองใหม่'}`, 'error');
+        return;
       }
 
       // 2. Update currentUser in memory

@@ -124,6 +124,9 @@ export function openBookingModal(preselectedType = '') {
       }
 
       closeModal();
+      if (document.getElementById('bookings-tbody')) {
+        loadBookingsData();
+      }
       showModal({
         title: '🎉 ส่งข้อมูลการจองสำเร็จ',
         body: `
@@ -135,7 +138,7 @@ export function openBookingModal(preselectedType = '') {
               เจ้าหน้าที่หอพักชายธนกฤษฎ์จะติดต่อกลับผ่านเบอร์ <strong>${phone}</strong> เพื่อยืนยันห้องพักและขั้นตอนเข้าพักโดยเร็วที่สุดครับ
             </p>
             <div style="font-size:0.85rem; background:#F8FAFC; border: 1px solid #E2E8F0; padding:12px; border-radius:8px; color:#334155;">
-              📞 ติดต่อด่วน: <strong>086-946-1654 (นายเกียรติศักดิ์ บริหาร)</strong> หรือ Line: <strong>Tonyeiei</strong>
+              📞 ติดต่อด่วน: <strong>086-946-1654 (นายธนกฤษฎ์ เพชรดำ ผู้จัดการหอพัก)</strong> หรือ Line: <strong>Tonyeiei</strong>
             </div>
           </div>
         `,
@@ -395,7 +398,12 @@ async function loadBookingsData() {
     sel.onchange = async (e) => {
       const id = sel.getAttribute('data-id');
       const newStatus = e.target.value;
-      await supabase.from('bookings').eq('id', id).update({ status: newStatus });
+      const { error } = await supabase.from('bookings').eq('id', id).update({ status: newStatus });
+      if (error) {
+        toast(`อัปเดตสถานะการจองไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+        loadBookingsData();
+        return;
+      }
       toast(`อัปเดตสถานะการจอง ${id} เรียบร้อยแล้ว`, 'success');
       loadBookingsData();
     };
@@ -406,9 +414,11 @@ async function loadBookingsData() {
     btn.onclick = async () => {
       const id = btn.getAttribute('data-id');
       if (confirm(`คุณต้องการลบรายการจอง ${id} หรือไม่?`)) {
-        try {
-          await supabase.from('bookings').eq('id', id).delete();
-        } catch (_) {}
+        const { error } = await supabase.from('bookings').eq('id', id).delete();
+        if (error) {
+          toast(`ลบรายการจองไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+          return;
+        }
         cachedBookings = cachedBookings.filter(b => b.id !== id);
         toast('ลบรายการจองเรียบร้อยแล้ว', 'info');
         loadBookingsData();

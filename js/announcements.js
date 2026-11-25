@@ -233,7 +233,11 @@ async function loadAnnouncementsData() {
       btn.onclick = async () => {
         const id = btn.getAttribute('data-id');
         if (confirm('คุณต้องการลบประกาศนี้ใช่หรือไม่?')) {
-          await supabase.from('announcements').eq('id', id).delete();
+          const { error } = await supabase.from('announcements').eq('id', id).delete();
+          if (error) {
+            toast(`ลบประกาศไม่สำเร็จ: ${error.message || 'กรุณาลองใหม่'}`, 'error');
+            return;
+          }
           toast('ลบประกาศเรียบร้อยแล้ว', 'info');
           loadAnnouncementsData();
         }
@@ -320,6 +324,7 @@ function openAddAnnouncementModal() {
   });
 
   document.getElementById('btn-submit-ann').onclick = async () => {
+    const submitBtn = document.getElementById('btn-submit-ann');
     const title = document.getElementById('ann-title').value.trim();
     const cat = document.getElementById('ann-cat').value;
     const pinned = document.getElementById('ann-pinned').checked;
@@ -330,7 +335,10 @@ function openAddAnnouncementModal() {
       return;
     }
 
-    const newId = 'ANN-' + Math.floor(10 + Math.random() * 90);
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'กำลังเผยแพร่...';
+
+    const newId = 'ANN-' + Math.floor(1000 + Math.random() * 9000);
 
     const { error } = await supabase.from('announcements').insert([{
       id: newId,
@@ -342,7 +350,9 @@ function openAddAnnouncementModal() {
     }]);
 
     if (error) {
-      toast('เกิดข้อผิดพลาดในการบันทึกประกาศ', 'error');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'โพสต์ประกาศ';
+      toast(`เกิดข้อผิดพลาดในการบันทึกประกาศ: ${error.message || ''}`, 'error');
       return;
     }
 
