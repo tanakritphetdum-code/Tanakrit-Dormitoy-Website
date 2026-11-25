@@ -2,14 +2,28 @@
 // ระบบพัสดุและไปรษณียภัณฑ์ (Parcel Management)
 // ออกแบบด้วย Smoky Frosted Glass Design System
 import { supabase } from './supabase.js';
-import { ic, fmtDate, showModal, closeModal, toast } from './api.js';
+import { ic, fmtDate, showModal, closeModal, toast, compressImage, showImageModal } from './api.js';
 import { currentUser } from './auth.js';
 
 let parcelFilter = 'all';
 let parcelSearch = '';
 let cachedParcels = [];
 
+const PARCEL_IMG_MARKER = '\n__PARCEL_IMG__:';
+
 export const DEFAULT_PARCELS = [];
+
+// แยกข้อความรายละเอียดพัสดุออกจากรูปถ่ายที่แนบไว้ใน description
+function parseParcelDescription(rawDesc, fallbackImgUrl = '') {
+  const raw = String(rawDesc || '');
+  const idx = raw.indexOf(PARCEL_IMG_MARKER);
+  if (idx !== -1) {
+    const text = raw.slice(0, idx).trim();
+    const imageUrl = raw.slice(idx + PARCEL_IMG_MARKER.length).trim();
+    return { text: text || 'กล่องพัสดุมาตรฐาน', imageUrl: imageUrl || fallbackImgUrl || '' };
+  }
+  return { text: raw.trim() || 'กล่องพัสดุมาตรฐาน', imageUrl: fallbackImgUrl || '' };
+}
 
 export function getBuildingName(roomNum) {
   const r = String(roomNum || '').trim();
@@ -188,14 +202,17 @@ async function loadParcelsData() {
 
   if (parcelSearch.trim()) {
     const q = parcelSearch.toLowerCase().trim();
-    list = list.filter(p => 
-      String(p.tracking_number || '').toLowerCase().includes(q) ||
-      String(p.recipient_name || '').toLowerCase().includes(q) ||
-      String(p.room_number || '').toLowerCase().includes(q) ||
-      getBuildingName(p.room_number).toLowerCase().includes(q) ||
-      String(p.courier || '').toLowerCase().includes(q) ||
-      String(p.description || '').toLowerCase().includes(q)
-    );
+    list = list.filter(p => {
+      const descText = parseParcelDescription(p.description, p.image_url).text;
+      return (
+        String(p.tracking_number || '').toLowerCase().includes(q) ||
+        String(p.recipient_name || '').toLowerCase().includes(q) ||
+        String(p.room_number || '').toLowerCase().includes(q) ||
+        getBuildingName(p.room_number).toLowerCase().includes(q) ||
+        String(p.courier || '').toLowerCase().includes(q) ||
+        descText.toLowerCase().includes(q)
+      );
+    });
   }
 
   if (list.length === 0) {
@@ -207,6 +224,7 @@ async function loadParcelsData() {
   list.forEach(p => {
     const isCollected = p.status === 'collected';
     const bldg = getBuildingName(p.room_number);
+    const { text: descText, imageUrl: parcelImg } = parseParcelDescription(p.description, p.image_url);
 
     let statusPill = '';
     if (isCollected) {
@@ -240,8 +258,16 @@ async function loadParcelsData() {
         </td>
         <td>
           <div style="font-size: 0.84rem; color: rgba(255,255,255,0.85);">
-            ${p.description || 'กล่องพัสดุมาตรฐาน'}
+            ${descText}
           </div>
+          ${parcelImg ? `
+            <div style="margin-top: 6px; display: flex; align-items: center; gap: 8px;">
+              <img src="${parcelImg}" alt="รูปพัสดุ ${p.tracking_number}" class="img-thumb-preview btn-view-parcel-img" data-id="${p.id}" style="width: 38px; height: 38px; border-radius: 6px; object-fit: cover; cursor: pointer;" title="คลิกเพื่อดูรูปพัสดุขนาดใหญ่">
+              <button type="button" class="btn-view-parcel-img" data-id="${p.id}" style="display:inline-flex; align-items:center; gap:4px; font-size:0.74rem; color:#60A5FA; cursor:pointer; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); padding:2px 9px; border-radius:9999px; font-weight:600;">
+                📸 ดูรูปพัสดุ
+              </button>
+            </div>
+          ` : ''}
         </td>
         <td>
           <div style="font-size: 0.82rem; color: rgba(255,255,255,0.75);">
@@ -277,6 +303,18 @@ async function loadParcelsData() {
   });
 
   tbody.innerHTML = html;
+
+  tbody.querySelectorAll('.btn-view-parcel-img').forEach(el => {
+    el.onclick = () => {
+      const id = el.getAttribute('data-id');
+      const target = cachedParcels.find(x => x.id === id);
+      if (!target) return;
+      const { imageUrl } = parseParcelDescription(target.description, target.image_url);
+      if (imageUrl) {
+        showImageModal(imageUrl, `รูปพัสดุ: ${target.tracking_number} (ห้อง ${target.room_number})`);
+      }
+    };
+  });
 
   tbody.querySelectorAll('.btn-collect-parcel').forEach(btn => {
     btn.onclick = async () => {
@@ -413,6 +451,29 @@ function openAddParcelModal() {
         <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">ลักษณะพัสดุ / หมายเหตุ</label>
         <input type="text" id="pk-desc" class="smoky-glass-input" placeholder="เช่น กล่องใหญ่, ซองเอกสาร, กล่องพัสดุขนาดกลาง" style="width: 100%; height: 42px; border-radius: 8px;">
       </div>
+
+      <!-- ส่วนแนบรูปถ่ายพัสดุ -->
+      <div class="field">
+        <label class="smoky-form-label" style="font-size: 0.84rem; display: block; margin-bottom: 6px;">แนบรูปถ่ายพัสดุ / หน้ากล่อง (ไม่บังคับ)</label>
+        <input type="file" id="pk-photo-input" accept="image/*" style="display:none;">
+        <div class="upload-dropzone" id="pk-photo-dropzone" style="padding:14px; border: 2px dashed rgba(255,255,255,0.22); border-radius: 10px; cursor: pointer; text-align: center;">
+          <div id="pk-dropzone-content">
+            <div style="font-size:1.6rem; margin-bottom:2px;">📦📸</div>
+            <div style="font-size:0.86rem; font-weight:600;">คลิกหรือลากรูปมาวาง เพื่อถ่ายรูป / แนบรูปพัสดุ</div>
+            <div style="font-size:0.75rem; opacity:0.65; margin-top:2px;">รองรับ JPG, PNG, WEBP (ระบบบีบอัดรูปอัตโนมัติก่อนบันทึก)</div>
+          </div>
+          <div id="pk-preview-wrap" style="display:none; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;">
+            <img id="pk-preview-img" alt="ตัวอย่างรูปพัสดุ" style="max-height:110px; max-width:160px; border-radius:8px; border:1px solid rgba(255,255,255,0.25); object-fit:cover; box-shadow:0 2px 10px rgba(0,0,0,0.2);">
+            <div style="text-align:left;">
+              <div id="pk-photo-name" style="font-size:0.80rem; font-weight:600; margin-bottom:8px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-change-pk-photo">เปลี่ยนรูป</button>
+                <button type="button" class="btn btn-outline btn-sm" id="btn-remove-pk-photo" style="color:#FB7185; border-color:rgba(244,63,94,0.4);">ลบรูป</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </form>
   `;
 
@@ -428,6 +489,78 @@ function openAddParcelModal() {
     maxWidth: '540px'
   });
 
+  // Parcel Photo Upload & Preview Handling
+  let selectedParcelPhoto = null;
+  let currentPreviewUrl = null;
+  const photoDropzone = document.getElementById('pk-photo-dropzone');
+  const photoInput = document.getElementById('pk-photo-input');
+  const dropzoneContent = document.getElementById('pk-dropzone-content');
+  const previewWrap = document.getElementById('pk-preview-wrap');
+  const previewImg = document.getElementById('pk-preview-img');
+  const photoNameEl = document.getElementById('pk-photo-name');
+  const btnChangePhoto = document.getElementById('btn-change-pk-photo');
+  const btnRemovePhoto = document.getElementById('btn-remove-pk-photo');
+
+  const applyParcelPhoto = (file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      toast('กรุณาเลือกไฟล์รูปภาพ (JPG, PNG, WEBP)', 'error');
+      return;
+    }
+    if (currentPreviewUrl) URL.revokeObjectURL(currentPreviewUrl);
+    selectedParcelPhoto = file;
+    currentPreviewUrl = URL.createObjectURL(file);
+    previewImg.src = currentPreviewUrl;
+    photoNameEl.textContent = file.name;
+    dropzoneContent.style.display = 'none';
+    previewWrap.style.display = 'flex';
+  };
+
+  const clearParcelPhoto = () => {
+    selectedParcelPhoto = null;
+    if (currentPreviewUrl) {
+      URL.revokeObjectURL(currentPreviewUrl);
+      currentPreviewUrl = null;
+    }
+    if (photoInput) photoInput.value = '';
+    previewImg.src = '';
+    photoNameEl.textContent = '';
+    previewWrap.style.display = 'none';
+    dropzoneContent.style.display = 'block';
+  };
+
+  if (photoDropzone && photoInput) {
+    photoDropzone.onclick = () => photoInput.click();
+    photoDropzone.ondragover = (e) => {
+      e.preventDefault();
+      photoDropzone.style.borderColor = '#3B82F6';
+    };
+    photoDropzone.ondragleave = () => {
+      photoDropzone.style.borderColor = 'rgba(255,255,255,0.22)';
+    };
+    photoDropzone.ondrop = (e) => {
+      e.preventDefault();
+      photoDropzone.style.borderColor = 'rgba(255,255,255,0.22)';
+      const file = e.dataTransfer?.files && e.dataTransfer.files[0];
+      if (file) applyParcelPhoto(file);
+    };
+    if (btnChangePhoto) {
+      btnChangePhoto.onclick = (e) => {
+        e.stopPropagation();
+        photoInput.click();
+      };
+    }
+    if (btnRemovePhoto) {
+      btnRemovePhoto.onclick = (e) => {
+        e.stopPropagation();
+        clearParcelPhoto();
+      };
+    }
+    photoInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) applyParcelPhoto(file);
+    };
+  }
+
   document.getElementById('btn-submit-parcel').onclick = async () => {
     const submitBtn = document.getElementById('btn-submit-parcel');
     const courier = document.getElementById('pk-courier').value;
@@ -442,7 +575,21 @@ function openAddParcelModal() {
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'กำลังบันทึก...';
+    submitBtn.textContent = selectedParcelPhoto ? '⏳ กำลังประมวลผลรูปและบันทึก...' : 'กำลังบันทึก...';
+
+    let finalDescription = desc || 'กล่องพัสดุมาตรฐาน';
+    if (selectedParcelPhoto) {
+      try {
+        const compressedImg = await compressImage(selectedParcelPhoto, 900, 0.78);
+        finalDescription = `${finalDescription}${PARCEL_IMG_MARKER}${compressedImg}`;
+      } catch (imgErr) {
+        console.warn('Parcel image compress error:', imgErr);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'บันทึกรับพัสดุ';
+        toast('ไม่สามารถประมวลผลรูปภาพได้ กรุณาลองเลือกรูปอื่น', 'error');
+        return;
+      }
+    }
 
     const newId = 'PKG-' + Math.floor(1000 + Math.random() * 9000);
 
@@ -452,7 +599,7 @@ function openAddParcelModal() {
       courier,
       room_number: room,
       recipient_name: name,
-      description: desc || 'กล่องพัสดุมาตรฐาน',
+      description: finalDescription,
       status: 'waiting',
       arrived_at: new Date().toISOString().split('T')[0]
     }]);

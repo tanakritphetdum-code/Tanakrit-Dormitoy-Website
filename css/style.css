@@ -4295,6 +4295,20 @@ body:not(.theme-light) #app-modal-backdrop [style*="background:#F8FAFC"] {
 body:not(.theme-light) #app-modal-backdrop .upload-dropzone * {
   color: rgba(255, 255, 255, 0.9) !important;
 }
+body:not(.theme-light) #app-modal-backdrop .upload-dropzone .btn-outline {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #FFFFFF !important;
+}
+body:not(.theme-light) #app-modal-backdrop .upload-dropzone .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+body:not(.theme-light) #app-modal-backdrop .upload-dropzone #btn-remove-pk-photo {
+  background: rgba(244, 63, 94, 0.16) !important;
+  border-color: rgba(244, 63, 94, 0.45) !important;
+  color: #FDA4AF !important;
+}
 
 /* Light Mode Inputs (Settings, Forms, Modals) */
 .theme-light .field input,
