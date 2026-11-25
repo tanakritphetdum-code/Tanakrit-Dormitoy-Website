@@ -3644,8 +3644,144 @@ function openAddRoomModal() {
   };
 }
 
+const ROOM_BUILDING_SHOWCASE = [
+  {
+    key: 'Tanakrit',
+    tabLabel: '🏢 อาคาร ธนกฤษฎ์ (1,500 ฿)',
+    title: 'อาคาร ธนกฤษฎ์',
+    badge: 'อาคารหลัก 🏢 · 9 ห้อง (ห้อง 101 – 109)',
+    price: '1,500 ฿ / เดือน',
+    size: '3.5 × 8 ม. (28 ตร.ม.)',
+    bathroom: 'ห้องน้ำในตัว',
+    atmosphere: 'โปร่งสบาย อากาศถ่ายเทดีเยี่ยม',
+    description: 'ห้องพัดลมขนาดกว้าง 3.5 × 8 เมตร พร้อมเตียง+ที่นอน ตู้เสื้อผ้า ห้องน้ำในตัว และระเบียงตากผ้าหลังห้องส่วนตัว',
+    image: './images/room-tanakrit.jpg',
+    bookingName: 'อาคาร ธนกฤษฎ์'
+  },
+  {
+    key: 'KingPhetch',
+    tabLabel: '🏡 อาคาร กิ่งเพชร (1,500 ฿)',
+    title: 'อาคาร กิ่งเพชร',
+    badge: 'เงียบสงบ 🍃 · 5 ห้อง (ห้อง 201 – 205)',
+    price: '1,500 ฿ / เดือน',
+    size: '3.5 × 8 ม. (28 ตร.ม.)',
+    bathroom: 'ห้องน้ำในตัว',
+    atmosphere: 'เงียบสงบ เป็นส่วนตัว เหมาะแก่การอ่านหนังสือ',
+    description: 'ห้องพัดลมขนาดใหญ่ 3.5 × 8 เมตร บรรยากาศเงียบสงบ เฟอร์นิเจอร์ครบ พร้อมห้องน้ำในตัวและราวตากผ้าหลังห้อง',
+    image: './images/room-kingphetch.jpg',
+    bookingName: 'อาคาร กิ่งเพชร'
+  },
+  {
+    key: 'UnderGround',
+    tabLabel: '🛋️ อาคารใต้บ้าน (800 ฿)',
+    title: 'อาคารใต้บ้าน',
+    badge: 'ประหยัดสุดคุ้ม 🔥 · 3 ห้อง (ห้อง B01 – B03)',
+    price: '800 ฿ / เดือน',
+    size: '3 × 4 ม. (12 ตร.ม.)',
+    bathroom: 'ห้องน้ำรวม (สะอาด ดูแลสม่ำเสมอ)',
+    atmosphere: 'กะทัดรัด ประหยัด คุ้มค่า',
+    description: 'ห้องพัดลมขนาดกะทัดรัด 3 × 4 เมตร ราคาสบายกระเป๋า เฟอร์นิเจอร์เตียง+ที่นอนและตู้เสื้อผ้าพร้อมอยู่ ใช้ห้องน้ำรวมที่สะอาดและดูแลสม่ำเสมอ',
+    image: './images/room-underground.jpg',
+    bookingName: 'อาคารใต้บ้าน'
+  }
+];
+
+// หน้าต่างดูรูปตัวอย่างห้องพักทั้ง 3 อาคารจากหน้าแรกเว็บไซต์
+function openRoomPreviewModal(buildingKey = 'Tanakrit') {
+  let activeIndex = ROOM_BUILDING_SHOWCASE.findIndex(b => b.key === buildingKey);
+  if (activeIndex === -1) activeIndex = 0;
+
+  const renderModal = () => {
+    const b = ROOM_BUILDING_SHOWCASE[activeIndex];
+    const tabsHtml = ROOM_BUILDING_SHOWCASE.map((item, idx) => `
+      <button type="button" class="rp-tab ${idx === activeIndex ? 'active' : ''}" data-rp-idx="${idx}">
+        ${item.tabLabel}
+      </button>
+    `).join('');
+
+    const body = `
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="rp-tabs">${tabsHtml}</div>
+
+        <div class="rp-stage">
+          <img src="${b.image}" alt="รูปตัวอย่างห้องพัก ${b.title}" class="rp-stage-img">
+          <span class="rp-stage-badge">${b.badge}</span>
+          <span class="rp-stage-price">${b.price}</span>
+          <button type="button" class="rp-nav-btn rp-nav-prev" id="rp-btn-prev" title="อาคารก่อนหน้า">‹</button>
+          <button type="button" class="rp-nav-btn rp-nav-next" id="rp-btn-next" title="อาคารถัดไป">›</button>
+        </div>
+
+        <div class="rp-info-grid">
+          <div class="smoky-modal-block" style="border-radius: 10px; padding: 10px 12px;">
+            <div class="smoky-modal-label" style="font-size: 0.74rem;">📐 ขนาดห้องพัก</div>
+            <div class="smoky-modal-val" style="font-weight: 600; margin-top: 2px;">${b.size}</div>
+          </div>
+          <div class="smoky-modal-block" style="border-radius: 10px; padding: 10px 12px;">
+            <div class="smoky-modal-label" style="font-size: 0.74rem;">🚿 ห้องน้ำ</div>
+            <div class="smoky-modal-val" style="font-weight: 600; margin-top: 2px;">${b.bathroom}</div>
+          </div>
+          <div class="smoky-modal-block" style="border-radius: 10px; padding: 10px 12px;">
+            <div class="smoky-modal-label" style="font-size: 0.74rem;">🌿 บรรยากาศ</div>
+            <div class="smoky-modal-val" style="font-weight: 600; margin-top: 2px;">${b.atmosphere}</div>
+          </div>
+        </div>
+
+        <div class="smoky-modal-notes" style="border-radius: 10px; padding: 10px 14px; font-size: 0.84rem; line-height: 1.55;">
+          ${b.description}
+        </div>
+      </div>
+    `;
+
+    const footer = `
+      <button type="button" class="btn btn-outline" onclick="window.closeAppModal()">ปิดหน้าต่าง</button>
+      <button type="button" class="btn btn-primary" id="rp-btn-book-now">📝 จองห้องพัก / สอบถามอาคารนี้</button>
+    `;
+
+    showModal({
+      title: `🖼️ รูปตัวอย่างห้องพัก — ${b.title}`,
+      body,
+      footer,
+      maxWidth: '660px'
+    });
+
+    document.querySelectorAll('.rp-tab').forEach(btn => {
+      btn.onclick = () => {
+        activeIndex = Number(btn.getAttribute('data-rp-idx'));
+        renderModal();
+      };
+    });
+
+    const prevBtn = document.getElementById('rp-btn-prev');
+    if (prevBtn) {
+      prevBtn.onclick = () => {
+        activeIndex = (activeIndex - 1 + ROOM_BUILDING_SHOWCASE.length) % ROOM_BUILDING_SHOWCASE.length;
+        renderModal();
+      };
+    }
+
+    const nextBtn = document.getElementById('rp-btn-next');
+    if (nextBtn) {
+      nextBtn.onclick = () => {
+        activeIndex = (activeIndex + 1) % ROOM_BUILDING_SHOWCASE.length;
+        renderModal();
+      };
+    }
+
+    const bookBtn = document.getElementById('rp-btn-book-now');
+    if (bookBtn) {
+      bookBtn.onclick = () => {
+        closeModal();
+        if (window.openBookingModal) window.openBookingModal(b.bookingName);
+      };
+    }
+  };
+
+  renderModal();
+}
+
 if (typeof window !== 'undefined') {
   window.reloadRoomsData = loadRoomsData;
+  window.openRoomPreviewModal = openRoomPreviewModal;
 }
 
 
