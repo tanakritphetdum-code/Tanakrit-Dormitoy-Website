@@ -1,4 +1,4 @@
-/* Bundled Tanakrit Dormitory Application - Standalone & File:// Compatible */
+﻿/* Bundled Tanakrit Dormitory Application - Standalone & File:// Compatible */
 (function() {
 "use strict";
 
@@ -10,6 +10,20 @@
 const SUPABASE_URL = 'https://ewvqgccmyxpwnhjzagye.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_QOYngsbMMfzYdDvHA34yyQ_BD1RMnjW';
 const SETTINGS_CACHE_KEY = 'tanakrit_settings_cache';
+const ROOM_PHOTOS_CACHE_KEY = 'tanakrit_room_photos_cache';
+const DEFAULT_ROOM_SAMPLE_PHOTOS = {
+  Tanakrit: './images/room-tanakrit.jpg',
+  KingPhetch: './images/room-kingphetch.jpg',
+  UnderGround: './images/room-underground.jpg'
+};
+
+let cachedRoomPhotos = (() => {
+  try {
+    const saved = localStorage.getItem(ROOM_PHOTOS_CACHE_KEY);
+    if (saved) return { ...DEFAULT_ROOM_SAMPLE_PHOTOS, ...JSON.parse(saved) };
+  } catch (_) {}
+  return { ...DEFAULT_ROOM_SAMPLE_PHOTOS };
+})();
 
 // การตั้งค่าเริ่มต้นสำรอง
 let cachedSettings = {
@@ -178,13 +192,73 @@ async function savePromptPayDetails(number, name) {
   return res;
 }
 
+// ดึงรูปตัวอย่างห้องพักทั้ง 3 อาคาร (สำหรับหน้าแรก ดูรูปตัวอย่างห้องพัก)
+function getRoomSamplePhotos() {
+  return { ...DEFAULT_ROOM_SAMPLE_PHOTOS, ...cachedRoomPhotos };
+}
+
+// บันทึกรูปตัวอย่างห้องพักทั้ง 3 อาคารขึ้น Supabase Cloud (settings row id='room_photos')
+async function saveRoomSamplePhotos(photosObj) {
+  const nextPhotos = {
+    Tanakrit: (photosObj && photosObj.Tanakrit) ? String(photosObj.Tanakrit).trim() : DEFAULT_ROOM_SAMPLE_PHOTOS.Tanakrit,
+    KingPhetch: (photosObj && photosObj.KingPhetch) ? String(photosObj.KingPhetch).trim() : DEFAULT_ROOM_SAMPLE_PHOTOS.KingPhetch,
+    UnderGround: (photosObj && photosObj.UnderGround) ? String(photosObj.UnderGround).trim() : DEFAULT_ROOM_SAMPLE_PHOTOS.UnderGround
+  };
+
+  cachedRoomPhotos = nextPhotos;
+  try {
+    localStorage.setItem(ROOM_PHOTOS_CACHE_KEY, JSON.stringify(nextPhotos));
+  } catch (_) {}
+
+  const payload = {
+    dorm_name: 'room_photos',
+    address: JSON.stringify(nextPhotos)
+  };
+
+  // Check if room_photos row already exists
+  const { data: existing } = await supabase.from('settings').select('id').eq('id', 'room_photos');
+  if (existing && existing.length > 0) {
+    return await supabase.from('settings').eq('id', 'room_photos').update(payload);
+  }
+  return await supabase.from('settings').insert([{ id: 'room_photos', ...payload }]);
+}
+
 // ผูกฟังก์ชันระดับ Window
 if (typeof window !== 'undefined') {
   window.applySettingsToLandingPage = applySettingsToLandingPage;
   window.getCurrentSettings = () => cachedSettings;
   window.getPromptPayDetails = getPromptPayDetails;
   window.savePromptPayDetails = savePromptPayDetails;
+  window.getRoomSamplePhotos = getRoomSamplePhotos;
+  window.saveRoomSamplePhotos = saveRoomSamplePhotos;
   applySettingsToLandingPage(cachedSettings);
+}
+
+// ฟังก์ชันซิงค์การตั้งค่ารูปตัวอย่างห้องพักจาก Supabase Cloud
+async function syncRoomPhotosFromCloud() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/settings?select=*&id=eq.room_photos`, {
+      method: 'GET',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows && rows.length > 0 && rows[0].address) {
+        try {
+          const parsed = JSON.parse(rows[0].address);
+          if (parsed && typeof parsed === 'object') {
+            cachedRoomPhotos = { ...DEFAULT_ROOM_SAMPLE_PHOTOS, ...parsed };
+            localStorage.setItem(ROOM_PHOTOS_CACHE_KEY, JSON.stringify(cachedRoomPhotos));
+          }
+        } catch (_) {}
+      }
+    }
+  } catch (err) {
+    console.warn('Background sync room photos warning:', err);
+  }
 }
 
 // ฟังก์ชันซิงค์การตั้งค่าจาก Supabase Cloud แบบ Background
@@ -212,8 +286,9 @@ async function syncSettingsFromCloud() {
   }
 }
 
-// เริ่มซิงค์ Settings ทันทีเมื่อสคริปต์โหลด
+// เริ่มซิงค์ Settings และรูปตัวอย่างห้องพักทันทีเมื่อสคริปต์โหลด
 syncSettingsFromCloud();
+syncRoomPhotosFromCloud();
 
 // คลาส QueryBuilder สำหรับเชื่อมต่อตารางใน Supabase
 class QueryBuilder {
@@ -365,273 +440,6 @@ const supabase = {
   url: SUPABASE_URL,
   key: SUPABASE_ANON_KEY
 };
-
-
-/* ========== js/realtime.js ========== */
-// js/realtime.js
-// ระบบซิงก์ข้อมูลสดแบบ Realtime WebSocket ผ่าน Supabase Cloud
-// อัปเดตข้อมูลบนหน้าจอทันทีเมื่อมีการเปลี่ยนแปลงในฐานข้อมูล โดยไม่ต้องกดรีเฟรช F5
-
-
-let socket = null;
-let heartbeatInterval = null;
-let reconnectTimer = null;
-let refCounter = 0;
-let isConnected = false;
-let registeredListeners = [];
-
-// เสียงแจ้งเตือนนุ่มนวลผ่าน Web Audio API (ไม่ต้องพึ่งพาไฟล์ภายนอก)
-function playChime() {
-  try {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    // คอร์ดคู่เสียงน่ารักสองจังหวะ (D5 -> A5)
-    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
-    gain.gain.setValueAtTime(0.06, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
-  } catch (_) {}
-}
-
-// อัปเดตสถานะป้ายไฟ Realtime บน Topbar
-function updateStatusUI(status) {
-  const pill = document.getElementById('realtime-status-pill');
-  const text = document.getElementById('realtime-status-text');
-  if (!pill || !text) return;
-
-  if (status === 'connected') {
-    pill.style.background = 'rgba(52, 211, 153, 0.12)';
-    pill.style.borderColor = 'rgba(52, 211, 153, 0.35)';
-    pill.style.color = '#34D399';
-    pill.innerHTML = `
-      <span style="width: 7px; height: 7px; border-radius: 50%; background: #34D399; box-shadow: 0 0 8px #34D399; display: inline-block;"></span>
-      <span id="realtime-status-text">Realtime Live</span>
-    `;
-    pill.title = 'เชื่อมต่อสดแบบ WebSocket สำเร็จ: ข้อมูลจะอัปเดตบนหน้าจอทันทีเมื่อมีความเคลื่อนไหว';
-  } else if (status === 'connecting') {
-    pill.style.background = 'rgba(245, 158, 11, 0.12)';
-    pill.style.borderColor = 'rgba(245, 158, 11, 0.35)';
-    pill.style.color = '#F59E0B';
-    pill.innerHTML = `
-      <span style="width: 7px; height: 7px; border-radius: 50%; background: #F59E0B; display: inline-block;"></span>
-      <span id="realtime-status-text">กำลังเชื่อมต่อสด...</span>
-    `;
-    pill.title = 'กำลังเชื่อมต่อ WebSocket กับ Supabase Cloud...';
-  } else {
-    pill.style.background = 'rgba(255, 255, 255, 0.05)';
-    pill.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-    pill.style.color = 'rgba(255, 255, 255, 0.5)';
-    pill.innerHTML = `
-      <span style="width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); display: inline-block;"></span>
-      <span id="realtime-status-text">ออฟไลน์</span>
-    `;
-    pill.title = 'ไม่ได้เชื่อมต่อ WebSocket (ใช้ระบบ REST API ปกติ)';
-  }
-}
-
-// ตัวหน่วงเวลาสำหรับการรีเฟรชหน้าจอ (Debounce) ป้องกันหน้าจอกระพริบถี่
-let refreshDebounceTimer = null;
-function triggerSmartRefresh(tableName) {
-  clearTimeout(refreshDebounceTimer);
-  refreshDebounceTimer = setTimeout(() => {
-    const currentView = window.currentAppView || 'dashboard';
-
-    // 1. ถ้าอยู่หน้า Dashboard ให้ดึงข้อมูลมาอัปเดตการ์ดตัวเลขและทีมงานทันที
-    if (currentView === 'dashboard' && typeof window.initStaffDashboard === 'function') {
-      window.initStaffDashboard();
-    }
-
-    // 2. ถ้าอยู่หน้าจอที่ตรงกับตารางที่มีการเปลี่ยนแปลง ให้รีเฟรชหน้าจอนั้นทันที
-    if (tableName === 'rooms' && currentView === 'rooms') {
-      if (typeof window.reloadRoomsData === 'function') {
-        window.reloadRoomsData();
-        return;
-      }
-    }
-    if (typeof window.switchView === 'function') {
-      if (tableName === 'rooms' && currentView === 'rooms') {
-        window.switchView('rooms');
-      } else if ((tableName === 'meter_readings' || tableName === 'bills') && currentView === 'utilities') {
-        window.switchView('utilities');
-      } else if (tableName === 'maintenance' && currentView === 'maintenance') {
-        window.switchView('maintenance');
-      } else if (tableName === 'parcels' && currentView === 'parcels') {
-        window.switchView('parcels');
-      } else if (tableName === 'bookings' && (currentView === 'bookings' || currentView === 'deals')) {
-        window.switchView('bookings');
-      } else if (tableName === 'announcements' && currentView === 'announcements') {
-        window.switchView('announcements');
-      } else if (tableName === 'tenants' && currentView === 'tenants') {
-        window.switchView('tenants');
-      } else if (tableName === 'users' && currentView === 'users') {
-        window.switchView('users');
-      }
-    }
-  }, 250);
-}
-
-// ประมวลผลข้อความที่ถูกส่งมาจาก Supabase Realtime
-function handlePostgresChanges(payload) {
-  if (!payload || !payload.data) return;
-
-  const data = payload.data;
-  const table = data.table;
-  const type = data.type; // 'INSERT', 'UPDATE', 'DELETE'
-  const record = data.record || {};
-  const oldRecord = data.old_record || {};
-
-  console.info(`[Supabase Realtime] ${type} on table: ${table}`, record);
-
-  // แจ้งเตือน Toast และเสียงเตือนตามเหตุการณ์สำคัญ
-  if (table === 'bookings' && type === 'INSERT') {
-    playChime();
-    toast(`🔔 คำขอจองห้องใหม่: ${record.name || 'ผู้สนใจเช่า'} (ห้อง ${record.room_number || ''})`, 'info');
-  } else if (table === 'maintenance') {
-    if (type === 'INSERT') {
-      playChime();
-      toast(`🛠️ แจ้งซ่อมใหม่: ห้อง ${record.room_number || ''} — ${record.category || 'อุปกรณ์ชำรุด'}`, 'warning');
-    } else if (type === 'UPDATE' && oldRecord.status !== record.status) {
-      toast(`🛠️ งานซ่อมห้อง ${record.room_number || ''}: ปรับสถานะเป็น "${record.status}"`, 'info');
-    }
-  } else if (table === 'meter_readings' || table === 'bills') {
-    if (type === 'UPDATE' && record.status === 'verifying') {
-      playChime();
-      toast(`💰 ผู้พักอัปโหลดสลิปชำระเงินใหม่: ห้อง ${record.room_number || ''}`, 'info');
-    } else if (type === 'UPDATE' && record.status === 'paid' && oldRecord.status !== 'paid') {
-      playChime();
-      toast(`✅ อนุมัติการชำระเงินบิลห้อง ${record.room_number || ''} สำเร็จ`, 'success');
-    }
-  } else if (table === 'parcels' && type === 'INSERT') {
-    playChime();
-    toast(`📦 มีพัสดุมาส่งใหม่: ห้อง ${record.room_number || ''} (${record.carrier || 'พัสดุ'})`, 'info');
-  } else if (table === 'rooms' && type === 'UPDATE' && oldRecord.status !== record.status) {
-    const statusLabelMap = { vacant: 'ห้องว่างพร้อมอยู่', occupied: 'มีผู้พักอาศัย', maintenance: 'ปิดปรับปรุง / ซ่อมบำรุง' };
-    const statusText = statusLabelMap[record.status] || record.status;
-    toast(`🚪 สถานะห้อง ${record.number || record.room_number || ''} เปลี่ยนเป็น: ${statusText}`, 'info');
-  } else if (table === 'announcements' && type === 'INSERT') {
-    playChime();
-    toast(`📢 มีประกาศข่าวสารใหม่: ${record.title || ''}`, 'info');
-  }
-
-  // เรียกใช้ตัวแทนรีเฟรชหน้าจออัตโนมัติ
-  triggerSmartRefresh(table);
-
-  // แจ้งผู้ฟังแบบกำหนดเอง (Custom Listeners)
-  registeredListeners.forEach(fn => {
-    try {
-      fn({ table, type, record, oldRecord });
-    } catch (e) {
-      console.warn('Listener callback error:', e);
-    }
-  });
-}
-
-// เริ่มการเชื่อมต่อ WebSocket
-function initRealtime() {
-  if (typeof window === 'undefined' || !window.WebSocket) return;
-  if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
-    return;
-  }
-
-  updateStatusUI('connecting');
-
-  // Supabase Realtime Phoenix WebSocket endpoint
-  const wsUrl = `${SUPABASE_URL.replace('https://', 'wss://')}/realtime/v1/websocket?apikey=${SUPABASE_ANON_KEY}&vsn=1.0.0`;
-
-  try {
-    socket = new WebSocket(wsUrl);
-
-    socket.onopen = () => {
-      isConnected = true;
-      updateStatusUI('connected');
-      console.info('[Supabase Realtime] WebSocket Connected successfully!');
-
-      // ส่งคำสั่งเข้าร่วม (Join) ห้อง realtime:public และดักฟังการเปลี่ยนแปลงทุกตาราง
-      refCounter++;
-      const joinMsg = {
-        topic: 'realtime:public',
-        event: 'phx_join',
-        payload: {
-          config: {
-            postgres_changes: [
-              { event: '*', schema: 'public' }
-            ]
-          }
-        },
-        ref: String(refCounter)
-      };
-      socket.send(JSON.stringify(joinMsg));
-
-      // เริ่มส่ง Heartbeat ทุก 25 วินาทีเพื่อรักษาท่อการเชื่อมต่อ
-      clearInterval(heartbeatInterval);
-      heartbeatInterval = setInterval(() => {
-        if (socket && socket.readyState === WebSocket.OPEN) {
-          refCounter++;
-          socket.send(JSON.stringify({
-            topic: 'phoenix',
-            event: 'heartbeat',
-            payload: {},
-            ref: String(refCounter)
-          }));
-        }
-      }, 25000);
-    };
-
-    socket.onmessage = (event) => {
-      try {
-        const msg = JSON.parse(event.data);
-        if (msg.event === 'postgres_changes') {
-          handlePostgresChanges(msg.payload);
-        }
-      } catch (err) {
-        console.warn('[Supabase Realtime] Parse message warning:', err);
-      }
-    };
-
-    socket.onclose = () => {
-      isConnected = false;
-      clearInterval(heartbeatInterval);
-      updateStatusUI('disconnected');
-      console.warn('[Supabase Realtime] WebSocket disconnected. Auto-reconnecting in 4s...');
-
-      // หน่วงเวลาแล้วต่อใหม่อัตโนมัติ
-      clearTimeout(reconnectTimer);
-      reconnectTimer = setTimeout(() => {
-        initRealtime();
-      }, 4000);
-    };
-
-    socket.onerror = (err) => {
-      console.warn('[Supabase Realtime] WebSocket error:', err);
-      socket.close();
-    };
-
-  } catch (err) {
-    console.warn('[Supabase Realtime] Initialization warning:', err);
-    updateStatusUI('disconnected');
-  }
-}
-
-// ลงทะเบียนฟังก์ชันตรวจจับการเปลี่ยนแปลง
-function onRealtimeChange(callback) {
-  if (typeof callback === 'function') {
-    registeredListeners.push(callback);
-  }
-}
-
-// ผูกเข้ากับระดับ window เพื่อเรียกใช้ได้จากทุกหน้า
-if (typeof window !== 'undefined') {
-  window.initRealtime = initRealtime;
-  window.playChime = playChime;
-}
 
 
 /* ========== js/api.js ========== */
@@ -3693,6 +3501,8 @@ function openRoomPreviewModal(buildingKey = 'Tanakrit') {
 
   const renderModal = () => {
     const b = ROOM_BUILDING_SHOWCASE[activeIndex];
+    const customPhotos = getRoomSamplePhotos();
+    const imgSrc = (customPhotos && customPhotos[b.key]) ? customPhotos[b.key] : b.image;
     const tabsHtml = ROOM_BUILDING_SHOWCASE.map((item, idx) => `
       <button type="button" class="rp-tab ${idx === activeIndex ? 'active' : ''}" data-rp-idx="${idx}">
         ${item.tabLabel}
@@ -3704,7 +3514,7 @@ function openRoomPreviewModal(buildingKey = 'Tanakrit') {
         <div class="rp-tabs">${tabsHtml}</div>
 
         <div class="rp-stage">
-          <img src="${b.image}" alt="รูปตัวอย่างห้องพัก ${b.title}" class="rp-stage-img">
+          <img src="${imgSrc}" alt="รูปตัวอย่างห้องพัก ${b.title}" class="rp-stage-img" onerror="this.onerror=null; this.src='${b.image}';">
           <span class="rp-stage-badge">${b.badge}</span>
           <span class="rp-stage-price">${b.price}</span>
           <button type="button" class="rp-nav-btn rp-nav-prev" id="rp-btn-prev" title="อาคารก่อนหน้า">‹</button>
@@ -8519,6 +8329,8 @@ function openUserModal(user = null) {
 // ออกแบบด้วย Smoky Frosted Glass Design System
 async function renderSettingsView() {
   const s = await supabase.getSettings();
+  await syncRoomPhotosFromCloud();
+  const roomPhotos = getRoomSamplePhotos();
   const pp = getPromptPayDetails();
   const isAdmin = currentUser && currentUser.role === 'admin';
 
@@ -8650,6 +8462,73 @@ async function renderSettingsView() {
             <button type="submit" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); font-size: 0.82rem; font-weight: 600;">
               ${ic('check')}
               <span>บันทึกการตั้งค่าหอพัก</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- 3.5 Room Sample Photos Settings Card (ตั้งค่ารูปตัวอย่างห้องพักหน้าแรก) -->
+        <div class="smoky-card" id="card-room-sample-photos">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                <div style="color: #60A5FA;">${ic('image')}</div>
+                <h3 style="font-size: 1.10rem; font-weight: 700; color: #ffffff; margin: 0;">ตั้งค่ารูปตัวอย่างห้องพัก (หน้าแรก · ดูรูปตัวอย่างห้องพัก)</h3>
+              </div>
+              <p style="color: rgba(255,255,255,0.48); font-size: 0.80rem; margin: 0;">
+                อัปโหลดรูปภาพใหม่หรือระบุลิงก์รูปภาพของห้องพักทั้ง 3 อาคาร ระบบจะนำไปแสดงในหน้าต่าง "ดูรูปตัวอย่าง" บนหน้าแรกเว็บไซต์ทันที
+              </p>
+            </div>
+            <button type="button" id="btn-preview-landing-gallery" class="smoky-round-glass-btn" style="width: auto; height: 34px; padding: 0 14px; border-radius: 9999px; font-size: 0.78rem; gap: 6px; color: #60A5FA; border-color: rgba(59,130,246,0.35); background: rgba(59,130,246,0.10);" onclick="window.openRoomPreviewModal && window.openRoomPreviewModal('Tanakrit')">
+              ${ic('eye')}
+              <span>ดูตัวอย่างหน้าแรก</span>
+            </button>
+          </div>
+
+          <form id="form-room-photos-settings">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 18px;">
+              ${[
+                { key: 'Tanakrit', label: '🏢 อาคาร ธนกฤษฎ์ (1,500 ฿)', sub: 'ห้อง 101 – 109 (พัดลม 28 ตร.ม.)' },
+                { key: 'KingPhetch', label: '🏡 อาคาร กิ่งเพชร (1,500 ฿)', sub: 'ห้อง 201 – 205 (พัดลม 28 ตร.ม.)' },
+                { key: 'UnderGround', label: '🛋️ อาคารใต้บ้าน (800 ฿)', sub: 'ห้อง B01 – B03 (พัดลม 12 ตร.ม.)' }
+              ].map(b => {
+                const currentSrc = roomPhotos[b.key] || DEFAULT_ROOM_SAMPLE_PHOTOS[b.key];
+                const safeDisplayVal = currentSrc.startsWith('data:') ? '' : currentSrc;
+                return `
+                  <div class="room-photo-setting-box" style="padding: 14px; border-radius: 14px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                      <div style="font-size: 0.88rem; font-weight: 700; color: #ffffff;">${b.label}</div>
+                      <div style="font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px;">${b.sub}</div>
+                    </div>
+
+                    <div style="position: relative; width: 100%; height: 150px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.25); cursor: zoom-in;" class="btn-zoom-room-photo" data-bkey="${b.key}" title="คลิกเพื่อดูรูปขนาดใหญ่">
+                      <img id="preview-room-photo-${b.key}" src="${currentSrc}" alt="${b.label}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='${DEFAULT_ROOM_SAMPLE_PHOTOS[b.key]}';">
+                      <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.65); color: #fff; font-size: 0.68rem; padding: 3px 8px; border-radius: 9999px; backdrop-filter: blur(6px);">คลิกขยาย</span>
+                    </div>
+
+                    <input type="file" id="file-room-photo-${b.key}" class="input-room-photo-file" data-bkey="${b.key}" accept="image/*" style="display: none;">
+                    <input type="hidden" id="val-room-photo-${b.key}" value="${currentSrc}">
+
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                      <button type="button" class="smoky-round-glass-btn btn-upload-room-photo" data-bkey="${b.key}" style="flex: 1; height: 32px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; gap: 5px; background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.35); color: #60A5FA;">
+                        ${ic('image')}
+                        <span>อัปโหลดรูปใหม่</span>
+                      </button>
+                      <button type="button" class="smoky-round-glass-btn btn-reset-room-photo" data-bkey="${b.key}" style="width: auto; padding: 0 10px; height: 32px; border-radius: 8px; font-size: 0.72rem; color: rgba(255,255,255,0.65);" title="กลับไปใช้รูปเริ่มต้น">
+                        ใช้รูปเดิม
+                      </button>
+                    </div>
+
+                    <div class="field" style="margin: 0;">
+                      <input type="text" id="url-room-photo-${b.key}" class="smoky-glass-input input-room-photo-url" data-bkey="${b.key}" value="${safeDisplayVal}" placeholder="${currentSrc.startsWith('data:') ? 'อัปโหลดรูปภาพแล้ว (Base64)' : 'หรือวาง URL รูปภาพ...'}" style="width: 100%; font-size: 0.74rem; padding: 6px 10px;">
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <button type="submit" id="btn-save-room-photos" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); font-size: 0.82rem; font-weight: 600;">
+              ${ic('check')}
+              <span>บันทึกรูปตัวอย่างห้องพัก</span>
             </button>
           </form>
         </div>
@@ -8794,6 +8673,117 @@ function bindSettingsEvents() {
   if (btnReset) {
     btnReset.onclick = () => {
       toast('ระบบเชื่อมต่อฐานข้อมูล Supabase Cloud สถานะพร้อมใช้งาน 100%', 'success');
+    };
+  }
+
+  // Room Sample Photos Settings Events
+  document.querySelectorAll('.btn-upload-room-photo').forEach(btn => {
+    btn.onclick = () => {
+      const key = btn.getAttribute('data-bkey');
+      const fileInput = document.getElementById(`file-room-photo-${key}`);
+      if (fileInput) fileInput.click();
+    };
+  });
+
+  document.querySelectorAll('.input-room-photo-file').forEach(input => {
+    input.onchange = async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const key = input.getAttribute('data-bkey');
+      try {
+        toast('กำลังบีบอัดและเตรียมรูปภาพ...', 'info');
+        const compressed = await compressImage(file, 1100, 0.82);
+        const valEl = document.getElementById(`val-room-photo-${key}`);
+        const previewEl = document.getElementById(`preview-room-photo-${key}`);
+        const urlEl = document.getElementById(`url-room-photo-${key}`);
+        if (valEl) valEl.value = compressed;
+        if (previewEl) previewEl.src = compressed;
+        if (urlEl) {
+          urlEl.value = '';
+          urlEl.placeholder = 'อัปโหลดรูปภาพใหม่แล้ว (พร้อมบันทึก)';
+        }
+        toast('อัปโหลดรูปภาพตัวอย่างพร้อมแล้ว กรุณากด "บันทึกรูปตัวอย่างห้องพัก"', 'success');
+      } catch (err) {
+        console.error('Compress room photo error:', err);
+        toast('ไม่สามารถอ่านไฟล์รูปภาพนี้ได้ กรุณาเลือกไฟล์ JPG/PNG', 'error');
+      }
+    };
+  });
+
+  document.querySelectorAll('.input-room-photo-url').forEach(urlInput => {
+    urlInput.oninput = () => {
+      const key = urlInput.getAttribute('data-bkey');
+      const val = urlInput.value.trim();
+      const valEl = document.getElementById(`val-room-photo-${key}`);
+      const previewEl = document.getElementById(`preview-room-photo-${key}`);
+      if (val) {
+        if (valEl) valEl.value = val;
+        if (previewEl) previewEl.src = val;
+      }
+    };
+  });
+
+  document.querySelectorAll('.btn-reset-room-photo').forEach(btn => {
+    btn.onclick = () => {
+      const key = btn.getAttribute('data-bkey');
+      const defSrc = DEFAULT_ROOM_SAMPLE_PHOTOS[key];
+      const valEl = document.getElementById(`val-room-photo-${key}`);
+      const previewEl = document.getElementById(`preview-room-photo-${key}`);
+      const urlEl = document.getElementById(`url-room-photo-${key}`);
+      if (valEl) valEl.value = defSrc;
+      if (previewEl) previewEl.src = defSrc;
+      if (urlEl) urlEl.value = defSrc;
+      toast('คืนค่ารูปภาพเริ่มต้นแล้ว (กดบันทึกเพื่อยืนยัน)', 'info');
+    };
+  });
+
+  document.querySelectorAll('.btn-zoom-room-photo').forEach(box => {
+    box.onclick = () => {
+      const key = box.getAttribute('data-bkey');
+      const previewEl = document.getElementById(`preview-room-photo-${key}`);
+      if (previewEl && previewEl.src) {
+        const titles = {
+          Tanakrit: 'รูปตัวอย่างห้องพัก — อาคาร ธนกฤษฎ์',
+          KingPhetch: 'รูปตัวอย่างห้องพัก — อาคาร กิ่งเพชร',
+          UnderGround: 'รูปตัวอย่างห้องพัก — อาคารใต้บ้าน'
+        };
+        showImageModal(previewEl.src, titles[key] || 'รูปตัวอย่างห้องพัก');
+      }
+    };
+  });
+
+  const roomPhotosForm = document.getElementById('form-room-photos-settings');
+  if (roomPhotosForm) {
+    roomPhotosForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('btn-save-room-photos');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>กำลังบันทึกรูปภาพ...</span>';
+      }
+
+      const payload = {
+        Tanakrit: (document.getElementById('val-room-photo-Tanakrit')?.value || '').trim() || DEFAULT_ROOM_SAMPLE_PHOTOS.Tanakrit,
+        KingPhetch: (document.getElementById('val-room-photo-KingPhetch')?.value || '').trim() || DEFAULT_ROOM_SAMPLE_PHOTOS.KingPhetch,
+        UnderGround: (document.getElementById('val-room-photo-UnderGround')?.value || '').trim() || DEFAULT_ROOM_SAMPLE_PHOTOS.UnderGround
+      };
+
+      try {
+        const { error } = await saveRoomSamplePhotos(payload);
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการบันทึกรูปขึ้น Supabase: ' + (error.message || ''), 'error');
+          return;
+        }
+        toast('บันทึกรูปตัวอย่างห้องพักทั้ง 3 อาคารเรียบร้อยแล้ว (อัปเดตบนหน้าแรกทันที)', 'success');
+      } catch (err) {
+        console.error('Save room photos error:', err);
+        toast('เกิดข้อผิดพลาดในการบันทึกรูปตัวอย่างห้องพัก', 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `${ic('check')}<span>บันทึกรูปตัวอย่างห้องพัก</span>`;
+        }
+      }
     };
   }
 }

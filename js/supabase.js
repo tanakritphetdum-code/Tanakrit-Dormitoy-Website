@@ -5,6 +5,21 @@
 export const SUPABASE_URL = 'https://ewvqgccmyxpwnhjzagye.supabase.co';
 export const SUPABASE_ANON_KEY = 'sb_publishable_QOYngsbMMfzYdDvHA34yyQ_BD1RMnjW';
 const SETTINGS_CACHE_KEY = 'tanakrit_settings_cache';
+const ROOM_PHOTOS_CACHE_KEY = 'tanakrit_room_photos_cache';
+
+export const DEFAULT_ROOM_SAMPLE_PHOTOS = {
+  Tanakrit: './images/room-tanakrit.jpg',
+  KingPhetch: './images/room-kingphetch.jpg',
+  UnderGround: './images/room-underground.jpg'
+};
+
+let cachedRoomPhotos = (() => {
+  try {
+    const saved = localStorage.getItem(ROOM_PHOTOS_CACHE_KEY);
+    if (saved) return { ...DEFAULT_ROOM_SAMPLE_PHOTOS, ...JSON.parse(saved) };
+  } catch (_) {}
+  return { ...DEFAULT_ROOM_SAMPLE_PHOTOS };
+})();
 
 // การตั้งค่าเริ่มต้นสำรอง
 let cachedSettings = {
@@ -173,13 +188,73 @@ export async function savePromptPayDetails(number, name) {
   return res;
 }
 
+// ดึงรูปตัวอย่างห้องพักทั้ง 3 อาคาร (สำหรับหน้าแรก ดูรูปตัวอย่างห้องพัก)
+export function getRoomSamplePhotos() {
+  return { ...DEFAULT_ROOM_SAMPLE_PHOTOS, ...cachedRoomPhotos };
+}
+
+// บันทึกรูปตัวอย่างห้องพักทั้ง 3 อาคารขึ้น Supabase Cloud (settings row id='room_photos')
+export async function saveRoomSamplePhotos(photosObj) {
+  const nextPhotos = {
+    Tanakrit: (photosObj && photosObj.Tanakrit) ? String(photosObj.Tanakrit).trim() : DEFAULT_ROOM_SAMPLE_PHOTOS.Tanakrit,
+    KingPhetch: (photosObj && photosObj.KingPhetch) ? String(photosObj.KingPhetch).trim() : DEFAULT_ROOM_SAMPLE_PHOTOS.KingPhetch,
+    UnderGround: (photosObj && photosObj.UnderGround) ? String(photosObj.UnderGround).trim() : DEFAULT_ROOM_SAMPLE_PHOTOS.UnderGround
+  };
+
+  cachedRoomPhotos = nextPhotos;
+  try {
+    localStorage.setItem(ROOM_PHOTOS_CACHE_KEY, JSON.stringify(nextPhotos));
+  } catch (_) {}
+
+  const payload = {
+    dorm_name: 'room_photos',
+    address: JSON.stringify(nextPhotos)
+  };
+
+  // Check if room_photos row already exists
+  const { data: existing } = await supabase.from('settings').select('id').eq('id', 'room_photos');
+  if (existing && existing.length > 0) {
+    return await supabase.from('settings').eq('id', 'room_photos').update(payload);
+  }
+  return await supabase.from('settings').insert([{ id: 'room_photos', ...payload }]);
+}
+
 // ผูกฟังก์ชันระดับ Window
 if (typeof window !== 'undefined') {
   window.applySettingsToLandingPage = applySettingsToLandingPage;
   window.getCurrentSettings = () => cachedSettings;
   window.getPromptPayDetails = getPromptPayDetails;
   window.savePromptPayDetails = savePromptPayDetails;
+  window.getRoomSamplePhotos = getRoomSamplePhotos;
+  window.saveRoomSamplePhotos = saveRoomSamplePhotos;
   applySettingsToLandingPage(cachedSettings);
+}
+
+// ฟังก์ชันซิงค์การตั้งค่ารูปตัวอย่างห้องพักจาก Supabase Cloud
+export async function syncRoomPhotosFromCloud() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/settings?select=*&id=eq.room_photos`, {
+      method: 'GET',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows && rows.length > 0 && rows[0].address) {
+        try {
+          const parsed = JSON.parse(rows[0].address);
+          if (parsed && typeof parsed === 'object') {
+            cachedRoomPhotos = { ...DEFAULT_ROOM_SAMPLE_PHOTOS, ...parsed };
+            localStorage.setItem(ROOM_PHOTOS_CACHE_KEY, JSON.stringify(cachedRoomPhotos));
+          }
+        } catch (_) {}
+      }
+    }
+  } catch (err) {
+    console.warn('Background sync room photos warning:', err);
+  }
 }
 
 // ฟังก์ชันซิงค์การตั้งค่าจาก Supabase Cloud แบบ Background
@@ -207,8 +282,9 @@ async function syncSettingsFromCloud() {
   }
 }
 
-// เริ่มซิงค์ Settings ทันทีเมื่อสคริปต์โหลด
+// เริ่มซิงค์ Settings และรูปตัวอย่างห้องพักทันทีเมื่อสคริปต์โหลด
 syncSettingsFromCloud();
+syncRoomPhotosFromCloud();
 
 // คลาส QueryBuilder สำหรับเชื่อมต่อตารางใน Supabase
 class QueryBuilder {

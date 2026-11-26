@@ -1,7 +1,7 @@
 // js/rooms.js
 // ระบบผังห้องพักและสถานะห้องพัก 3 อาคาร (Tanakrit, KingPhetch, UnderGround)
 // ออกแบบด้วย Smoky Frosted Glass Design System
-import { supabase } from './supabase.js';
+import { supabase, getRoomSamplePhotos } from './supabase.js';
 import { ic, fmtCurrency, showModal, closeModal, toast } from './api.js';
 
 let currentBuildingFilter = 'all';
@@ -982,6 +982,8 @@ export function openRoomPreviewModal(buildingKey = 'Tanakrit') {
 
   const renderModal = () => {
     const b = ROOM_BUILDING_SHOWCASE[activeIndex];
+    const customPhotos = getRoomSamplePhotos();
+    const imgSrc = (customPhotos && customPhotos[b.key]) ? customPhotos[b.key] : b.image;
     const tabsHtml = ROOM_BUILDING_SHOWCASE.map((item, idx) => `
       <button type="button" class="rp-tab ${idx === activeIndex ? 'active' : ''}" data-rp-idx="${idx}">
         ${item.tabLabel}
@@ -993,7 +995,7 @@ export function openRoomPreviewModal(buildingKey = 'Tanakrit') {
         <div class="rp-tabs">${tabsHtml}</div>
 
         <div class="rp-stage">
-          <img src="${b.image}" alt="รูปตัวอย่างห้องพัก ${b.title}" class="rp-stage-img">
+          <img src="${imgSrc}" alt="รูปตัวอย่างห้องพัก ${b.title}" class="rp-stage-img" onerror="this.onerror=null; this.src='${b.image}';">
           <span class="rp-stage-badge">${b.badge}</span>
           <span class="rp-stage-price">${b.price}</span>
           <button type="button" class="rp-nav-btn rp-nav-prev" id="rp-btn-prev" title="อาคารก่อนหน้า">‹</button>

@@ -4626,6 +4626,29 @@ body:not(.theme-light) #app-modal-backdrop .upload-dropzone #btn-remove-pk-photo
   background: #F8FAFC !important;
 }
 
+/* Room Sample Photos Settings Card - Light Mode Support */
+.theme-light .room-photo-setting-box {
+  background: rgba(241, 245, 249, 0.85) !important;
+  border: 1px solid rgba(203, 213, 225, 0.85) !important;
+}
+.theme-light .room-photo-setting-box div[style*="color: #ffffff"],
+.theme-light .room-photo-setting-box div[style*="color:#ffffff"] {
+  color: #0F172A !important;
+}
+.theme-light .room-photo-setting-box div[style*="color: rgba(255,255,255,0.45)"] {
+  color: #64748B !important;
+}
+.theme-light .room-photo-setting-box .btn-upload-room-photo {
+  background: rgba(37, 99, 235, 0.12) !important;
+  border-color: rgba(37, 99, 235, 0.35) !important;
+  color: #1D4ED8 !important;
+}
+.theme-light .room-photo-setting-box .btn-reset-room-photo {
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #475569 !important;
+}
+
 
 
 

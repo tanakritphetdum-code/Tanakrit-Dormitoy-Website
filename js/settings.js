@@ -1,12 +1,14 @@
 // js/settings.js
 // ตั้งค่าระบบและบัญชีผู้ใช้งาน (System Settings)
 // ออกแบบด้วย Smoky Frosted Glass Design System
-import { supabase, getPromptPayDetails } from './supabase.js';
-import { ic, toast } from './api.js';
+import { supabase, getPromptPayDetails, getRoomSamplePhotos, saveRoomSamplePhotos, DEFAULT_ROOM_SAMPLE_PHOTOS, syncRoomPhotosFromCloud } from './supabase.js';
+import { ic, toast, compressImage, showImageModal } from './api.js';
 import { currentUser } from './auth.js';
 
 export async function renderSettingsView() {
   const s = await supabase.getSettings();
+  await syncRoomPhotosFromCloud();
+  const roomPhotos = getRoomSamplePhotos();
   const pp = getPromptPayDetails();
   const isAdmin = currentUser && currentUser.role === 'admin';
 
@@ -138,6 +140,73 @@ export async function renderSettingsView() {
             <button type="submit" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); font-size: 0.82rem; font-weight: 600;">
               ${ic('check')}
               <span>บันทึกการตั้งค่าหอพัก</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- 3.5 Room Sample Photos Settings Card (ตั้งค่ารูปตัวอย่างห้องพักหน้าแรก) -->
+        <div class="smoky-card" id="card-room-sample-photos">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                <div style="color: #60A5FA;">${ic('image')}</div>
+                <h3 style="font-size: 1.10rem; font-weight: 700; color: #ffffff; margin: 0;">ตั้งค่ารูปตัวอย่างห้องพัก (หน้าแรก · ดูรูปตัวอย่างห้องพัก)</h3>
+              </div>
+              <p style="color: rgba(255,255,255,0.48); font-size: 0.80rem; margin: 0;">
+                อัปโหลดรูปภาพใหม่หรือระบุลิงก์รูปภาพของห้องพักทั้ง 3 อาคาร ระบบจะนำไปแสดงในหน้าต่าง "ดูรูปตัวอย่าง" บนหน้าแรกเว็บไซต์ทันที
+              </p>
+            </div>
+            <button type="button" id="btn-preview-landing-gallery" class="smoky-round-glass-btn" style="width: auto; height: 34px; padding: 0 14px; border-radius: 9999px; font-size: 0.78rem; gap: 6px; color: #60A5FA; border-color: rgba(59,130,246,0.35); background: rgba(59,130,246,0.10);" onclick="window.openRoomPreviewModal && window.openRoomPreviewModal('Tanakrit')">
+              ${ic('eye')}
+              <span>ดูตัวอย่างหน้าแรก</span>
+            </button>
+          </div>
+
+          <form id="form-room-photos-settings">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 18px;">
+              ${[
+                { key: 'Tanakrit', label: '🏢 อาคาร ธนกฤษฎ์ (1,500 ฿)', sub: 'ห้อง 101 – 109 (พัดลม 28 ตร.ม.)' },
+                { key: 'KingPhetch', label: '🏡 อาคาร กิ่งเพชร (1,500 ฿)', sub: 'ห้อง 201 – 205 (พัดลม 28 ตร.ม.)' },
+                { key: 'UnderGround', label: '🛋️ อาคารใต้บ้าน (800 ฿)', sub: 'ห้อง B01 – B03 (พัดลม 12 ตร.ม.)' }
+              ].map(b => {
+                const currentSrc = roomPhotos[b.key] || DEFAULT_ROOM_SAMPLE_PHOTOS[b.key];
+                const safeDisplayVal = currentSrc.startsWith('data:') ? '' : currentSrc;
+                return `
+                  <div class="room-photo-setting-box" style="padding: 14px; border-radius: 14px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; gap: 10px;">
+                    <div>
+                      <div style="font-size: 0.88rem; font-weight: 700; color: #ffffff;">${b.label}</div>
+                      <div style="font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px;">${b.sub}</div>
+                    </div>
+
+                    <div style="position: relative; width: 100%; height: 150px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.25); cursor: zoom-in;" class="btn-zoom-room-photo" data-bkey="${b.key}" title="คลิกเพื่อดูรูปขนาดใหญ่">
+                      <img id="preview-room-photo-${b.key}" src="${currentSrc}" alt="${b.label}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='${DEFAULT_ROOM_SAMPLE_PHOTOS[b.key]}';">
+                      <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.65); color: #fff; font-size: 0.68rem; padding: 3px 8px; border-radius: 9999px; backdrop-filter: blur(6px);">คลิกขยาย</span>
+                    </div>
+
+                    <input type="file" id="file-room-photo-${b.key}" class="input-room-photo-file" data-bkey="${b.key}" accept="image/*" style="display: none;">
+                    <input type="hidden" id="val-room-photo-${b.key}" value="${currentSrc}">
+
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                      <button type="button" class="smoky-round-glass-btn btn-upload-room-photo" data-bkey="${b.key}" style="flex: 1; height: 32px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; gap: 5px; background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.35); color: #60A5FA;">
+                        ${ic('image')}
+                        <span>อัปโหลดรูปใหม่</span>
+                      </button>
+                      <button type="button" class="smoky-round-glass-btn btn-reset-room-photo" data-bkey="${b.key}" style="width: auto; padding: 0 10px; height: 32px; border-radius: 8px; font-size: 0.72rem; color: rgba(255,255,255,0.65);" title="กลับไปใช้รูปเริ่มต้น">
+                        ใช้รูปเดิม
+                      </button>
+                    </div>
+
+                    <div class="field" style="margin: 0;">
+                      <input type="text" id="url-room-photo-${b.key}" class="smoky-glass-input input-room-photo-url" data-bkey="${b.key}" value="${safeDisplayVal}" placeholder="${currentSrc.startsWith('data:') ? 'อัปโหลดรูปภาพแล้ว (Base64)' : 'หรือวาง URL รูปภาพ...'}" style="width: 100%; font-size: 0.74rem; padding: 6px 10px;">
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <button type="submit" id="btn-save-room-photos" class="smoky-round-glass-btn" style="width: auto; border-radius: 9999px; padding: 0 20px; height: 38px; background: #3B82F6; color: #ffffff; border: 1px solid rgba(59,130,246,0.5); font-size: 0.82rem; font-weight: 600;">
+              ${ic('check')}
+              <span>บันทึกรูปตัวอย่างห้องพัก</span>
             </button>
           </form>
         </div>
@@ -282,6 +351,117 @@ function bindSettingsEvents() {
   if (btnReset) {
     btnReset.onclick = () => {
       toast('ระบบเชื่อมต่อฐานข้อมูล Supabase Cloud สถานะพร้อมใช้งาน 100%', 'success');
+    };
+  }
+
+  // Room Sample Photos Settings Events
+  document.querySelectorAll('.btn-upload-room-photo').forEach(btn => {
+    btn.onclick = () => {
+      const key = btn.getAttribute('data-bkey');
+      const fileInput = document.getElementById(`file-room-photo-${key}`);
+      if (fileInput) fileInput.click();
+    };
+  });
+
+  document.querySelectorAll('.input-room-photo-file').forEach(input => {
+    input.onchange = async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const key = input.getAttribute('data-bkey');
+      try {
+        toast('กำลังบีบอัดและเตรียมรูปภาพ...', 'info');
+        const compressed = await compressImage(file, 1100, 0.82);
+        const valEl = document.getElementById(`val-room-photo-${key}`);
+        const previewEl = document.getElementById(`preview-room-photo-${key}`);
+        const urlEl = document.getElementById(`url-room-photo-${key}`);
+        if (valEl) valEl.value = compressed;
+        if (previewEl) previewEl.src = compressed;
+        if (urlEl) {
+          urlEl.value = '';
+          urlEl.placeholder = 'อัปโหลดรูปภาพใหม่แล้ว (พร้อมบันทึก)';
+        }
+        toast('อัปโหลดรูปภาพตัวอย่างพร้อมแล้ว กรุณากด "บันทึกรูปตัวอย่างห้องพัก"', 'success');
+      } catch (err) {
+        console.error('Compress room photo error:', err);
+        toast('ไม่สามารถอ่านไฟล์รูปภาพนี้ได้ กรุณาเลือกไฟล์ JPG/PNG', 'error');
+      }
+    };
+  });
+
+  document.querySelectorAll('.input-room-photo-url').forEach(urlInput => {
+    urlInput.oninput = () => {
+      const key = urlInput.getAttribute('data-bkey');
+      const val = urlInput.value.trim();
+      const valEl = document.getElementById(`val-room-photo-${key}`);
+      const previewEl = document.getElementById(`preview-room-photo-${key}`);
+      if (val) {
+        if (valEl) valEl.value = val;
+        if (previewEl) previewEl.src = val;
+      }
+    };
+  });
+
+  document.querySelectorAll('.btn-reset-room-photo').forEach(btn => {
+    btn.onclick = () => {
+      const key = btn.getAttribute('data-bkey');
+      const defSrc = DEFAULT_ROOM_SAMPLE_PHOTOS[key];
+      const valEl = document.getElementById(`val-room-photo-${key}`);
+      const previewEl = document.getElementById(`preview-room-photo-${key}`);
+      const urlEl = document.getElementById(`url-room-photo-${key}`);
+      if (valEl) valEl.value = defSrc;
+      if (previewEl) previewEl.src = defSrc;
+      if (urlEl) urlEl.value = defSrc;
+      toast('คืนค่ารูปภาพเริ่มต้นแล้ว (กดบันทึกเพื่อยืนยัน)', 'info');
+    };
+  });
+
+  document.querySelectorAll('.btn-zoom-room-photo').forEach(box => {
+    box.onclick = () => {
+      const key = box.getAttribute('data-bkey');
+      const previewEl = document.getElementById(`preview-room-photo-${key}`);
+      if (previewEl && previewEl.src) {
+        const titles = {
+          Tanakrit: 'รูปตัวอย่างห้องพัก — อาคาร ธนกฤษฎ์',
+          KingPhetch: 'รูปตัวอย่างห้องพัก — อาคาร กิ่งเพชร',
+          UnderGround: 'รูปตัวอย่างห้องพัก — อาคารใต้บ้าน'
+        };
+        showImageModal(previewEl.src, titles[key] || 'รูปตัวอย่างห้องพัก');
+      }
+    };
+  });
+
+  const roomPhotosForm = document.getElementById('form-room-photos-settings');
+  if (roomPhotosForm) {
+    roomPhotosForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('btn-save-room-photos');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>กำลังบันทึกรูปภาพ...</span>';
+      }
+
+      const payload = {
+        Tanakrit: (document.getElementById('val-room-photo-Tanakrit')?.value || '').trim() || DEFAULT_ROOM_SAMPLE_PHOTOS.Tanakrit,
+        KingPhetch: (document.getElementById('val-room-photo-KingPhetch')?.value || '').trim() || DEFAULT_ROOM_SAMPLE_PHOTOS.KingPhetch,
+        UnderGround: (document.getElementById('val-room-photo-UnderGround')?.value || '').trim() || DEFAULT_ROOM_SAMPLE_PHOTOS.UnderGround
+      };
+
+      try {
+        const { error } = await saveRoomSamplePhotos(payload);
+        if (error) {
+          toast('เกิดข้อผิดพลาดในการบันทึกรูปขึ้น Supabase: ' + (error.message || ''), 'error');
+          return;
+        }
+        toast('บันทึกรูปตัวอย่างห้องพักทั้ง 3 อาคารเรียบร้อยแล้ว (อัปเดตบนหน้าแรกทันที)', 'success');
+      } catch (err) {
+        console.error('Save room photos error:', err);
+        toast('เกิดข้อผิดพลาดในการบันทึกรูปตัวอย่างห้องพัก', 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `${ic('check')}<span>บันทึกรูปตัวอย่างห้องพัก</span>`;
+        }
+      }
     };
   }
 }
